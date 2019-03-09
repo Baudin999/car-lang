@@ -17,11 +17,12 @@
     "pretty": true,
     "module": "commonjs",
     "target": "es6",
-    "jsx": "react"
+    "outDir": "dist/"
   },
+  "files": ["./src/transpiler.ts"],
   "formatCodeOptions": {
     "indentSize": 2,
     "tabSize": 2
   },
-  "exclude": ["node_modules/*"]
+  "exclude": ["node_modules/*", "dist/*"]
 }

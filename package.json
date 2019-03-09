@@ -2,19 +2,21 @@
   "name": "car-lang",
   "version": "0.0.1",
   "description": "The language to rule dragons",
-  "main": "index.js",
+  "main": "dist/transpiler.js",
   "repository": "https://github.com/Baudin999/car-lang.git",
   "author": "Carlos Kelkboom <ckelkboom@protonmail.com>",
   "license": "MIT",
   "private": false,
   "scripts": {
-    "test": "jest --watch"
+    "test": "jest --watch",
+    "build": "tsc --project ./"
   },
   "dependencies": {
     "@types/jest": "^24.0.11",
     "@types/lodash": "^4.14.122",
     "@types/ramda": "^0.26.1",
     "chevrotain": "^4.2.0",
+    "commander": "^2.19.0",
     "jest": "^24.3.1",
     "lodash": "^4.17.11",
     "ramda": "^0.26.1",

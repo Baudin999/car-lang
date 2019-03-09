@@ -1,5 +1,5 @@
 import { parser } from "./parser";
-import { purge } from "./helpers";
+import { purge, getStartToken, ITokenStart } from "./helpers";
 
 const BaseCstVisitorWithDefaults: any = parser.getBaseCstVisitorConstructorWithDefaults();
 
@@ -121,15 +121,19 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
     if (ctx.GenericIdentifier) {
       return {
         id: ctx.GenericIdentifier[0].image,
-        params: ctx.GenericParameter.map(g => g.image)
+        params: ctx.GenericParameter.map(g => g.image),
+        id_start: getStartToken(ctx.GenericIdentifier[0]),
+        params_start: ctx.GenericParameter.map(getStartToken)
       };
     } else if (ctx.FieldName) {
       return {
-        id: ctx.FieldName[0].image
+        id: ctx.FieldName[0].image,
+        id_start: getStartToken(ctx.FieldName[0])
       };
     } else {
       return {
-        id: ctx.Identifier[0].image
+        id: ctx.Identifier[0].image,
+        id_start: getStartToken(ctx.Identifier[0])
       };
     }
   }
@@ -278,7 +282,9 @@ export interface IAnnotation {
 
 export interface IIdentity {
   id: string;
+  id_start: ITokenStart;
   params?: string[];
+  params_start?: ITokenStart[];
 }
 
 export interface IMarkdownChapter {
