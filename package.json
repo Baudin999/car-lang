@@ -9,7 +9,8 @@
   "private": false,
   "scripts": {
     "test": "jest --watch",
-    "build": "tsc --project ./"
+    "build": "tsc --project ./",
+    "railroad": "ts-node ./src/railroad.ts"
   },
   "dependencies": {
     "@types/jest": "^24.0.11",
@@ -21,6 +22,10 @@
     "lodash": "^4.17.11",
     "ramda": "^0.26.1",
     "ts-jest": "^24.0.0",
+    "tslib": "^1.9.3",
     "typescript": "^3.3.3333"
+  },
+  "devDependencies": {
+    "ts-node": "^8.0.3"
   }
 }

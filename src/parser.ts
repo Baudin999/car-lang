@@ -11,6 +11,16 @@ class DomainParser extends Parser {
   ALIAS_FOR: any;
   DATA: any;
   DATA_OPTION: any;
+  RESTRICTION: any;
+  ASSIGNMENT: any;
+  PARAMETERS: any;
+  STATEMENT: any;
+  BINARY_EXPRESSION: any;
+  VALUE_EXPRESSION: any;
+  FUNCTION_APPLICATION: any;
+
+  IDENTIFIER: any;
+  TYPE_IDENTIFIER: any;
 
   ROOT_ANNOTATIONS: any;
   ANNOTATIONS: any;
@@ -40,6 +50,7 @@ class DomainParser extends Parser {
         { ALT: () => $.SUBRULE($.TYPE) },
         { ALT: () => $.SUBRULE($.ALIAS) },
         { ALT: () => $.SUBRULE($.DATA) },
+        { ALT: () => $.SUBRULE($.ASSIGNMENT) },
         { ALT: () => $.SUBRULE($.MARKDOWN_CHAPTER) },
         { ALT: () => $.SUBRULE($.MARKDOWN_PARAGRAPH) },
         { ALT: () => $.SUBRULE($.MARKDOWN_IMAGE) },
@@ -51,22 +62,16 @@ class DomainParser extends Parser {
 
     $.RULE("TYPE", () => {
       $.CONSUME(tokenLookup.KW_Type);
-      $.OR([
-        { ALT: () => $.CONSUME(tokenLookup.Identifier) },
-        {
-          ALT: () => {
-            $.CONSUME(tokenLookup.GenericIdentifier);
-            $.MANY(() => {
-              $.CONSUME1(tokenLookup.GenericParameter);
-            });
-          }
-        }
-      ]);
-      $.MANY1(() => $.CONSUME(tokenLookup.GenericParameter));
+      $.SUBRULE($.IDENTIFIER);
 
-      $.OPTION2(() => {
+      $.OPTION(() => {
+        $.CONSUME(tokenLookup.KW_extends);
+        $.AT_LEAST_ONE1(() => $.CONSUME1(tokenLookup.Identifier));
+      });
+
+      $.OPTION1(() => {
         $.CONSUME(tokenLookup.SIGN_EqualsType);
-        $.AT_LEAST_ONE({
+        $.AT_LEAST_ONE2({
           DEF: () => $.SUBRULE($.TYPE_FIELD)
         });
       });
@@ -75,62 +80,29 @@ class DomainParser extends Parser {
     $.RULE("TYPE_FIELD", () => {
       $.SUBRULE($.ANNOTATIONS);
       $.CONSUME(tokenLookup.Indent);
-      $.CONSUME(tokenLookup.FieldName);
+      $.SUBRULE($.IDENTIFIER);
       $.CONSUME(tokenLookup.SIGN_TypeDefStart);
-
-      $.OR([
-        { ALT: () => $.CONSUME(tokenLookup.GenericParameter) },
-        {
-          ALT: () => {
-            $.CONSUME(tokenLookup.GenericIdentifier);
-            $.MANY(() => {
-              $.CONSUME1(tokenLookup.GenericParameter);
-            });
-          }
-        },
-        {
-          ALT: () => {
-            $.AT_LEAST_ONE(() => {
-              $.OR1([
-                { ALT: () => $.CONSUME(tokenLookup.Identifier) },
-                { ALT: () => $.CONSUME(tokenLookup.ConcreteIdentifier) },
-                { ALT: () => $.CONSUME(tokenLookup.StringLiteral) },
-                { ALT: () => $.CONSUME(tokenLookup.NumberLiteral) },
-                { ALT: () => $.CONSUME(tokenLookup.PatternLiteral) }
-              ]);
-            });
-          }
-        }
-      ]);
+      $.SUBRULE($.TYPE_IDENTIFIER);
+      $.MANY({
+        GATE: this.isRestriction as any,
+        DEF: () => $.SUBRULE($.RESTRICTION)
+      });
     });
 
     $.RULE("ALIAS", () => {
-      $.CONSUME(tokenLookup.KW_Alias);
-      $.CONSUME(tokenLookup.Identifier);
+      $.CONSUME(tokenLookup.KW_alias);
+      $.SUBRULE($.IDENTIFIER);
       $.CONSUME(tokenLookup.SIGN_EqualsAlias);
-      $.SUBRULE($.ALIAS_FOR);
-    });
-
-    $.RULE("ALIAS_FOR", () => {
-      $.AT_LEAST_ONE(() => {
-        $.OR([
-          { ALT: () => $.CONSUME(tokenLookup.Identifier) },
-          { ALT: () => $.CONSUME(tokenLookup.ConcreteIdentifier) },
-          { ALT: () => $.CONSUME(tokenLookup.StringLiteral) },
-          { ALT: () => $.CONSUME(tokenLookup.NumberLiteral) },
-          { ALT: () => $.CONSUME(tokenLookup.PatternLiteral) }
-        ]);
+      $.SUBRULE($.TYPE_IDENTIFIER);
+      $.MANY({
+        GATE: this.isRestriction as any,
+        DEF: () => $.SUBRULE($.RESTRICTION)
       });
     });
 
     $.RULE("DATA", () => {
       $.CONSUME(tokenLookup.KW_data);
-      $.OR([
-        { ALT: () => $.CONSUME(tokenLookup.Identifier) },
-        { ALT: () => $.CONSUME(tokenLookup.GenericIdentifier) }
-      ]);
-
-      $.MANY(() => $.CONSUME(tokenLookup.GenericParameter));
+      $.SUBRULE($.IDENTIFIER);
       $.CONSUME(tokenLookup.SIGN_EqualsData);
       $.AT_LEAST_ONE(() => $.SUBRULE($.DATA_OPTION));
     });
@@ -139,23 +111,73 @@ class DomainParser extends Parser {
       $.SUBRULE($.ANNOTATIONS);
       $.CONSUME(tokenLookup.Indent);
       $.CONSUME(tokenLookup.SIGN_Or);
+      $.SUBRULE($.IDENTIFIER);
+    });
+
+    $.RULE("RESTRICTION", () => {
+      $.AT_LEAST_ONE(() => {
+        $.CONSUME(tokenLookup.Indent);
+      });
+      $.CONSUME(tokenLookup.SIGN_Restriction);
+      $.CONSUME(tokenLookup.RestrictionIdentifier);
       $.OR([
-        { ALT: () => $.CONSUME(tokenLookup.Identifier) },
+        { ALT: () => $.CONSUME(tokenLookup.NumberLiteral) },
+        { ALT: () => $.CONSUME(tokenLookup.StringLiteral) },
+        { ALT: () => $.CONSUME(tokenLookup.PatternLiteral) },
+        { ALT: () => $.CONSUME(tokenLookup.BooleanLiteral) }
+      ]);
+    });
+
+    $.RULE("TYPE_IDENTIFIER", () => {
+      $.OR([
+        { ALT: () => $.CONSUME(tokenLookup.GenericParameter) },
         {
           ALT: () => {
             $.CONSUME(tokenLookup.GenericIdentifier);
-            $.MANY(() => {
+            $.AT_LEAST_ONE(() => {
               $.CONSUME1(tokenLookup.GenericParameter);
             });
           }
         },
         {
           ALT: () => {
-            $.CONSUME(tokenLookup.ConcreteIdentifier);
-            $.MANY1(() => {
-              $.CONSUME1(tokenLookup.Identifier);
+            $.AT_LEAST_ONE1(() => {
+              $.CONSUME(tokenLookup.Identifier);
             });
           }
+        }
+      ]);
+    });
+
+    /**
+     * The is the type identifier. The Type identifier identifies the
+     * type whcih is expressed. For example:
+     *
+     * Integer
+     * Maybe String
+     *
+     * Are type identifiers
+     */
+    $.RULE("IDENTIFIER", () => {
+      $.OR([
+        {
+          ALT: () => {
+            $.CONSUME(tokenLookup.GenericIdentifier);
+            $.MANY({
+              GATE: this.isGenericParameter as any,
+              DEF: () => $.CONSUME1(tokenLookup.GenericParameter)
+            });
+          }
+        },
+        {
+          ALT: () => {
+            $.AT_LEAST_ONE1(() => {
+              $.CONSUME(tokenLookup.Identifier);
+            });
+          }
+        },
+        {
+          ALT: () => $.CONSUME(tokenLookup.FieldName)
         }
       ]);
     });
@@ -195,6 +217,41 @@ class DomainParser extends Parser {
       $.CONSUME(tokenLookup.MarkdownImageLiteral);
     });
 
+    /* WEAK ATTEMPT AT FUNCTIONS AND VARIABLES */
+    $.RULE("ASSIGNMENT", () => {
+      $.CONSUME(tokenLookup.KW_let);
+      $.CONSUME(tokenLookup.ValiableIdentifier);
+      $.SUBRULE($.PARAMETERS);
+      $.CONSUME(tokenLookup.SIGN_Equals);
+      $.SUBRULE($.STATEMENT);
+    });
+
+    $.RULE("PARAMETERS", () => {
+      $.MANY(() => $.CONSUME(tokenLookup.ValiableIdentifier));
+    });
+
+    $.RULE("STATEMENT", () => {
+      $.OR([
+        { ALT: () => $.SUBRULE($.BINARY_EXPRESSION) },
+        { ALT: () => $.SUBRULE($.VALUE_EXPRESSION) },
+        { ALT: () => $.CONSUME(tokenLookup.ValiableIdentifier) }
+      ]);
+    });
+
+    $.RULE("VALUE_EXPRESSION", () => {
+      $.OR([
+        { ALT: () => $.CONSUME(tokenLookup.NumberLiteral) },
+        { ALT: () => $.CONSUME(tokenLookup.StringLiteral) },
+        { ALT: () => $.CONSUME(tokenLookup.PatternLiteral) }
+      ]);
+    });
+
+    $.RULE("BINARY_EXPRESSION", () => {
+      $.CONSUME(tokenLookup.ValiableIdentifier);
+      $.CONSUME(tokenLookup.Operator);
+      $.SUBRULE($.STATEMENT);
+    });
+
     this.performSelfAnalysis();
   }
 
@@ -206,6 +263,23 @@ class DomainParser extends Parser {
       return t2 && t2.tokenType && t2.tokenType.tokenName === "Annotation";
     }
     return t1 && t1.tokenType && t1.tokenType.tokenName === "Annotation";
+  }
+
+  isRestriction(): boolean | undefined {
+    let t2 = this.LA(2) as IToken; // either Indent or SIGN_Restriction
+    let t3 = this.LA(3) as IToken; // if t2 is Indent this one should be SIGN_Restriction
+
+    const isOr = t => {
+      return t && t.tokenType && t.tokenType.tokenName === "SIGN_Restriction";
+    };
+
+    return isOr(t2) || isOr(t3);
+  }
+
+  isGenericParameter(): boolean | undefined {
+    let t1 = this.LA(1) as IToken;
+
+    return t1.image !== "extends";
   }
 }
 

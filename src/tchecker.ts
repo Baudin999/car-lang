@@ -1,24 +1,53 @@
-/**
- * This is the type checker. We're going to do "soft" type checking
- * because this tool will mostly be used to do some very soft designing
- * and should not be used in a "hard" environment.
- *
- * Eventually we'll want to do things like code generation, auto-completion
- * plucking of types and most of all show where a change will have impact,
- * so impact analysis and general "tree shaking".
- *
- * Severity can be:
- * 1: "Hint", 2: "Info", 4: "Warning", 8: "Error"
- *
- *
- * @param {AST} ast
- */
-export const typeChecker = (ast = []) => {
-  return ast
-    .filter((node: any) => node._type === "ALIAS")
-    .map((node: any) => ({
-      ...node.tokens.start,
-      severity: 4,
-      message: "Unused alias."
-    }));
+import { baseTypes, ITokenStart } from "./helpers";
+import { IExpression, IType, NodeType, ITypeField } from "./outline";
+
+const lookupTree = {};
+
+/*
+We will need a function with which we can grab a node
+from the ast by the id
+*/
+const getNodeById = (ast: IExpression[], params: string[] = [], id: string) => {
+  return (
+    params.indexOf(id) > -1 ||
+    baseTypes.find(t => t === id) ||
+    ast.find((node: any) => node.id && node.id === id)
+  );
 };
+
+export const typeChecker = (ast: IExpression[] = []): IError[] => {
+  let errors: IError[] = [];
+  ast
+    .filter(node => node.type === NodeType.TYPE)
+    .forEach((node: IType) => {
+      node.fields.forEach((field: ITypeField) => {
+        // the id of the field
+        let typeId = field.ofType;
+        let ref = getNodeById(ast, node.params, typeId);
+        if (!ref) {
+          errors.push({
+            message: `Cannot find type "${typeId}" of field "${field.id}" of type "${node.id}"`,
+            ...(field.ofType_start as ITokenStart)
+          });
+        }
+
+        // Now also check all the parameters if they exist
+        for (let i = 0; i < field.ofType_params.length; ++i) {
+          let paramId = field.ofType_params[i];
+          let paramRef = getNodeById(ast, node.params, paramId);
+          if (!paramRef) {
+            errors.push({
+              message: `Cannot find type "${paramId}" of field "${field.id}" of type "${node.id}"`,
+              ...(field.ofType_params_start[i] as ITokenStart)
+            });
+          }
+        }
+      });
+    });
+
+  return errors;
+};
+
+export interface IError {
+  message: string;
+}

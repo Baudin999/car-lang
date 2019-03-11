@@ -10,5 +10,5 @@ const serializedGrammar = parserInstance.getSerializedGastProductions();
 const htmlText = chevrotain.createSyntaxDiagramsCode(serializedGrammar);
 
 // Write the HTML file to disk
-const outPath = path.resolve(__dirname, "./../../");
+const outPath = path.resolve(__dirname, "./../");
 fs.writeFileSync(outPath + "/railroad.html", htmlText);

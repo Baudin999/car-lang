@@ -23,9 +23,9 @@ const KW_Type = createToken({
   push_mode: "type_definition"
 });
 
-const KW_Alias = createToken({
+const KW_alias = createToken({
   pattern: /alias/,
-  name: "KW_Alias",
+  name: "KW_alias",
   push_mode: "alias_definition"
 });
 
@@ -39,6 +39,21 @@ const KW_let = createToken({
   pattern: /let/,
   name: "KW_let",
   push_mode: "let_definition"
+});
+
+const KW_extends = createToken({
+  pattern: /extends/,
+  name: "KW_extends"
+});
+
+const KW_option = createToken({
+  pattern: /option/,
+  name: "KW_option"
+});
+
+const SIGN_Equals = createToken({
+  name: "SIGN_Equals",
+  pattern: /=/
 });
 
 const SIGN_EqualsType = createToken({
@@ -69,14 +84,29 @@ const SIGN_Or = createToken({
   pattern: /\|/
 });
 
+const SIGN_Restriction = createToken({
+  name: "SIGN_Restriction",
+  pattern: /\|/
+});
+
 const SIGN_TypeDefStart = createToken({
   name: "SIGN_TypeDefStart",
   pattern: /:/
 });
 
+const SIGN_dot = createToken({
+  name: "SIGN_dot",
+  pattern: /\./
+});
+
 const Identifier = createToken({
   name: "Identifier",
   pattern: /[A-Z][a-zA-Z0-9_]*/
+});
+
+const ValiableIdentifier = createToken({
+  name: "ValiableIdentifier",
+  pattern: /[a-z][a-zA-Z0-9_]*/
 });
 
 const RestrictionIdentifier = createToken({
@@ -87,11 +117,6 @@ const RestrictionIdentifier = createToken({
 const GenericIdentifier = createToken({
   name: "GenericIdentifier",
   pattern: /[A-Z][a-zA-Z0-9_]*(?= +[a-z])/
-});
-
-const ConcreteIdentifier = createToken({
-  name: "ConcreteIdentifier",
-  pattern: /[A-Z][a-zA-Z0-9_]*(?= +[A-Z])/
 });
 
 const GenericParameter = createToken({
@@ -111,7 +136,7 @@ const NewLine = createToken({
 });
 
 const Indent = createToken({
-  pattern: /( {2})\s*/,
+  pattern: /( {4})/,
   name: "Indent"
 });
 
@@ -134,6 +159,15 @@ const StringLiteral = createToken({
 const PatternLiteral = createToken({
   name: "PatternLiteral",
   pattern: /\/.+\//
+});
+const BooleanLiteral = createToken({
+  name: "BooleanLiteral",
+  pattern: /True|False/
+});
+
+const Operator = createToken({
+  name: "Operator",
+  pattern: /[\+\-\*%#\|\\\/&\^!\.><@]+/
 });
 
 /* MARKDOWN */
@@ -160,7 +194,19 @@ const MarkdownListLiteral = createToken({
 
 const MarkdownParagraphLiteral = createToken({
   name: "MarkdownParagraphLiteral",
-  pattern: /(?![ ]+\*).(.|\n\r?\w)*/
+  pattern: /(?=[ ]+\*).(.|\n\r?\w)*/
+});
+
+/* LET DEFINITION */
+
+const FunctionIdentifier = createToken({
+  name: "FunctionIdentifier",
+  pattern: /(?=let +)[a-z][a-zA-Z0-9_]*(?= +)/
+});
+
+const FunctionParameter = createToken({
+  name: "FunctionParameter",
+  pattern: /[a-z][a-zA-Z0-9_]*(?= +)/
 });
 
 /* SYSTEM TOKENS - END */
@@ -169,9 +215,9 @@ const multiModeLexerDefinition = {
   modes: {
     root: [
       KW_Type,
-      KW_Alias,
+      KW_alias,
       KW_data,
-      KW_let,
+      //KW_let,
       Annotation,
       EndBlock,
       CommentBlock,
@@ -182,6 +228,7 @@ const multiModeLexerDefinition = {
       MarkdownParagraphLiteral
     ],
     type_definition: [
+      KW_extends,
       SIGN_EqualsType,
       GenericParameter,
       GenericIdentifier,
@@ -196,9 +243,11 @@ const multiModeLexerDefinition = {
       Annotation,
       FieldName,
       SIGN_TypeDefStart,
+      SIGN_Restriction,
+      RestrictionIdentifier,
       GenericParameter,
       GenericIdentifier,
-      ConcreteIdentifier,
+      BooleanLiteral,
       StringLiteral,
       NumberLiteral,
       PatternLiteral,
@@ -209,10 +258,13 @@ const multiModeLexerDefinition = {
     ],
     alias_definition: [
       EndBlock,
-      SIGN_EqualsAlias,
       Indent,
-      ConcreteIdentifier,
+      Annotation,
+      SIGN_EqualsAlias,
+      SIGN_Restriction,
       GenericIdentifier,
+      RestrictionIdentifier,
+      BooleanLiteral,
       StringLiteral,
       NumberLiteral,
       PatternLiteral,
@@ -242,15 +294,24 @@ const multiModeLexerDefinition = {
       EndBlock,
       WhiteSpace,
       CommentBlock
-    ],
-    restriction_field_definition: [
-      SIGN_Or,
-      Annotation,
-      RestrictionIdentifier,
-      EndBlock,
-      CommentBlock
-    ],
-    let_definition: [StringLiteral, NumberLiteral, PatternLiteral]
+    ]
+    // restriction_field_definition: [
+    //   SIGN_Or,
+    //   Annotation,
+    //   RestrictionIdentifier,
+    //   EndBlock,
+    //   CommentBlock
+    // ],
+    // let_definition: [
+    //   ValiableIdentifier,
+    //   SIGN_Equals,
+    //   SIGN_dot,
+    //   StringLiteral,
+    //   Operator,
+    //   NumberLiteral,
+    //   PatternLiteral,
+    //   EndBlock
+    // ]
   },
 
   defaultMode: "root"
@@ -259,25 +320,33 @@ const multiModeLexerDefinition = {
 export const tokenLookup = {
   // keywords
   KW_Type,
-  KW_Alias,
+  KW_alias,
   KW_data,
+  KW_extends,
+  KW_let,
 
+  SIGN_Equals,
   SIGN_EqualsType,
   SIGN_EqualsData,
   SIGN_EqualsAlias,
   SIGN_EqualsOption,
   SIGN_Or,
+  SIGN_Restriction,
+  SIGN_dot,
+  Operator,
 
   Annotation,
   Identifier,
+  ValiableIdentifier,
   GenericIdentifier,
-  ConcreteIdentifier,
   GenericParameter,
+  RestrictionIdentifier,
   FieldName,
   SIGN_TypeDefStart,
 
   CommentBlock,
 
+  BooleanLiteral,
   StringLiteral,
   NumberLiteral,
   PatternLiteral,

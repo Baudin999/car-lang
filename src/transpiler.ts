@@ -1,72 +1,33 @@
-import { readFile } from "fs";
 import { DomainLexer } from "./lexer";
 import { parser } from "./parser";
 import { OutlineVisitor } from "./outline";
-import * as program from "commander";
+import { substituteExtensions, substituteAliases } from "./substitute";
+import { typeChecker } from "./tchecker";
 
-function id(val) {
-  return val;
-}
-
-program
-  .version("0.0.1", "-v, --version")
-  .option("-a", "Output the AST, default is true")
-  .option("-c", "Output the CST, default is false")
-  .option("-f, --file <s>", "The input file", id)
-  .option("-o, --out <s>", "The output file", id)
-  .parse(process.argv);
-
-readFile(program.file, "utf8", (err, sourceCode) => {
-  if (err) {
-    console.log(err);
-    process.exit(1);
-  }
-
-  const lexedSource = DomainLexer.tokenize(sourceCode);
+export const transpile = (source: string) => {
+  const lexedSource = DomainLexer.tokenize(source);
   parser.input = lexedSource.tokens;
   const cst = parser.START();
+
+  if (parser.errors && parser.errors.length > 0) {
+    console.log(parser.errors);
+  }
 
   const visitor = new OutlineVisitor();
   const ast = visitor.visit(cst);
 
-  console.log(JSON.stringify(ast, null, 4));
-  process.exit(0);
-});
+  let rwAlias = substituteAliases(ast);
+  let rwAliasAST = rwAlias.newAST;
+  let rwAliasErrors = rwAlias.errors;
 
-// export const transpile = (content: string, dir?: string) => {
-//   const tokenStream = DomainLexer.tokenize(content);
-//   parser.input = tokenStream.tokens;
-//   const cst = parser.START();
-//   const parserErrors = parser.errors.map(error => {
-//     console.log(JSON.stringify(error, null, 4));
-//     const bStart = getStartToken((error as any).previousToken);
-//     let eStart = getStartToken(error.token);
-//     eStart.startLineNumber = bStart.startLineNumber;
-//     eStart.startColumn = bStart.startColumn;
+  var { newAST, errors } = substituteExtensions(rwAliasAST);
 
-//     let message;
-//     if (error.token.image === "=") {
-//       message = `Encountered a "=" symbol, maybe try a ":"`;
-//     } else if (error.token.image === "\n\n") {
-//       message = `Block not finished exception:\nEncountered a couple of new lines, this means that this block has ended and a new block is beginning. Looks like this was not intentional. `;
-//     }
+  const checkASTs = typeChecker(newAST) || [];
 
-//     return {
-//       ...eStart,
-//       severity: 8,
-//       message: message || error.message || error.name
-//     };
-//   });
-
-//   const toOutlineVisitor = new OutlineVisitor();
-//   let result = toOutlineVisitor.visit(cst) || {};
-//   if (result.ast) {
-//     const errors = typeChecker(result.ast);
-//     result.errors = [...result.errors, ...errors, ...parserErrors];
-
-//     return result;
-//   } else {
-//     result.errors = parserErrors;
-//     return result;
-//   }
-// };
+  return {
+    tokens: lexedSource.tokens,
+    cst,
+    ast: newAST,
+    errors: [...rwAliasErrors, ...errors, ...checkASTs]
+  };
+};

@@ -11,13 +11,15 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
     this.validateVisitor();
   }
 
-  START(ctx: any) {
-    const expressions = ctx.EXPRESSION.map(expression => this.visit(expression));
+  START(ctx: any): IExpression[] {
+    const expressions = purge<IExpression>(
+      ctx.EXPRESSION.map(expression => this.visit(expression))
+    );
 
     return expressions;
   }
 
-  EXPRESSION(ctx: any): IType | IData | IAlias | IComment | null {
+  EXPRESSION(ctx: any): IExpression | null {
     const annotations = purge(ctx.ROOT_ANNOTATIONS.map(a => this.visit(a)));
     if (ctx.TYPE) {
       return {
@@ -57,23 +59,20 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
 
   TYPE(ctx: any): IType {
     return {
-      type: NodeType.TYPE_FIELD,
-      ...this.GetIdentity(ctx),
+      type: NodeType.TYPE,
+      ...this.visit(ctx.IDENTIFIER[0]),
+      extends: (ctx.Identifier || []).map(i => i.image),
+      extends_start: (ctx.Identifier || []).map(getStartToken),
       fields: ctx.SIGN_EqualsType ? ctx.TYPE_FIELD.map(f => this.visit(f)) : []
     };
   }
 
   TYPE_FIELD(ctx: any): ITypeField {
-    const items = purge<string>([
-      (ctx.GenericIdentifier || []).map(i => i.image),
-      (ctx.ConcreteIdentifier || []).map(i => i.image),
-      (ctx.Identifier || []).map(i => i.image),
-      (ctx.GenericParameter || []).map(i => i.image)
-    ]);
     return {
       type: NodeType.TYPE_FIELD,
-      ...this.GetIdentity(ctx),
-      ofType: items,
+      ...this.visit(ctx.IDENTIFIER[0]),
+      ...this.visit(ctx.TYPE_IDENTIFIER[0]),
+      restrictions: (ctx.RESTRICTION || []).map(r => this.visit(r)),
       annotations: purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
     };
   }
@@ -82,7 +81,7 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
     const options = ctx.DATA_OPTION.map(d => this.visit(d));
     return {
       type: NodeType.DATA,
-      ...this.GetIdentity(ctx),
+      ...this.visit(ctx.IDENTIFIER[0]),
       options
     };
   }
@@ -90,40 +89,26 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
   DATA_OPTION(ctx: any): IDataOption {
     return {
       type: NodeType.DATA_OPTION,
-      ...this.GetIdentity(ctx)
+      ...this.visit(ctx.IDENTIFIER[0])
     };
   }
 
   ALIAS(ctx: any): IAlias {
     return {
       type: NodeType.ALIAS,
-      ...this.GetIdentity(ctx),
-      ...this.visit(ctx.ALIAS_FOR[0])
+      ...this.visit(ctx.IDENTIFIER[0]),
+      ...this.visit(ctx.TYPE_IDENTIFIER[0]),
+      restrictions: (ctx.RESTRICTION || []).map(r => this.visit(r))
     };
   }
 
-  ALIAS_FOR(ctx: any): IAliasFor {
-    const items = purge([
-      (ctx.GenericIdentifier || []).map(i => i.image),
-      (ctx.ConcreteIdentifier || []).map(i => i.image),
-      (ctx.Identifier || []).map(i => i.image),
-      (ctx.GenericParameter || []).map(i => i.image),
-      (ctx.StringLiteral || []).map(i => i.image),
-      (ctx.NumberLiteral || []).map(i => i.image),
-      (ctx.PatternLiteral || []).map(i => i.image)
-    ]);
-    return {
-      ofType: items
-    };
-  }
-
-  GetIdentity(ctx: any): IIdentity {
+  IDENTIFIER(ctx: any): IIdentity {
     if (ctx.GenericIdentifier) {
       return {
         id: ctx.GenericIdentifier[0].image,
-        params: ctx.GenericParameter.map(g => g.image),
+        params: (ctx.GenericParameter || []).map(g => g.image),
         id_start: getStartToken(ctx.GenericIdentifier[0]),
-        params_start: ctx.GenericParameter.map(getStartToken)
+        params_start: (ctx.GenericParameter || []).map(getStartToken)
       };
     } else if (ctx.FieldName) {
       return {
@@ -137,6 +122,52 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
       };
     }
   }
+
+  TYPE_IDENTIFIER(ctx: any) {
+    if (ctx.GenericIdentifier) {
+      return {
+        ofType: ctx.GenericIdentifier[0].image,
+        ofType_params: (ctx.GenericParameter || []).map(g => g.image),
+        ofType_start: getStartToken(ctx.GenericIdentifier[0]),
+        ofType_params_start: (ctx.GenericParameter || []).map(getStartToken)
+      };
+    } else if (ctx.GenericParameter) {
+      return {
+        ofType: ctx.GenericParameter[0].image,
+        ofType_start: getStartToken(ctx.GenericParameter[0]),
+        ofType_params: [],
+        ofType_params_start: []
+      };
+    } else {
+      let [ofType, ...ofType_params] = ctx.Identifier.map(i => i.image);
+      let [ofType_start, ...ofType_params_start] = ctx.Identifier.map(getStartToken);
+      return {
+        ofType,
+        ofType_start,
+        ofType_params,
+        ofType_params_start
+      };
+    }
+  }
+
+  RESTRICTION(ctx): IRestriction {
+    return {
+      key: ctx.RestrictionIdentifier[0].image,
+      value: ctx.NumberLiteral
+        ? +ctx.NumberLiteral[0].image
+        : ctx.StringLiteral
+        ? ctx.StringLiteral[0].image
+        : ctx.PatternLiteral
+        ? ctx.PatternLiteral[0].image
+        : ctx.BooleanLiteral
+        ? ctx.BooleanLiteral[0].image === "True"
+        : false
+    };
+  }
+
+  // GetIdentity(ctx: any): IIdentity {
+
+  // }
 
   /* MARKDOWN */
 
@@ -236,6 +267,8 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
 export interface IType {
   type: NodeType;
   id: string;
+  extends: string[];
+  extends_start: ITokenStart[];
   params?: string[];
   fields: ITypeField[];
 }
@@ -243,8 +276,12 @@ export interface IType {
 export interface ITypeField {
   type: NodeType;
   id: string;
-  ofType: string[];
+  ofType: string;
+  ofType_start: ITokenStart;
+  ofType_params: string[];
+  ofType_params_start: ITokenStart[];
   annotations: IAnnotation[];
+  source?: string;
 }
 
 export interface IData {
@@ -263,6 +300,11 @@ export interface IDataOption {
 export interface IAlias {
   type: NodeType;
   id: string;
+  ofType: string;
+  ofType_start: ITokenStart;
+  ofType_params: string[];
+  ofType_params_start: ITokenStart[];
+  annotations: IAnnotation[];
 }
 
 export interface IComment {
@@ -285,6 +327,11 @@ export interface IIdentity {
   id_start: ITokenStart;
   params?: string[];
   params_start?: ITokenStart[];
+}
+
+export interface IRestriction {
+  key: string;
+  value: string | number | boolean;
 }
 
 export interface IMarkdownChapter {
@@ -316,7 +363,18 @@ export interface IMarkdownList {
   items: string[];
 }
 
-enum NodeType {
+export type IExpression =
+  | IType
+  | IAlias
+  | IData
+  | IComment
+  | IMarkdownChapter
+  | IMarkdownCode
+  | IMarkdownImage
+  | IMarkdownList
+  | IMarkdownParagraph;
+
+export enum NodeType {
   TYPE = "TYPE",
   TYPE_FIELD = "TYPE_FIELD",
   ANNOTATION = "ANNOTATION",
@@ -333,3 +391,10 @@ enum NodeType {
   MARKDOWN_CHAPTER = "MARKDOWN_CHAPTER",
   MARKDOWN_LIST = "MARKDOWN_LIST"
 }
+
+const defaultStart: ITokenStart = {
+  startLineNumber: 0,
+  endLineNumber: 0,
+  startColumn: 0,
+  endColumn: 0
+};
