@@ -1,5 +1,5 @@
 import { IType, NodeType, ITypeField, IExpression } from "../outline";
-import { baseTypes } from "../helpers";
+import { baseTypes, foldText } from "../helpers";
 import { ILookup } from "./createERD";
 
 export class PlantClass {
@@ -38,6 +38,10 @@ export class PlantClass {
       .join("\n");
   }
 
+  annotations() {
+    return this.node.annotations.map(a => foldText(`<b>${a.key}</b>: ${a.value}`));
+  }
+
   source() {
     return this.node.source ? `<${this.node.source}>` : "";
   }
@@ -46,6 +50,8 @@ export class PlantClass {
     return `
 class ${this.node.id}${this.source()} {
 ${this.fields()}
+---
+${this.annotations()}
 }
 ${this.associations()}
 ${this.extensions()}

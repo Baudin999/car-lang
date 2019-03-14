@@ -140,7 +140,7 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
   VIEW(ctx: any): IView {
     // Parse the Directives in the code.
     const pattern = /( *)(%)(.*)(:)(.*)(\n)/;
-    let directives: IDirective[] = ctx.DirectiveLiteral.map(d => {
+    let directives: IDirective[] = (ctx.DirectiveLiteral || []).map(d => {
       const segments = pattern.exec(d.image);
       if (segments) {
         return {
@@ -364,6 +364,7 @@ export interface IType {
   params?: string[];
   fields: (ITypeField | IPluckedField)[];
   source?: string;
+  annotations: IAnnotation[];
 }
 
 export interface ITypeField {

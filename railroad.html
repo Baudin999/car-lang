@@ -41,7 +41,7 @@
   {
     "type": "Rule",
     "name": "EXPRESSION",
-    "orgText": "() => {\n            $.SUBRULE($.ROOT_ANNOTATIONS);\n            $.OR([\n                { ALT: () => $.SUBRULE($.TYPE) },\n                { ALT: () => $.SUBRULE($.ALIAS) },\n                { ALT: () => $.SUBRULE($.DATA) },\n                { ALT: () => $.SUBRULE($.VIEW) },\n                { ALT: () => $.SUBRULE($.OPTION) },\n                { ALT: () => $.SUBRULE($.ASSIGNMENT) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_CHAPTER) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_PARAGRAPH) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_IMAGE) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_CODE) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_LIST) },\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.CommentBlock) }\n            ]);\n        }",
+    "orgText": "() => {\n            $.SUBRULE($.ROOT_ANNOTATIONS);\n            $.OR([\n                { ALT: () => $.SUBRULE($.TYPE) },\n                { ALT: () => $.SUBRULE($.ALIAS) },\n                { ALT: () => $.SUBRULE($.DATA) },\n                { ALT: () => $.SUBRULE($.VIEW) },\n                { ALT: () => $.SUBRULE($.CHOICE) },\n                { ALT: () => $.SUBRULE($.OPEN) },\n                { ALT: () => $.SUBRULE($.ASSIGNMENT) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_CHAPTER) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_PARAGRAPH) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_IMAGE) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_CODE) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_LIST) },\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.CommentBlock) }\n            ]);\n        }",
     "definition": [
       {
         "type": "NonTerminal",
@@ -97,7 +97,17 @@
             "definition": [
               {
                 "type": "NonTerminal",
-                "name": "OPTION",
+                "name": "CHOICE",
+                "idx": 0
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "OPEN",
                 "idx": 0
               }
             ]
@@ -180,6 +190,93 @@
   },
   {
     "type": "Rule",
+    "name": "OPEN",
+    "orgText": "() => {\n            $.CONSUME(lexer_1.tokenLookup.KW_open);\n            $.AT_LEAST_ONE_SEP({\n                SEP: lexer_1.tokenLookup.SIGN_dot,\n                DEF: () => $.CONSUME(lexer_1.tokenLookup.Identifier)\n            });\n            $.SUBRULE($.IMPORTING);\n        }",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "KW_open",
+        "label": "KW_open",
+        "idx": 0,
+        "pattern": "open"
+      },
+      {
+        "type": "RepetitionMandatoryWithSeparator",
+        "idx": 0,
+        "separator": {
+          "type": "Terminal",
+          "name": "SIGN_dot",
+          "label": "SIGN_dot",
+          "idx": 1,
+          "pattern": "\\."
+        },
+        "definition": [
+          {
+            "type": "Terminal",
+            "name": "Identifier",
+            "label": "Identifier",
+            "idx": 0,
+            "pattern": "[A-Z][a-zA-Z0-9_]*"
+          }
+        ]
+      },
+      {
+        "type": "NonTerminal",
+        "name": "IMPORTING",
+        "idx": 0
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "IMPORTING",
+    "orgText": "() => {\n            $.CONSUME(lexer_1.tokenLookup.KW_importing);\n            $.CONSUME(lexer_1.tokenLookup.SIGN_collectionOpen);\n            $.AT_LEAST_ONE_SEP1({\n                SEP: lexer_1.tokenLookup.SIGN_collectionSeparator,\n                DEF: () => $.CONSUME1(lexer_1.tokenLookup.Identifier)\n            });\n            $.CONSUME(lexer_1.tokenLookup.SIGN_collectionClose);\n        }",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "KW_importing",
+        "label": "KW_importing",
+        "idx": 0,
+        "pattern": "importing"
+      },
+      {
+        "type": "Terminal",
+        "name": "SIGN_collectionOpen",
+        "label": "SIGN_collectionOpen",
+        "idx": 0,
+        "pattern": "\\("
+      },
+      {
+        "type": "RepetitionMandatoryWithSeparator",
+        "idx": 1,
+        "separator": {
+          "type": "Terminal",
+          "name": "SIGN_collectionSeparator",
+          "label": "SIGN_collectionSeparator",
+          "idx": 1,
+          "pattern": ","
+        },
+        "definition": [
+          {
+            "type": "Terminal",
+            "name": "Identifier",
+            "label": "Identifier",
+            "idx": 1,
+            "pattern": "[A-Z][a-zA-Z0-9_]*"
+          }
+        ]
+      },
+      {
+        "type": "Terminal",
+        "name": "SIGN_collectionClose",
+        "label": "SIGN_collectionClose",
+        "idx": 0,
+        "pattern": "\\)"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
     "name": "TYPE",
     "orgText": "() => {\n            $.CONSUME(lexer_1.tokenLookup.KW_Type);\n            $.SUBRULE($.IDENTIFIER);\n            $.OPTION(() => {\n                $.CONSUME(lexer_1.tokenLookup.KW_extends);\n                $.AT_LEAST_ONE1(() => $.CONSUME1(lexer_1.tokenLookup.Identifier));\n            });\n            $.OPTION1(() => {\n                $.CONSUME(lexer_1.tokenLookup.SIGN_EqualsType);\n                $.AT_LEAST_ONE2({\n                    DEF: () => $.SUBRULE($.TYPE_FIELD)\n                });\n            });\n        }",
     "definition": [
@@ -250,7 +347,7 @@
   {
     "type": "Rule",
     "name": "TYPE_FIELD",
-    "orgText": "() => {\n            $.SUBRULE($.ANNOTATIONS);\n            $.CONSUME(lexer_1.tokenLookup.Indent);\n            $.SUBRULE($.IDENTIFIER);\n            $.CONSUME(lexer_1.tokenLookup.SIGN_TypeDefStart);\n            $.SUBRULE($.TYPE_IDENTIFIER);\n            $.MANY({\n                GATE: this.isRestriction,\n                DEF: () => $.SUBRULE($.RESTRICTION)\n            });\n        }",
+    "orgText": "() => {\n            $.SUBRULE($.ANNOTATIONS);\n            $.CONSUME(lexer_1.tokenLookup.Indent);\n            $.OR([\n                {\n                    ALT: () => {\n                        $.SUBRULE($.IDENTIFIER);\n                        $.CONSUME(lexer_1.tokenLookup.SIGN_TypeDefStart);\n                        $.SUBRULE($.TYPE_IDENTIFIER);\n                        $.MANY({\n                            GATE: this.isRestriction,\n                            DEF: () => $.SUBRULE($.RESTRICTION)\n                        });\n                    }\n                },\n                {\n                    ALT: () => {\n                        $.CONSUME(lexer_1.tokenLookup.KW_pluck);\n                        $.AT_LEAST_ONE_SEP({\n                            SEP: lexer_1.tokenLookup.SIGN_dot,\n                            DEF: () => $.CONSUME(lexer_1.tokenLookup.Identifier)\n                        });\n                    }\n                }\n            ]);\n        }",
     "definition": [
       {
         "type": "NonTerminal",
@@ -265,30 +362,73 @@
         "pattern": "( {4})"
       },
       {
-        "type": "NonTerminal",
-        "name": "IDENTIFIER",
-        "idx": 0
-      },
-      {
-        "type": "Terminal",
-        "name": "SIGN_TypeDefStart",
-        "label": "SIGN_TypeDefStart",
-        "idx": 0,
-        "pattern": ":"
-      },
-      {
-        "type": "NonTerminal",
-        "name": "TYPE_IDENTIFIER",
-        "idx": 0
-      },
-      {
-        "type": "Repetition",
+        "type": "Alternation",
         "idx": 0,
         "definition": [
           {
-            "type": "NonTerminal",
-            "name": "RESTRICTION",
-            "idx": 0
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "IDENTIFIER",
+                "idx": 0
+              },
+              {
+                "type": "Terminal",
+                "name": "SIGN_TypeDefStart",
+                "label": "SIGN_TypeDefStart",
+                "idx": 0,
+                "pattern": ":"
+              },
+              {
+                "type": "NonTerminal",
+                "name": "TYPE_IDENTIFIER",
+                "idx": 0
+              },
+              {
+                "type": "Repetition",
+                "idx": 0,
+                "definition": [
+                  {
+                    "type": "NonTerminal",
+                    "name": "RESTRICTION",
+                    "idx": 0
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "KW_pluck",
+                "label": "KW_pluck",
+                "idx": 0,
+                "pattern": "pluck"
+              },
+              {
+                "type": "RepetitionMandatoryWithSeparator",
+                "idx": 0,
+                "separator": {
+                  "type": "Terminal",
+                  "name": "SIGN_dot",
+                  "label": "SIGN_dot",
+                  "idx": 1,
+                  "pattern": "\\."
+                },
+                "definition": [
+                  {
+                    "type": "Terminal",
+                    "name": "Identifier",
+                    "label": "Identifier",
+                    "idx": 0,
+                    "pattern": "[A-Z][a-zA-Z0-9_]*"
+                  }
+                ]
+              }
+            ]
           }
         ]
       }
@@ -406,15 +546,15 @@
   },
   {
     "type": "Rule",
-    "name": "OPTION",
-    "orgText": "() => {\n            $.CONSUME(lexer_1.tokenLookup.KW_option);\n            $.CONSUME(lexer_1.tokenLookup.Identifier);\n            $.CONSUME(lexer_1.tokenLookup.SIGN_Equals);\n            $.AT_LEAST_ONE(() => $.SUBRULE($.OPTION_OPTION));\n        }",
+    "name": "CHOICE",
+    "orgText": "() => {\n            $.CONSUME(lexer_1.tokenLookup.KW_choice);\n            $.CONSUME(lexer_1.tokenLookup.Identifier);\n            $.CONSUME(lexer_1.tokenLookup.SIGN_Equals);\n            $.AT_LEAST_ONE(() => $.SUBRULE($.CHOICE_OPTION));\n        }",
     "definition": [
       {
         "type": "Terminal",
-        "name": "KW_option",
-        "label": "KW_option",
+        "name": "KW_choice",
+        "label": "KW_choice",
         "idx": 0,
-        "pattern": "option"
+        "pattern": "choice"
       },
       {
         "type": "Terminal",
@@ -436,7 +576,7 @@
         "definition": [
           {
             "type": "NonTerminal",
-            "name": "OPTION_OPTION",
+            "name": "CHOICE_OPTION",
             "idx": 0
           }
         ]
@@ -445,7 +585,7 @@
   },
   {
     "type": "Rule",
-    "name": "OPTION_OPTION",
+    "name": "CHOICE_OPTION",
     "orgText": "() => {\n            $.SUBRULE($.ANNOTATIONS);\n            $.CONSUME(lexer_1.tokenLookup.Indent);\n            $.CONSUME(lexer_1.tokenLookup.SIGN_Or);\n            $.OR([\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.StringLiteral) },\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.NumberLiteral) }\n            ]);\n        }",
     "definition": [
       {

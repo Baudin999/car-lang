@@ -23,5 +23,5 @@ export declare const clone: (source: any) => any;
  * @param useSpaces - if true, attempt to insert newlines at whitespace
  * @param a - array used to build result, defaults to new array
  */
-export declare function foldText(s: string, n?: number, useSpaces?: boolean, a?: any[]): any;
+export declare function foldText(s: string, split?: string, n?: number, useSpaces?: boolean, a?: string[]): string;
 export declare const baseTypes: string[];

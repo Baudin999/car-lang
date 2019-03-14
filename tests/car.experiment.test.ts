@@ -30,6 +30,9 @@ type Address =
     City: String
     Country: String
 
+@ This is the Person Entity which
+@ will be the basis for other types
+@ of entities.
 type Person extends MyEntity =
     FirstName: Maybe String
     LastName: String

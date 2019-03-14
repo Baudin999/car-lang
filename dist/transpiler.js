@@ -10,7 +10,7 @@ exports.transpile = (source) => {
     parser_1.parser.input = lexedSource.tokens;
     const cst = parser_1.parser.START();
     if (parser_1.parser.errors && parser_1.parser.errors.length > 0) {
-        console.log(parser_1.parser.errors);
+        console.log(JSON.stringify(parser_1.parser.errors, null, 4));
     }
     const visitor = new outline_1.OutlineVisitor();
     const ast = visitor.visit(cst);

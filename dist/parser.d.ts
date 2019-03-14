@@ -8,6 +8,9 @@ declare class DomainParser extends Parser {
     ALIAS_FOR: any;
     DATA: any;
     DATA_OPTION: any;
+    CHOICE: any;
+    CHOICE_OPTION: any;
+    VIEW: any;
     RESTRICTION: any;
     ASSIGNMENT: any;
     PARAMETERS: any;
@@ -15,6 +18,8 @@ declare class DomainParser extends Parser {
     BINARY_EXPRESSION: any;
     VALUE_EXPRESSION: any;
     FUNCTION_APPLICATION: any;
+    OPEN: any;
+    IMPORTING: any;
     IDENTIFIER: any;
     TYPE_IDENTIFIER: any;
     ROOT_ANNOTATIONS: any;

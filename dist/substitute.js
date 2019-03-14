@@ -15,12 +15,17 @@ const getNodeById = (ast, params = [], id) => {
 exports.substituteAliases = (ast = []) => {
     const errors = [];
     const newAST = ast.map((node) => {
-        if (node.type !== outline_1.NodeType.ALIAS || node.ofType_params.length === 0)
+        if (node.type !== outline_1.NodeType.ALIAS)
             return node;
         else {
-            let _node = helpers_1.clone(getNodeById(ast, [], node.ofType));
+            let originalType = getNodeById(ast, [], node.ofType);
+            if (!originalType) {
+                errors.push(Object.assign({ message: `Could not find type ${node.ofType}` }, node.ofType_start));
+                return node;
+            }
+            let _node = helpers_1.clone(originalType);
             _node.fields = _node.fields.map(field => {
-                const fieldIndex = _node.params.indexOf(field.ofType);
+                const fieldIndex = (_node.params || []).indexOf(field.ofType);
                 if (fieldIndex > -1) {
                     field.ofType = node.ofType_params[fieldIndex];
                     field.ofType_start = node.ofType_params_start[fieldIndex];
@@ -29,6 +34,7 @@ exports.substituteAliases = (ast = []) => {
             });
             _node.params = [];
             _node.id = node.id;
+            _node.source = `${node.ofType}`;
             return _node;
         }
     });
@@ -50,8 +56,11 @@ exports.substituteExtensions = (ast = []) => {
                     errors.push(Object.assign({ message: `Type ${e} is not a "type" and as such cannot be extended from.` }, node.extends_start[i]));
                 }
                 else {
-                    extension.fields.forEach(eField => {
-                        let existingField = node.fields.find(f => f.id === eField.id);
+                    extension.fields
+                        .filter(f => f.type === outline_1.NodeType.TYPE_FIELD)
+                        .forEach(eField => {
+                        let existingField = node.fields.find(f => f.type === outline_1.NodeType.TYPE_FIELD &&
+                            f.id === eField.id);
                         if (!existingField) {
                             newNode.fields.push(Object.assign({}, eField, { source: e }));
                         }

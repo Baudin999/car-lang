@@ -24,6 +24,15 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
         else if (ctx.ALIAS) {
             return Object.assign({ annotations }, this.visit(ctx.ALIAS[0]));
         }
+        else if (ctx.VIEW) {
+            return Object.assign({ annotations }, this.visit(ctx.VIEW[0]));
+        }
+        else if (ctx.OPEN) {
+            return this.visit(ctx.OPEN[0]);
+        }
+        else if (ctx.CHOICE) {
+            return Object.assign({ annotations }, this.visit(ctx.CHOICE[0]));
+        }
         else if (ctx.CommentBlock) {
             return {
                 type: NodeType.COMMENT,
@@ -45,16 +54,39 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
         else if (ctx.MARKDOWN_LIST) {
             return this.visit(ctx.MARKDOWN_LIST);
         }
+        else if (ctx.ROOT_ANNOTATIONS) {
+            // do nothing, already parsed at the top...
+            return null;
+        }
         else {
             console.log(ctx);
             return null;
         }
     }
+    OPEN(ctx) {
+        return {
+            type: NodeType.OPEN,
+            module: ctx.Identifier.map(i => i.image).join("."),
+            imports: this.visit(ctx.IMPORTING[0])
+        };
+    }
+    IMPORTING(ctx) {
+        return ctx.Identifier.map(i => i.image);
+    }
     TYPE(ctx) {
         return Object.assign({ type: NodeType.TYPE }, this.visit(ctx.IDENTIFIER[0]), { extends: (ctx.Identifier || []).map(i => i.image), extends_start: (ctx.Identifier || []).map(helpers_1.getStartToken), fields: ctx.SIGN_EqualsType ? ctx.TYPE_FIELD.map(f => this.visit(f)) : [] });
     }
     TYPE_FIELD(ctx) {
-        return Object.assign({ type: NodeType.TYPE_FIELD }, this.visit(ctx.IDENTIFIER[0]), this.visit(ctx.TYPE_IDENTIFIER[0]), { restrictions: (ctx.RESTRICTION || []).map(r => this.visit(r)), annotations: helpers_1.purge((ctx.ANNOTATIONS || []).map(a => this.visit(a))) });
+        if (ctx.KW_pluck) {
+            return {
+                type: NodeType.PLUCKED_FIELD,
+                parts: ctx.Identifier.map(i => i.image),
+                parts_start: ctx.Identifier.map(helpers_1.getStartToken)
+            };
+        }
+        else {
+            return Object.assign({ type: NodeType.TYPE_FIELD }, this.visit(ctx.IDENTIFIER[0]), this.visit(ctx.TYPE_IDENTIFIER[0]), { restrictions: (ctx.RESTRICTION || []).map(r => this.visit(r)), annotations: helpers_1.purge((ctx.ANNOTATIONS || []).map(a => this.visit(a))) });
+        }
     }
     DATA(ctx) {
         const options = ctx.DATA_OPTION.map(d => this.visit(d));
@@ -65,6 +97,54 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
     }
     ALIAS(ctx) {
         return Object.assign({ type: NodeType.ALIAS }, this.visit(ctx.IDENTIFIER[0]), this.visit(ctx.TYPE_IDENTIFIER[0]), { restrictions: (ctx.RESTRICTION || []).map(r => this.visit(r)) });
+    }
+    VIEW(ctx) {
+        // Parse the Directives in the code.
+        const pattern = /( *)(%)(.*)(:)(.*)(\n)/;
+        let directives = (ctx.DirectiveLiteral || []).map(d => {
+            const segments = pattern.exec(d.image);
+            if (segments) {
+                return {
+                    key: segments[3].trim(),
+                    value: segments[5].trim()
+                };
+            }
+            else {
+                return {
+                    key: "description",
+                    value: d.image
+                        .replace(/%%/g, "")
+                        .split(/\n +/)
+                        .join(" ")
+                        .trim()
+                };
+            }
+        });
+        return {
+            type: NodeType.VIEW,
+            id: ctx.ViewIdentifier ? ctx.ViewIdentifier[0].image : "",
+            nodes: (ctx.Identifier || []).map(i => i.image),
+            directives
+        };
+    }
+    CHOICE(ctx) {
+        return {
+            type: NodeType.CHOICE,
+            id: ctx.Identifier[0].image,
+            id_start: helpers_1.getStartToken(ctx.Identifier[0]),
+            options: ctx.CHOICE_OPTION.map(o => this.visit(o)),
+            options_start: ctx.CHOICE_OPTION.map(o => {
+                const literal = o.children.StringLiteral || o.children.NumberLiteral;
+                return helpers_1.getStartToken(literal[0]);
+            })
+        };
+    }
+    CHOICE_OPTION(ctx) {
+        return ctx.StringLiteral
+            ? ctx.StringLiteral[0].image.replace(/"/g, "")
+            : ctx.NumberLiteral
+                ? +ctx.NumberLiteral[0].image
+                : "";
     }
     IDENTIFIER(ctx) {
         if (ctx.GenericIdentifier) {
@@ -179,7 +259,7 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
     ROOT_ANNOTATIONS(ctx) {
         // The description is the accumulation of all the annotations
         // without a real key.
-        const description = (ctx.Annotation || [])
+        const description = (ctx.AnnotationLiteral || [])
             .filter(a => a.image.indexOf(":") === -1)
             .map(a => {
             const pattern = /( *)(@)(.*)/;
@@ -196,7 +276,7 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
             }
             : null;
         // return the collection of annotations with the description annotation
-        return [descriptionAnnotation, ...(ctx.Annotation || []).map(this.ANNOTATION)];
+        return [descriptionAnnotation, ...(ctx.AnnotationLiteral || []).map(this.ANNOTATION)];
     }
     ANNOTATIONS(ctx) {
         return this.ROOT_ANNOTATIONS(ctx);
@@ -225,12 +305,16 @@ var NodeType;
     NodeType["COMMENT"] = "COMMENT";
     NodeType["CHAPTER"] = "CHAPTER";
     NodeType["IMAGE"] = "IMAGE";
+    NodeType["VIEW"] = "VIEW";
     NodeType["PARAGRAPH"] = "PARAGRAPH";
     NodeType["MARKDOWN_CODE"] = "MARKDOWN_CODE";
     NodeType["MARKDOWN_PARAGRAPH"] = "MARKDOWN_PARAGRAPH";
     NodeType["MARKDOWN_IMAGE"] = "MARKDOWN_IMAGE";
     NodeType["MARKDOWN_CHAPTER"] = "MARKDOWN_CHAPTER";
     NodeType["MARKDOWN_LIST"] = "MARKDOWN_LIST";
+    NodeType["CHOICE"] = "CHOICE";
+    NodeType["PLUCKED_FIELD"] = "PLUCKED_FIELD";
+    NodeType["OPEN"] = "OPEN";
 })(NodeType = exports.NodeType || (exports.NodeType = {}));
 const defaultStart = {
     startLineNumber: 0,

@@ -33,17 +33,17 @@ exports.clone = source => {
  * @param useSpaces - if true, attempt to insert newlines at whitespace
  * @param a - array used to build result, defaults to new array
  */
-function foldText(s, n = 40, useSpaces = true, a = []) {
+function foldText(s, split = "\n", n = 40, useSpaces = true, a = []) {
     a = a || [];
     if (s.length <= n) {
         a.push(s);
-        return a;
+        return a.join(split);
     }
     var line = s.substring(0, n);
     if (!useSpaces) {
         // insert newlines anywhere
         a.push(line);
-        return foldText(s.substring(n), n, useSpaces, a);
+        return foldText(s.substring(n), split, n, useSpaces, a);
     }
     else {
         // attempt to insert newlines after whitespace
@@ -55,7 +55,7 @@ function foldText(s, n = 40, useSpaces = true, a = []) {
             nextIdx = idx;
         }
         a.push(line);
-        return foldText(s.substring(nextIdx), n, useSpaces, a);
+        return foldText(s.substring(nextIdx), split, n, useSpaces, a);
     }
 }
 exports.foldText = foldText;

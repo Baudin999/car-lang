@@ -5,11 +5,16 @@ export declare class OutlineVisitor extends BaseCstVisitorWithDefaults {
     constructor();
     START(ctx: any): IExpression[];
     EXPRESSION(ctx: any): IExpression | null;
+    OPEN(ctx: any): IOpen;
+    IMPORTING(ctx: any): string[];
     TYPE(ctx: any): IType;
-    TYPE_FIELD(ctx: any): ITypeField;
+    TYPE_FIELD(ctx: any): ITypeField | IPluckedField;
     DATA(ctx: any): IData;
     DATA_OPTION(ctx: any): IDataOption;
     ALIAS(ctx: any): IAlias;
+    VIEW(ctx: any): IView;
+    CHOICE(ctx: any): IChoice;
+    CHOICE_OPTION(ctx: any): any;
     IDENTIFIER(ctx: any): IIdentity;
     TYPE_IDENTIFIER(ctx: any): {
         ofType: any;
@@ -27,13 +32,20 @@ export declare class OutlineVisitor extends BaseCstVisitorWithDefaults {
     ANNOTATIONS(ctx: any): IAnnotation[];
     ANNOTATION(ctx: any): IAnnotation | null;
 }
+export interface IOpen {
+    type: NodeType;
+    module: string;
+    imports: string[];
+}
 export interface IType {
     type: NodeType;
     id: string;
     extends: string[];
     extends_start: ITokenStart[];
     params?: string[];
-    fields: ITypeField[];
+    fields: (ITypeField | IPluckedField)[];
+    source?: string;
+    annotations: IAnnotation[];
 }
 export interface ITypeField {
     type: NodeType;
@@ -44,6 +56,11 @@ export interface ITypeField {
     ofType_params_start: ITokenStart[];
     annotations: IAnnotation[];
     source?: string;
+}
+export interface IPluckedField {
+    type: NodeType;
+    parts: string[];
+    parts_start: ITokenStart[];
 }
 export interface IData {
     type: NodeType;
@@ -56,6 +73,12 @@ export interface IDataOption {
     id: string;
     params?: string[];
 }
+export interface IView {
+    type: NodeType;
+    id?: string;
+    nodes: string[];
+    directives: IDirective[];
+}
 export interface IAlias {
     type: NodeType;
     id: string;
@@ -64,6 +87,7 @@ export interface IAlias {
     ofType_params: string[];
     ofType_params_start: ITokenStart[];
     annotations: IAnnotation[];
+    source?: string;
 }
 export interface IComment {
     type: NodeType;
@@ -77,11 +101,22 @@ export interface IAnnotation {
     key: string;
     value: string;
 }
+export interface IDirective {
+    key: string;
+    value: string;
+}
 export interface IIdentity {
     id: string;
     id_start: ITokenStart;
     params?: string[];
     params_start?: ITokenStart[];
+}
+export interface IChoice {
+    type: string;
+    id: string;
+    id_start: ITokenStart;
+    options: string[];
+    options_start: ITokenStart[];
 }
 export interface IRestriction {
     key: string;
@@ -122,11 +157,15 @@ export declare enum NodeType {
     COMMENT = "COMMENT",
     CHAPTER = "CHAPTER",
     IMAGE = "IMAGE",
+    VIEW = "VIEW",
     PARAGRAPH = "PARAGRAPH",
     MARKDOWN_CODE = "MARKDOWN_CODE",
     MARKDOWN_PARAGRAPH = "MARKDOWN_PARAGRAPH",
     MARKDOWN_IMAGE = "MARKDOWN_IMAGE",
     MARKDOWN_CHAPTER = "MARKDOWN_CHAPTER",
-    MARKDOWN_LIST = "MARKDOWN_LIST"
+    MARKDOWN_LIST = "MARKDOWN_LIST",
+    CHOICE = "CHOICE",
+    PLUCKED_FIELD = "PLUCKED_FIELD",
+    OPEN = "OPEN"
 }
 export {};

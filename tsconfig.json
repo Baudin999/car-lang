@@ -19,7 +19,7 @@
     "target": "es6",
     "outDir": "dist/"
   },
-  "files": ["./src/transpiler.ts"],
+  "files": ["./src/program.ts"],
   "formatCodeOptions": {
     "indentSize": 2,
     "tabSize": 2
