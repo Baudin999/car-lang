@@ -1,16 +1,17 @@
 import { DomainLexer } from "./lexer";
 import { parser } from "./parser";
-import { OutlineVisitor } from "./outline";
+import { OutlineVisitor, IExpression } from "./outline";
 import { substituteExtensions, substituteAliases } from "./substitute";
-import { typeChecker } from "./tchecker";
+import { typeChecker, IError } from "./tchecker";
+import { IToken } from "chevrotain";
 
-export const transpile = (source: string) => {
+export const transpile = (source: string): ITranspilationResult => {
   const lexedSource = DomainLexer.tokenize(source);
   parser.input = lexedSource.tokens;
   const cst = parser.START();
 
   if (parser.errors && parser.errors.length > 0) {
-    console.log(parser.errors);
+    console.log(JSON.stringify(parser.errors, null, 4));
   }
 
   const visitor = new OutlineVisitor();
@@ -31,3 +32,10 @@ export const transpile = (source: string) => {
     errors: [...rwAliasErrors, ...errors, ...checkASTs]
   };
 };
+
+export interface ITranspilationResult {
+  tokens: IToken[];
+  cst: any[];
+  ast: IExpression[];
+  errors: IError[];
+}

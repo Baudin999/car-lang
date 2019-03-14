@@ -1,5 +1,5 @@
 import { baseTypes, clone, purge } from "./helpers";
-import { IExpression, IType, NodeType, IAlias } from "./outline";
+import { IExpression, IType, NodeType, IAlias, ITypeField } from "./outline";
 
 const lookupTree = {};
 
@@ -20,11 +20,20 @@ export const substituteAliases = (
 ): { newAST: IExpression[]; errors: IError[] } => {
   const errors: IError[] = [];
   const newAST = ast.map((node: any) => {
-    if (node.type !== NodeType.ALIAS || node.ofType_params.length === 0) return node;
+    if (node.type !== NodeType.ALIAS) return node;
     else {
-      let _node = clone(getNodeById(ast, [], node.ofType)) as any;
+      let originalType = getNodeById(ast, [], node.ofType);
+      if (!originalType) {
+        errors.push({
+          message: `Could not find type ${node.ofType}`,
+          ...node.ofType_start
+        });
+        return node;
+      }
+
+      let _node = clone(originalType) as any;
       _node.fields = _node.fields.map(field => {
-        const fieldIndex = _node.params.indexOf(field.ofType);
+        const fieldIndex = (_node.params || []).indexOf(field.ofType);
         if (fieldIndex > -1) {
           field.ofType = node.ofType_params[fieldIndex];
           field.ofType_start = node.ofType_params_start[fieldIndex];
@@ -33,6 +42,7 @@ export const substituteAliases = (
       });
       _node.params = [];
       _node.id = node.id;
+      _node.source = `${node.ofType}`;
       return _node;
     }
   });
@@ -60,12 +70,18 @@ export const substituteExtensions = (
             ...node.extends_start[i]
           });
         } else {
-          (extension as IType).fields.forEach(eField => {
-            let existingField = node.fields.find(f => f.id === eField.id);
-            if (!existingField) {
-              newNode.fields.push({ ...eField, source: e });
-            }
-          });
+          (extension as IType).fields
+            .filter(f => f.type === NodeType.TYPE_FIELD)
+            .forEach(eField => {
+              let existingField = node.fields.find(
+                f =>
+                  f.type === NodeType.TYPE_FIELD &&
+                  (f as ITypeField).id === (eField as ITypeField).id
+              );
+              if (!existingField) {
+                newNode.fields.push({ ...eField, source: e });
+              }
+            });
         }
       });
       return newNode;

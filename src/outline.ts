@@ -36,6 +36,18 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
         annotations,
         ...this.visit(ctx.ALIAS[0])
       };
+    } else if (ctx.VIEW) {
+      return {
+        annotations,
+        ...this.visit(ctx.VIEW[0])
+      };
+    } else if (ctx.OPEN) {
+      return this.visit(ctx.OPEN[0]);
+    } else if (ctx.CHOICE) {
+      return {
+        annotations,
+        ...this.visit(ctx.CHOICE[0])
+      };
     } else if (ctx.CommentBlock) {
       return {
         type: NodeType.COMMENT,
@@ -51,10 +63,25 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
       return this.visit(ctx.MARKDOWN_CODE[0]);
     } else if (ctx.MARKDOWN_LIST) {
       return this.visit(ctx.MARKDOWN_LIST);
+    } else if (ctx.ROOT_ANNOTATIONS) {
+      // do nothing, already parsed at the top...
+      return null;
     } else {
       console.log(ctx);
       return null;
     }
+  }
+
+  OPEN(ctx: any): IOpen {
+    return {
+      type: NodeType.OPEN,
+      module: ctx.Identifier.map(i => i.image).join("."),
+      imports: this.visit(ctx.IMPORTING[0])
+    };
+  }
+
+  IMPORTING(ctx: any): string[] {
+    return ctx.Identifier.map(i => i.image);
   }
 
   TYPE(ctx: any): IType {
@@ -67,14 +94,22 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
     };
   }
 
-  TYPE_FIELD(ctx: any): ITypeField {
-    return {
-      type: NodeType.TYPE_FIELD,
-      ...this.visit(ctx.IDENTIFIER[0]),
-      ...this.visit(ctx.TYPE_IDENTIFIER[0]),
-      restrictions: (ctx.RESTRICTION || []).map(r => this.visit(r)),
-      annotations: purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
-    };
+  TYPE_FIELD(ctx: any): ITypeField | IPluckedField {
+    if (ctx.KW_pluck) {
+      return {
+        type: NodeType.PLUCKED_FIELD,
+        parts: ctx.Identifier.map(i => i.image),
+        parts_start: ctx.Identifier.map(getStartToken)
+      };
+    } else {
+      return {
+        type: NodeType.TYPE_FIELD,
+        ...this.visit(ctx.IDENTIFIER[0]),
+        ...this.visit(ctx.TYPE_IDENTIFIER[0]),
+        restrictions: (ctx.RESTRICTION || []).map(r => this.visit(r)),
+        annotations: purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
+      };
+    }
   }
 
   DATA(ctx: any): IData {
@@ -100,6 +135,57 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
       ...this.visit(ctx.TYPE_IDENTIFIER[0]),
       restrictions: (ctx.RESTRICTION || []).map(r => this.visit(r))
     };
+  }
+
+  VIEW(ctx: any): IView {
+    // Parse the Directives in the code.
+    const pattern = /( *)(%)(.*)(:)(.*)(\n)/;
+    let directives: IDirective[] = ctx.DirectiveLiteral.map(d => {
+      const segments = pattern.exec(d.image);
+      if (segments) {
+        return {
+          key: segments[3].trim(),
+          value: segments[5].trim()
+        };
+      } else {
+        return {
+          key: "description",
+          value: d.image
+            .replace(/%%/g, "")
+            .split(/\n +/)
+            .join(" ")
+            .trim()
+        };
+      }
+    });
+
+    return {
+      type: NodeType.VIEW,
+      id: ctx.ViewIdentifier ? ctx.ViewIdentifier[0].image : "",
+      nodes: (ctx.Identifier || []).map(i => i.image),
+      directives
+    };
+  }
+
+  CHOICE(ctx: any): IChoice {
+    return {
+      type: NodeType.CHOICE,
+      id: ctx.Identifier[0].image,
+      id_start: getStartToken(ctx.Identifier[0]),
+      options: ctx.CHOICE_OPTION.map(o => this.visit(o)),
+      options_start: ctx.CHOICE_OPTION.map(o => {
+        const literal = o.children.StringLiteral || o.children.NumberLiteral;
+        return getStartToken(literal[0]);
+      })
+    };
+  }
+
+  CHOICE_OPTION(ctx: any) {
+    return ctx.StringLiteral
+      ? ctx.StringLiteral[0].image.replace(/"/g, "")
+      : ctx.NumberLiteral
+      ? +ctx.NumberLiteral[0].image
+      : "";
   }
 
   IDENTIFIER(ctx: any): IIdentity {
@@ -225,7 +311,7 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
   ROOT_ANNOTATIONS(ctx: any): IAnnotation[] {
     // The description is the accumulation of all the annotations
     // without a real key.
-    const description = (ctx.Annotation || [])
+    const description = (ctx.AnnotationLiteral || [])
       .filter(a => a.image.indexOf(":") === -1)
       .map(a => {
         const pattern = /( *)(@)(.*)/;
@@ -244,7 +330,7 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
       : null;
 
     // return the collection of annotations with the description annotation
-    return [descriptionAnnotation, ...(ctx.Annotation || []).map(this.ANNOTATION)];
+    return [descriptionAnnotation, ...(ctx.AnnotationLiteral || []).map(this.ANNOTATION)];
   }
 
   ANNOTATIONS(ctx: any) {
@@ -264,13 +350,20 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
   }
 }
 
+export interface IOpen {
+  type: NodeType;
+  module: string;
+  imports: string[];
+}
+
 export interface IType {
   type: NodeType;
   id: string;
   extends: string[];
   extends_start: ITokenStart[];
   params?: string[];
-  fields: ITypeField[];
+  fields: (ITypeField | IPluckedField)[];
+  source?: string;
 }
 
 export interface ITypeField {
@@ -282,6 +375,12 @@ export interface ITypeField {
   ofType_params_start: ITokenStart[];
   annotations: IAnnotation[];
   source?: string;
+}
+
+export interface IPluckedField {
+  type: NodeType;
+  parts: string[];
+  parts_start: ITokenStart[];
 }
 
 export interface IData {
@@ -297,6 +396,13 @@ export interface IDataOption {
   params?: string[];
 }
 
+export interface IView {
+  type: NodeType;
+  id?: string;
+  nodes: string[];
+  directives: IDirective[];
+}
+
 export interface IAlias {
   type: NodeType;
   id: string;
@@ -305,6 +411,7 @@ export interface IAlias {
   ofType_params: string[];
   ofType_params_start: ITokenStart[];
   annotations: IAnnotation[];
+  source?: string;
 }
 
 export interface IComment {
@@ -322,11 +429,24 @@ export interface IAnnotation {
   value: string;
 }
 
+export interface IDirective {
+  key: string;
+  value: string;
+}
+
 export interface IIdentity {
   id: string;
   id_start: ITokenStart;
   params?: string[];
   params_start?: ITokenStart[];
+}
+
+export interface IChoice {
+  type: string;
+  id: string;
+  id_start: ITokenStart;
+  options: string[];
+  options_start: ITokenStart[];
 }
 
 export interface IRestriction {
@@ -384,12 +504,16 @@ export enum NodeType {
   COMMENT = "COMMENT",
   CHAPTER = "CHAPTER",
   IMAGE = "IMAGE",
+  VIEW = "VIEW",
   PARAGRAPH = "PARAGRAPH",
   MARKDOWN_CODE = "MARKDOWN_CODE",
   MARKDOWN_PARAGRAPH = "MARKDOWN_PARAGRAPH",
   MARKDOWN_IMAGE = "MARKDOWN_IMAGE",
   MARKDOWN_CHAPTER = "MARKDOWN_CHAPTER",
-  MARKDOWN_LIST = "MARKDOWN_LIST"
+  MARKDOWN_LIST = "MARKDOWN_LIST",
+  CHOICE = "CHOICE",
+  PLUCKED_FIELD = "PLUCKED_FIELD",
+  OPEN = "OPEN"
 }
 
 const defaultStart: ITokenStart = {

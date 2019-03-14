@@ -21,6 +21,28 @@ type Person =
   });
 });
 
+describe("Pluck fields from other types", () => {
+  const source = `
+
+type Person =
+    FirstName: String
+    LastName: String
+    Email: String
+
+type Account =
+    UserName: String
+    Password: String
+    pluck Person.Email
+
+`;
+
+  const { cst, ast, errors } = transpile(source);
+
+  it("We should be able to tokenize", () => {
+    expect(ast).toBeDefined();
+  });
+});
+
 describe("Alias with a restriction", () => {
   const source = `
 
@@ -86,29 +108,29 @@ type Person =
       message: 'Cannot find type "Maybe" of field "FirstName" of type "Person"',
       startLineNumber: 4,
       endLineNumber: 4,
-      startColumn: 14,
-      endColumn: 19
+      startColumn: 16,
+      endColumn: 21
     },
     {
       message: 'Cannot find type "Foo" of field "LastName" of type "Person"',
       startLineNumber: 5,
       endLineNumber: 5,
-      startColumn: 13,
-      endColumn: 16
+      startColumn: 15,
+      endColumn: 18
     },
     {
       message: 'Cannot find type "Bar" of field "LastName" of type "Person"',
       startLineNumber: 5,
       endLineNumber: 5,
-      startColumn: 17,
-      endColumn: 20
+      startColumn: 19,
+      endColumn: 22
     },
     {
       message: 'Cannot find type "Result" of field "LastName" of type "Person"',
       startLineNumber: 5,
       endLineNumber: 5,
-      startColumn: 21,
-      endColumn: 27
+      startColumn: 23,
+      endColumn: 29
     }
   ];
 
@@ -117,7 +139,7 @@ type Person =
   it("We should be able to tokenize", () => {
     expect(ast).toBeDefined();
     expect(errors).toBeDefined();
-    expect(errors.length).toEqual(0); // 4
+    expect(errors.length).toEqual(4);
     errors.forEach((error, i) => {
       for (var key in error) {
         expect(errors[i][key]).toEqual(errorResults[i][key]);

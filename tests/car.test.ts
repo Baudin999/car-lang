@@ -1,6 +1,7 @@
 import { DomainLexer } from "../src/lexer";
 import { parser } from "../src/parser";
 import { OutlineVisitor } from "./../src/outline";
+import { transpile } from "../src/transpiler";
 
 const log = source => {
   console.log(JSON.stringify(source, null, 4));
@@ -10,8 +11,8 @@ describe("Define and parser a simple type", () => {
   const source = `
 
 type Person =
-  FirstName: String
-  LastName: String
+    FirstName: String
+    LastName: String
 
 `;
 
@@ -34,19 +35,12 @@ describe("Annotate a type and annotate the fields", () => {
 @ on this type
 @ api : No api yet!
 type Person =
-  @ This is the person.firstName field
-  @ faker: person.firstName
-  FirstName: String
+    @ This is the person.firstName field
+    @ faker: person.firstName
+    FirstName: String
 
 `;
-  const tokenStream = DomainLexer.tokenize(source);
-  parser.input = tokenStream.tokens;
-  const cst = parser.START();
-  const visitor = new OutlineVisitor();
-  const ast = visitor.visit(cst);
-  // log(parser.errors);
-  // log(cst);
-  // log(ast);
+  const { cst, ast } = transpile(source);
 
   it("CST should be defined", () => {
     expect(cst).toBeDefined();
@@ -59,17 +53,29 @@ describe("An alias type", () => {
 alias Foo = Something String
 
 `;
-  const tokenStream = DomainLexer.tokenize(source);
-  parser.input = tokenStream.tokens;
-  const cst = parser.START();
-  const visitor = new OutlineVisitor();
-  const ast = visitor.visit(cst);
-  //log(parser.errors);
-  //log(cst);
-  //log(ast);
+  const { cst, errors, ast } = transpile(source);
 
   it("CST should be defined", () => {
     expect(cst).toBeDefined();
+  });
+  it("should contain errors because the type Something is unknown", () => {
+    expect(errors.length).toEqual(1);
+  });
+});
+
+describe("An option type, an enumeration", () => {
+  const source = `
+
+choice Food =
+    | "Hamburger"
+    | "Filet 'o Fish"
+
+`;
+  const { cst, errors, ast, tokens } = transpile(source);
+
+  it("CST should be defined", () => {
+    expect(cst).toBeDefined();
+    expect(errors.length).toEqual(0);
   });
 });
 
@@ -77,18 +83,11 @@ describe("A simple Data object", () => {
   const source = `
 
 data Maybe a =
-  | Just a
-  | Nothing
+    | Just a
+    | Nothing
 
 `;
-  const tokenStream = DomainLexer.tokenize(source);
-  parser.input = tokenStream.tokens;
-  const cst = parser.START();
-  const visitor = new OutlineVisitor();
-  const ast = visitor.visit(cst);
-  //log(parser.errors);
-  //log(cst);
-  //log(ast);
+  const { cst, ast } = transpile(source);
 
   it("CST should be defined", () => {
     expect(cst).toBeDefined();
@@ -99,37 +98,29 @@ describe("An outline should be able to be made", () => {
   const source = `
 
 data Option a =
-  | Just a
-  | Nothing
+    | Just a
+    | Nothing
 
 alias IntSuccess = Success Integer Boolean
 
 type Person =
-  FirstName: String
-  LastName: String
-  CodeMessage: IntSuccess
-  Message: Success String Integer
-
+    FirstName: String
+    LastName: String
+    CodeMessage: IntSuccess
+    Message: Success String Integer
 
 
 @ The Success Type
 type Success a b =
-  Body: a
-  Error: b
+    Body: a
+    Error: b
+
 
 `;
-  const tokenStream = DomainLexer.tokenize(source);
-  parser.input = tokenStream.tokens;
-  const cst = parser.START();
-  const visitor = new OutlineVisitor();
-  const ast = visitor.visit(cst);
-  // log(parser.errors);
-  // log(cst);
-  // log(ast);
+  const { cst, ast, errors } = transpile(source);
 
   it("Check the validity of the cst", () => {
     expect(cst).toBeDefined();
-    expect(cst.children.EXPRESSION.length).toEqual(4);
   });
 });
 
@@ -146,18 +137,10 @@ describe("Comments should be possible", () => {
 type Foo
 
 `;
-  const tokenStream = DomainLexer.tokenize(source);
-  parser.input = tokenStream.tokens;
-  const cst = parser.START();
-  const visitor = new OutlineVisitor();
-  const ast = visitor.visit(cst);
-  // log(parser.errors);
-  // log(cst);
-  // log(ast);
+  const { cst, ast } = transpile(source);
 
   it("Check the validity of the cst", () => {
     expect(cst).toBeDefined();
-    expect(cst.children.EXPRESSION.length).toEqual(3);
   });
 });
 
@@ -183,7 +166,6 @@ fun sum a b => a + b
 \`\`\`
 
 
-
  * Something
  * Or Other
     * Child List Item
@@ -194,68 +176,9 @@ fun sum a b => a + b
  And another paragraph
 
 `;
-  const tokenStream = DomainLexer.tokenize(source);
-  parser.input = tokenStream.tokens;
-  const cst = parser.START();
-  const visitor = new OutlineVisitor();
-  const ast = visitor.visit(cst);
-  // log(parser.errors);
-  // log(cst);
-  //log(ast);
+  const { tokens, cst, ast } = transpile(source);
 
   it("Check the validity of the cst", () => {
     expect(cst).toBeDefined();
-    expect(cst.children.EXPRESSION.length).toEqual(7);
-  });
-});
-
-describe("Concrete values and partially applied constructor functions", () => {
-  /*
-  A little bit of context:
-  Pushing a concrete value as the generic parameter instead of
-  a type results in a concrete type and a partially applied
-  constructor function.
-
-  so, in TypeScript, the constructor for Kelkboompjes looks like:
-
-  const Person = (firstName: string, lastName: string) : Person => {
-    return {
-      FirstName: firstName,
-      LastName: lastName
-    };
-  };
-
-  const Kelkboompjes = (firstName:string) : Person => {
-    return {
-      FirstName: firstName,
-      LastName: "Kelkboom"
-    };
-  };
-
-  */
-
-  const source = `
-
-alias Kelkboompjes = Person "Kelkboom"
-
-type Person a =
-  FirstName: String
-  LastName: a
-
-
-`;
-  const tokenStream = DomainLexer.tokenize(source);
-  parser.input = tokenStream.tokens;
-  const cst = parser.START();
-  const visitor = new OutlineVisitor();
-  const ast = visitor.visit(cst);
-  // log(parser.errors);
-  // log(cst);
-  //log(ast);
-
-  it("Check the validity of the cst", () => {
-    expect(cst).toBeDefined();
-    expect(cst.children.EXPRESSION.length).toEqual(2);
-    //log(cst.children.EXPRESSION[0]);
   });
 });

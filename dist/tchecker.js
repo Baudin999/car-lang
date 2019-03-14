@@ -1,23 +1,39 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-/**
- * This is the type checker. We're going to do "soft" type checking
- * because this tool will mostly be used to do some very soft designing
- * and should not be used in a "hard" environment.
- *
- * Eventually we'll want to do things like code generation, auto-completion
- * plucking of types and most of all show where a change will have impact,
- * so impact analysis and general "tree shaking".
- *
- * Severity can be:
- * 1: "Hint", 2: "Info", 4: "Warning", 8: "Error"
- *
- *
- * @param {AST} ast
- */
+const helpers_1 = require("./helpers");
+const outline_1 = require("./outline");
+const lookupTree = {};
+/*
+We will need a function with which we can grab a node
+from the ast by the id
+*/
+const getNodeById = (ast, params = [], id) => {
+    return (params.indexOf(id) > -1 ||
+        helpers_1.baseTypes.find(t => t === id) ||
+        ast.find((node) => node.id && node.id === id));
+};
 exports.typeChecker = (ast = []) => {
-    return ast
-        .filter((node) => node._type === "ALIAS")
-        .map((node) => (Object.assign({}, node.tokens.start, { severity: 4, message: "Unused alias." })));
+    let errors = [];
+    ast
+        .filter(node => node.type === outline_1.NodeType.TYPE)
+        .forEach((node) => {
+        node.fields.forEach((field) => {
+            // the id of the field
+            let typeId = field.ofType;
+            let ref = getNodeById(ast, node.params, typeId);
+            if (!ref) {
+                errors.push(Object.assign({ message: `Cannot find type "${typeId}" of field "${field.id}" of type "${node.id}"` }, field.ofType_start));
+            }
+            // Now also check all the parameters if they exist
+            for (let i = 0; i < field.ofType_params.length; ++i) {
+                let paramId = field.ofType_params[i];
+                let paramRef = getNodeById(ast, node.params, paramId);
+                if (!paramRef) {
+                    errors.push(Object.assign({ message: `Cannot find type "${paramId}" of field "${field.id}" of type "${node.id}"` }, field.ofType_params_start[i]));
+                }
+            }
+        });
+    });
+    return errors;
 };
 //# sourceMappingURL=tchecker.js.map

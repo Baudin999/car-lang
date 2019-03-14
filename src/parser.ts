@@ -11,6 +11,9 @@ class DomainParser extends Parser {
   ALIAS_FOR: any;
   DATA: any;
   DATA_OPTION: any;
+  CHOICE: any;
+  CHOICE_OPTION: any;
+  VIEW: any;
   RESTRICTION: any;
   ASSIGNMENT: any;
   PARAMETERS: any;
@@ -18,6 +21,8 @@ class DomainParser extends Parser {
   BINARY_EXPRESSION: any;
   VALUE_EXPRESSION: any;
   FUNCTION_APPLICATION: any;
+  OPEN: any;
+  IMPORTING: any;
 
   IDENTIFIER: any;
   TYPE_IDENTIFIER: any;
@@ -50,6 +55,9 @@ class DomainParser extends Parser {
         { ALT: () => $.SUBRULE($.TYPE) },
         { ALT: () => $.SUBRULE($.ALIAS) },
         { ALT: () => $.SUBRULE($.DATA) },
+        { ALT: () => $.SUBRULE($.VIEW) },
+        { ALT: () => $.SUBRULE($.CHOICE) },
+        { ALT: () => $.SUBRULE($.OPEN) },
         { ALT: () => $.SUBRULE($.ASSIGNMENT) },
         { ALT: () => $.SUBRULE($.MARKDOWN_CHAPTER) },
         { ALT: () => $.SUBRULE($.MARKDOWN_PARAGRAPH) },
@@ -58,6 +66,25 @@ class DomainParser extends Parser {
         { ALT: () => $.SUBRULE($.MARKDOWN_LIST) },
         { ALT: () => $.CONSUME(tokenLookup.CommentBlock) }
       ]);
+    });
+
+    $.RULE("OPEN", () => {
+      $.CONSUME(tokenLookup.KW_open);
+      $.AT_LEAST_ONE_SEP({
+        SEP: tokenLookup.SIGN_dot,
+        DEF: () => $.CONSUME(tokenLookup.Identifier)
+      });
+      $.SUBRULE($.IMPORTING);
+    });
+
+    $.RULE("IMPORTING", () => {
+      $.CONSUME(tokenLookup.KW_importing);
+      $.CONSUME(tokenLookup.SIGN_collectionOpen);
+      $.AT_LEAST_ONE_SEP1({
+        SEP: tokenLookup.SIGN_collectionSeparator,
+        DEF: () => $.CONSUME1(tokenLookup.Identifier)
+      });
+      $.CONSUME(tokenLookup.SIGN_collectionClose);
     });
 
     $.RULE("TYPE", () => {
@@ -80,13 +107,29 @@ class DomainParser extends Parser {
     $.RULE("TYPE_FIELD", () => {
       $.SUBRULE($.ANNOTATIONS);
       $.CONSUME(tokenLookup.Indent);
-      $.SUBRULE($.IDENTIFIER);
-      $.CONSUME(tokenLookup.SIGN_TypeDefStart);
-      $.SUBRULE($.TYPE_IDENTIFIER);
-      $.MANY({
-        GATE: this.isRestriction as any,
-        DEF: () => $.SUBRULE($.RESTRICTION)
-      });
+
+      $.OR([
+        {
+          ALT: () => {
+            $.SUBRULE($.IDENTIFIER);
+            $.CONSUME(tokenLookup.SIGN_TypeDefStart);
+            $.SUBRULE($.TYPE_IDENTIFIER);
+            $.MANY({
+              GATE: this.isRestriction as any,
+              DEF: () => $.SUBRULE($.RESTRICTION)
+            });
+          }
+        },
+        {
+          ALT: () => {
+            $.CONSUME(tokenLookup.KW_pluck);
+            $.AT_LEAST_ONE_SEP({
+              SEP: tokenLookup.SIGN_dot,
+              DEF: () => $.CONSUME(tokenLookup.Identifier)
+            });
+          }
+        }
+      ]);
     });
 
     $.RULE("ALIAS", () => {
@@ -112,6 +155,38 @@ class DomainParser extends Parser {
       $.CONSUME(tokenLookup.Indent);
       $.CONSUME(tokenLookup.SIGN_Or);
       $.SUBRULE($.IDENTIFIER);
+    });
+
+    $.RULE("CHOICE", () => {
+      $.CONSUME(tokenLookup.KW_choice);
+      $.CONSUME(tokenLookup.Identifier);
+      $.CONSUME(tokenLookup.SIGN_Equals);
+      $.AT_LEAST_ONE(() => $.SUBRULE($.CHOICE_OPTION));
+    });
+
+    $.RULE("CHOICE_OPTION", () => {
+      $.SUBRULE($.ANNOTATIONS);
+      $.CONSUME(tokenLookup.Indent);
+      $.CONSUME(tokenLookup.SIGN_Or);
+      $.OR([
+        { ALT: () => $.CONSUME(tokenLookup.StringLiteral) },
+        { ALT: () => $.CONSUME(tokenLookup.NumberLiteral) }
+      ]);
+    });
+
+    $.RULE("VIEW", () => {
+      $.CONSUME(tokenLookup.KW_view);
+      $.OPTION(() => $.CONSUME(tokenLookup.ViewIdentifier));
+      $.CONSUME(tokenLookup.SIGN_open);
+      $.MANY(() => {
+        $.AT_LEAST_ONE(() => $.CONSUME(tokenLookup.Indent));
+        $.CONSUME(tokenLookup.DirectiveLiteral);
+      });
+      $.MANY1(() => {
+        $.AT_LEAST_ONE1(() => $.CONSUME1(tokenLookup.Indent));
+        $.CONSUME1(tokenLookup.Identifier);
+      });
+      $.CONSUME(tokenLookup.SIGN_close);
     });
 
     $.RULE("RESTRICTION", () => {
@@ -187,13 +262,13 @@ class DomainParser extends Parser {
         GATE: this.isAnnotation as any,
         DEF: () => {
           $.CONSUME(tokenLookup.Indent);
-          $.CONSUME(tokenLookup.Annotation);
+          $.CONSUME(tokenLookup.AnnotationLiteral);
         }
       });
     });
 
     $.RULE("ROOT_ANNOTATIONS", () => {
-      $.MANY(() => $.CONSUME(tokenLookup.Annotation));
+      $.MANY(() => $.CONSUME(tokenLookup.AnnotationLiteral));
     });
 
     /* MARKDOWN RULES */
@@ -260,9 +335,9 @@ class DomainParser extends Parser {
     let t2 = this.LA(2) as IToken;
 
     if (t1 && t1.tokenType && t1.tokenType.tokenName === "Indent") {
-      return t2 && t2.tokenType && t2.tokenType.tokenName === "Annotation";
+      return t2 && t2.tokenType && t2.tokenType.tokenName === "AnnotationLiteral";
     }
-    return t1 && t1.tokenType && t1.tokenType.tokenName === "Annotation";
+    return t1 && t1.tokenType && t1.tokenType.tokenName === "AnnotationLiteral";
   }
 
   isRestriction(): boolean | undefined {

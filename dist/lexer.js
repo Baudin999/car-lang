@@ -20,9 +20,9 @@ const KW_Type = chevrotain_1.createToken({
     name: "KW_Type",
     push_mode: "type_definition"
 });
-const KW_Alias = chevrotain_1.createToken({
+const KW_alias = chevrotain_1.createToken({
     pattern: /alias/,
-    name: "KW_Alias",
+    name: "KW_alias",
     push_mode: "alias_definition"
 });
 const KW_data = chevrotain_1.createToken({
@@ -34,6 +34,18 @@ const KW_let = chevrotain_1.createToken({
     pattern: /let/,
     name: "KW_let",
     push_mode: "let_definition"
+});
+const KW_extends = chevrotain_1.createToken({
+    pattern: /extends/,
+    name: "KW_extends"
+});
+const KW_option = chevrotain_1.createToken({
+    pattern: /option/,
+    name: "KW_option"
+});
+const SIGN_Equals = chevrotain_1.createToken({
+    name: "SIGN_Equals",
+    pattern: /=/
 });
 const SIGN_EqualsType = chevrotain_1.createToken({
     name: "SIGN_EqualsType",
@@ -58,13 +70,25 @@ const SIGN_Or = chevrotain_1.createToken({
     name: "SIGN_Or",
     pattern: /\|/
 });
+const SIGN_Restriction = chevrotain_1.createToken({
+    name: "SIGN_Restriction",
+    pattern: /\|/
+});
 const SIGN_TypeDefStart = chevrotain_1.createToken({
     name: "SIGN_TypeDefStart",
     pattern: /:/
 });
+const SIGN_dot = chevrotain_1.createToken({
+    name: "SIGN_dot",
+    pattern: /\./
+});
 const Identifier = chevrotain_1.createToken({
     name: "Identifier",
     pattern: /[A-Z][a-zA-Z0-9_]*/
+});
+const ValiableIdentifier = chevrotain_1.createToken({
+    name: "ValiableIdentifier",
+    pattern: /[a-z][a-zA-Z0-9_]*/
 });
 const RestrictionIdentifier = chevrotain_1.createToken({
     name: "RestrictionIdentifier",
@@ -73,10 +97,6 @@ const RestrictionIdentifier = chevrotain_1.createToken({
 const GenericIdentifier = chevrotain_1.createToken({
     name: "GenericIdentifier",
     pattern: /[A-Z][a-zA-Z0-9_]*(?= +[a-z])/
-});
-const ConcreteIdentifier = chevrotain_1.createToken({
-    name: "ConcreteIdentifier",
-    pattern: /[A-Z][a-zA-Z0-9_]*(?= +[A-Z])/
 });
 const GenericParameter = chevrotain_1.createToken({
     name: "GenericParameter",
@@ -92,7 +112,7 @@ const NewLine = chevrotain_1.createToken({
     group: chevrotain_1.Lexer.SKIPPED
 });
 const Indent = chevrotain_1.createToken({
-    pattern: /( {2})\s*/,
+    pattern: /( {4})/,
     name: "Indent"
 });
 const WhiteSpace = chevrotain_1.createToken({
@@ -113,6 +133,14 @@ const PatternLiteral = chevrotain_1.createToken({
     name: "PatternLiteral",
     pattern: /\/.+\//
 });
+const BooleanLiteral = chevrotain_1.createToken({
+    name: "BooleanLiteral",
+    pattern: /True|False/
+});
+const Operator = chevrotain_1.createToken({
+    name: "Operator",
+    pattern: /[\+\-\*%#\|\\\/&\^!\.><@]+/
+});
 /* MARKDOWN */
 const MarkdownImageLiteral = chevrotain_1.createToken({
     name: "MarkdownImageLiteral",
@@ -132,16 +160,25 @@ const MarkdownListLiteral = chevrotain_1.createToken({
 });
 const MarkdownParagraphLiteral = chevrotain_1.createToken({
     name: "MarkdownParagraphLiteral",
-    pattern: /(?![ ]+\*).(.|\n\r?\w)*/
+    pattern: /(?=[ ]+\*).(.|\n\r?\w)*/
+});
+/* LET DEFINITION */
+const FunctionIdentifier = chevrotain_1.createToken({
+    name: "FunctionIdentifier",
+    pattern: /(?=let +)[a-z][a-zA-Z0-9_]*(?= +)/
+});
+const FunctionParameter = chevrotain_1.createToken({
+    name: "FunctionParameter",
+    pattern: /[a-z][a-zA-Z0-9_]*(?= +)/
 });
 /* SYSTEM TOKENS - END */
 const multiModeLexerDefinition = {
     modes: {
         root: [
             KW_Type,
-            KW_Alias,
+            KW_alias,
             KW_data,
-            KW_let,
+            //KW_let,
             Annotation,
             EndBlock,
             CommentBlock,
@@ -152,6 +189,7 @@ const multiModeLexerDefinition = {
             MarkdownParagraphLiteral
         ],
         type_definition: [
+            KW_extends,
             SIGN_EqualsType,
             GenericParameter,
             GenericIdentifier,
@@ -166,9 +204,11 @@ const multiModeLexerDefinition = {
             Annotation,
             FieldName,
             SIGN_TypeDefStart,
+            SIGN_Restriction,
+            RestrictionIdentifier,
             GenericParameter,
             GenericIdentifier,
-            ConcreteIdentifier,
+            BooleanLiteral,
             StringLiteral,
             NumberLiteral,
             PatternLiteral,
@@ -179,10 +219,13 @@ const multiModeLexerDefinition = {
         ],
         alias_definition: [
             EndBlock,
-            SIGN_EqualsAlias,
             Indent,
-            ConcreteIdentifier,
+            Annotation,
+            SIGN_EqualsAlias,
+            SIGN_Restriction,
             GenericIdentifier,
+            RestrictionIdentifier,
+            BooleanLiteral,
             StringLiteral,
             NumberLiteral,
             PatternLiteral,
@@ -212,36 +255,53 @@ const multiModeLexerDefinition = {
             EndBlock,
             WhiteSpace,
             CommentBlock
-        ],
-        restriction_field_definition: [
-            SIGN_Or,
-            Annotation,
-            RestrictionIdentifier,
-            EndBlock,
-            CommentBlock
-        ],
-        let_definition: [StringLiteral, NumberLiteral, PatternLiteral]
+        ]
+        // restriction_field_definition: [
+        //   SIGN_Or,
+        //   Annotation,
+        //   RestrictionIdentifier,
+        //   EndBlock,
+        //   CommentBlock
+        // ],
+        // let_definition: [
+        //   ValiableIdentifier,
+        //   SIGN_Equals,
+        //   SIGN_dot,
+        //   StringLiteral,
+        //   Operator,
+        //   NumberLiteral,
+        //   PatternLiteral,
+        //   EndBlock
+        // ]
     },
     defaultMode: "root"
 };
 exports.tokenLookup = {
     // keywords
     KW_Type,
-    KW_Alias,
+    KW_alias,
     KW_data,
+    KW_extends,
+    KW_let,
+    SIGN_Equals,
     SIGN_EqualsType,
     SIGN_EqualsData,
     SIGN_EqualsAlias,
     SIGN_EqualsOption,
     SIGN_Or,
+    SIGN_Restriction,
+    SIGN_dot,
+    Operator,
     Annotation,
     Identifier,
+    ValiableIdentifier,
     GenericIdentifier,
-    ConcreteIdentifier,
     GenericParameter,
+    RestrictionIdentifier,
     FieldName,
     SIGN_TypeDefStart,
     CommentBlock,
+    BooleanLiteral,
     StringLiteral,
     NumberLiteral,
     PatternLiteral,

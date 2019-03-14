@@ -41,7 +41,7 @@
   {
     "type": "Rule",
     "name": "EXPRESSION",
-    "orgText": "() => {\n            $.SUBRULE($.ROOT_ANNOTATIONS);\n            $.OR([\n                { ALT: () => $.SUBRULE($.TYPE) },\n                { ALT: () => $.SUBRULE($.ALIAS) },\n                { ALT: () => $.SUBRULE($.DATA) },\n                { ALT: () => $.SUBRULE($.ASSIGNMENT) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_CHAPTER) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_PARAGRAPH) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_IMAGE) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_CODE) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_LIST) },\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.CommentBlock) }\n            ]);\n        }",
+    "orgText": "() => {\n            $.SUBRULE($.ROOT_ANNOTATIONS);\n            $.OR([\n                { ALT: () => $.SUBRULE($.TYPE) },\n                { ALT: () => $.SUBRULE($.ALIAS) },\n                { ALT: () => $.SUBRULE($.DATA) },\n                { ALT: () => $.SUBRULE($.VIEW) },\n                { ALT: () => $.SUBRULE($.OPTION) },\n                { ALT: () => $.SUBRULE($.ASSIGNMENT) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_CHAPTER) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_PARAGRAPH) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_IMAGE) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_CODE) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_LIST) },\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.CommentBlock) }\n            ]);\n        }",
     "definition": [
       {
         "type": "NonTerminal",
@@ -78,6 +78,26 @@
               {
                 "type": "NonTerminal",
                 "name": "DATA",
+                "idx": 0
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "VIEW",
+                "idx": 0
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "OPTION",
                 "idx": 0
               }
             ]
@@ -386,6 +406,194 @@
   },
   {
     "type": "Rule",
+    "name": "OPTION",
+    "orgText": "() => {\n            $.CONSUME(lexer_1.tokenLookup.KW_option);\n            $.CONSUME(lexer_1.tokenLookup.Identifier);\n            $.CONSUME(lexer_1.tokenLookup.SIGN_Equals);\n            $.AT_LEAST_ONE(() => $.SUBRULE($.OPTION_OPTION));\n        }",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "KW_option",
+        "label": "KW_option",
+        "idx": 0,
+        "pattern": "option"
+      },
+      {
+        "type": "Terminal",
+        "name": "Identifier",
+        "label": "Identifier",
+        "idx": 0,
+        "pattern": "[A-Z][a-zA-Z0-9_]*"
+      },
+      {
+        "type": "Terminal",
+        "name": "SIGN_Equals",
+        "label": "SIGN_Equals",
+        "idx": 0,
+        "pattern": "="
+      },
+      {
+        "type": "RepetitionMandatory",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "OPTION_OPTION",
+            "idx": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "OPTION_OPTION",
+    "orgText": "() => {\n            $.SUBRULE($.ANNOTATIONS);\n            $.CONSUME(lexer_1.tokenLookup.Indent);\n            $.CONSUME(lexer_1.tokenLookup.SIGN_Or);\n            $.OR([\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.StringLiteral) },\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.NumberLiteral) }\n            ]);\n        }",
+    "definition": [
+      {
+        "type": "NonTerminal",
+        "name": "ANNOTATIONS",
+        "idx": 0
+      },
+      {
+        "type": "Terminal",
+        "name": "Indent",
+        "label": "Indent",
+        "idx": 0,
+        "pattern": "( {4})"
+      },
+      {
+        "type": "Terminal",
+        "name": "SIGN_Or",
+        "label": "SIGN_Or",
+        "idx": 0,
+        "pattern": "\\|"
+      },
+      {
+        "type": "Alternation",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "StringLiteral",
+                "label": "StringLiteral",
+                "idx": 0,
+                "pattern": "([\"'])(?:(?=(\\\\?))\\2.)*?\\1"
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "NumberLiteral",
+                "label": "NumberLiteral",
+                "idx": 0,
+                "pattern": "-?(0|[1-9]\\d*)(\\.\\d+)?([eE][+-]?\\d+)?"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "VIEW",
+    "orgText": "() => {\n            $.CONSUME(lexer_1.tokenLookup.KW_view);\n            $.OPTION(() => $.CONSUME(lexer_1.tokenLookup.ViewIdentifier));\n            $.CONSUME(lexer_1.tokenLookup.SIGN_open);\n            $.MANY(() => {\n                $.AT_LEAST_ONE(() => $.CONSUME(lexer_1.tokenLookup.Indent));\n                $.CONSUME(lexer_1.tokenLookup.DirectiveLiteral);\n            });\n            $.MANY1(() => {\n                $.AT_LEAST_ONE1(() => $.CONSUME1(lexer_1.tokenLookup.Indent));\n                $.CONSUME1(lexer_1.tokenLookup.Identifier);\n            });\n            $.CONSUME(lexer_1.tokenLookup.SIGN_close);\n        }",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "KW_view",
+        "label": "KW_view",
+        "idx": 0,
+        "pattern": "view"
+      },
+      {
+        "type": "Option",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Terminal",
+            "name": "ViewIdentifier",
+            "label": "ViewIdentifier",
+            "idx": 0,
+            "pattern": "[A-Z][a-zA-Z0-9_]*(?= *{)"
+          }
+        ]
+      },
+      {
+        "type": "Terminal",
+        "name": "SIGN_open",
+        "label": "SIGN_open",
+        "idx": 0,
+        "pattern": "{"
+      },
+      {
+        "type": "Repetition",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "RepetitionMandatory",
+            "idx": 0,
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Indent",
+                "label": "Indent",
+                "idx": 0,
+                "pattern": "( {4})"
+              }
+            ]
+          },
+          {
+            "type": "Terminal",
+            "name": "DirectiveLiteral",
+            "label": "DirectiveLiteral",
+            "idx": 0,
+            "pattern": "(%{2})([^%]*)(%{2})|%.*\\n"
+          }
+        ]
+      },
+      {
+        "type": "Repetition",
+        "idx": 1,
+        "definition": [
+          {
+            "type": "RepetitionMandatory",
+            "idx": 1,
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Indent",
+                "label": "Indent",
+                "idx": 1,
+                "pattern": "( {4})"
+              }
+            ]
+          },
+          {
+            "type": "Terminal",
+            "name": "Identifier",
+            "label": "Identifier",
+            "idx": 1,
+            "pattern": "[A-Z][a-zA-Z0-9_]*"
+          }
+        ]
+      },
+      {
+        "type": "Terminal",
+        "name": "SIGN_close",
+        "label": "SIGN_close",
+        "idx": 0,
+        "pattern": "}"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
     "name": "RESTRICTION",
     "orgText": "() => {\n            $.AT_LEAST_ONE(() => {\n                $.CONSUME(lexer_1.tokenLookup.Indent);\n            });\n            $.CONSUME(lexer_1.tokenLookup.SIGN_Restriction);\n            $.CONSUME(lexer_1.tokenLookup.RestrictionIdentifier);\n            $.OR([\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.NumberLiteral) },\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.StringLiteral) },\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.PatternLiteral) },\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.BooleanLiteral) }\n            ]);\n        }",
     "definition": [
@@ -611,7 +819,7 @@
   {
     "type": "Rule",
     "name": "ANNOTATIONS",
-    "orgText": "() => {\n            $.MANY({\n                GATE: this.isAnnotation,\n                DEF: () => {\n                    $.CONSUME(lexer_1.tokenLookup.Indent);\n                    $.CONSUME(lexer_1.tokenLookup.Annotation);\n                }\n            });\n        }",
+    "orgText": "() => {\n            $.MANY({\n                GATE: this.isAnnotation,\n                DEF: () => {\n                    $.CONSUME(lexer_1.tokenLookup.Indent);\n                    $.CONSUME(lexer_1.tokenLookup.AnnotationLiteral);\n                }\n            });\n        }",
     "definition": [
       {
         "type": "Repetition",
@@ -626,10 +834,10 @@
           },
           {
             "type": "Terminal",
-            "name": "Annotation",
-            "label": "Annotation",
+            "name": "AnnotationLiteral",
+            "label": "AnnotationLiteral",
             "idx": 0,
-            "pattern": "(@) *([a-z][a-zA-Z0-9_-]* *:)?(.+)\\n"
+            "pattern": "(@{2})([^@]*)(@{2})|@.*\\n"
           }
         ]
       }
@@ -638,7 +846,7 @@
   {
     "type": "Rule",
     "name": "ROOT_ANNOTATIONS",
-    "orgText": "() => {\n            $.MANY(() => $.CONSUME(lexer_1.tokenLookup.Annotation));\n        }",
+    "orgText": "() => {\n            $.MANY(() => $.CONSUME(lexer_1.tokenLookup.AnnotationLiteral));\n        }",
     "definition": [
       {
         "type": "Repetition",
@@ -646,10 +854,10 @@
         "definition": [
           {
             "type": "Terminal",
-            "name": "Annotation",
-            "label": "Annotation",
+            "name": "AnnotationLiteral",
+            "label": "AnnotationLiteral",
             "idx": 0,
-            "pattern": "(@) *([a-z][a-zA-Z0-9_-]* *:)?(.+)\\n"
+            "pattern": "(@{2})([^@]*)(@{2})|@.*\\n"
           }
         ]
       }
@@ -693,7 +901,7 @@
         "name": "MarkdownParagraphLiteral",
         "label": "MarkdownParagraphLiteral",
         "idx": 0,
-        "pattern": "(?=[ ]+\\*).(.|\\n\\r?\\w)*"
+        "pattern": "(?![ ]+\\*).(.|\\n\\r?\\w)*"
       }
     ]
   },

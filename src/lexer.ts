@@ -12,15 +12,21 @@ const CommentBlock = createToken({
   pattern: /({\*)[^*}]*(\*})(?= *\n)/
 });
 
-const Annotation = createToken({
-  name: "Annotation",
-  pattern: /(@) *([a-z][a-zA-Z0-9_-]* *:)?(.+)\n/
-});
-
 const KW_Type = createToken({
   pattern: /type/,
   name: "KW_Type",
   push_mode: "type_definition"
+});
+
+const KW_open = createToken({
+  pattern: /open/,
+  name: "KW_open",
+  push_mode: "open_definition"
+});
+
+const KW_importing = createToken({
+  pattern: /importing/,
+  name: "KW_importing"
 });
 
 const KW_alias = createToken({
@@ -41,14 +47,31 @@ const KW_let = createToken({
   push_mode: "let_definition"
 });
 
+const KW_view = createToken({
+  pattern: /view/,
+  name: "KW_view",
+  push_mode: "view_definition"
+});
+
 const KW_extends = createToken({
   pattern: /extends/,
   name: "KW_extends"
 });
 
-const KW_option = createToken({
-  pattern: /option/,
-  name: "KW_option"
+const KW_choice = createToken({
+  pattern: /choice/,
+  name: "KW_choice",
+  push_mode: "choice_definition"
+});
+
+const KW_as = createToken({
+  pattern: /as/,
+  name: "KW_as"
+});
+
+const KW_pluck = createToken({
+  pattern: /pluck/,
+  name: "KW_pluck"
 });
 
 const SIGN_Equals = createToken({
@@ -65,12 +88,6 @@ const SIGN_EqualsType = createToken({
 const SIGN_EqualsAlias = createToken({
   name: "SIGN_EqualsAlias",
   pattern: /=/
-});
-
-const SIGN_EqualsOption = createToken({
-  name: "SIGN_EqualsOption",
-  pattern: /=/,
-  push_mode: "option_field_definition"
 });
 
 const SIGN_EqualsData = createToken({
@@ -99,9 +116,41 @@ const SIGN_dot = createToken({
   pattern: /\./
 });
 
+const SIGN_open = createToken({
+  name: "SIGN_open",
+  pattern: /{/
+});
+
+const SIGN_close = createToken({
+  name: "SIGN_close",
+  pattern: /}/,
+  push_mode: "root"
+});
+
+const SIGN_collectionOpen = createToken({
+  name: "SIGN_collectionOpen",
+  pattern: /\(/
+});
+
+const SIGN_collectionSeparator = createToken({
+  name: "SIGN_collectionSeparator",
+  pattern: /,/
+});
+
+const SIGN_collectionClose = createToken({
+  name: "SIGN_collectionClose",
+  pattern: /\)/,
+  push_mode: "root"
+});
+
 const Identifier = createToken({
   name: "Identifier",
   pattern: /[A-Z][a-zA-Z0-9_]*/
+});
+
+const ViewIdentifier = createToken({
+  name: "ViewIdentifier",
+  pattern: /[A-Z][a-zA-Z0-9_]*(?= *{)/
 });
 
 const ValiableIdentifier = createToken({
@@ -164,6 +213,18 @@ const BooleanLiteral = createToken({
   name: "BooleanLiteral",
   pattern: /True|False/
 });
+const DirectiveLiteral = createToken({
+  name: "DirectiveLiteral",
+  pattern: /(%{2})([^%]*)(%{2})|%.*\n/
+});
+const PragmaLiteral = createToken({
+  name: "PragmaLiteral",
+  pattern: /(#{2})([^#]*)(#{2})|#.*\n/
+});
+const AnnotationLiteral = createToken({
+  name: "AnnotationLiteral",
+  pattern: /(@{2})([^@]*)(@{2})|@.*\n/
+});
 
 const Operator = createToken({
   name: "Operator",
@@ -194,8 +255,10 @@ const MarkdownListLiteral = createToken({
 
 const MarkdownParagraphLiteral = createToken({
   name: "MarkdownParagraphLiteral",
-  pattern: /(?=[ ]+\*).(.|\n\r?\w)*/
+  pattern: /(?![ ]+\*).(.|\n\r?\w)*/
 });
+
+/* OPEN DEFINITION */
 
 /* LET DEFINITION */
 
@@ -217,8 +280,11 @@ const multiModeLexerDefinition = {
       KW_Type,
       KW_alias,
       KW_data,
-      //KW_let,
-      Annotation,
+      KW_choice,
+      KW_view,
+      KW_pluck,
+      KW_open,
+      AnnotationLiteral,
       EndBlock,
       CommentBlock,
       MarkdownChapterLiteral,
@@ -240,10 +306,12 @@ const multiModeLexerDefinition = {
     type_field_definition: [
       EndBlock,
       Indent,
-      Annotation,
+      AnnotationLiteral,
       FieldName,
       SIGN_TypeDefStart,
       SIGN_Restriction,
+      SIGN_dot,
+      KW_pluck,
       RestrictionIdentifier,
       GenericParameter,
       GenericIdentifier,
@@ -259,7 +327,7 @@ const multiModeLexerDefinition = {
     alias_definition: [
       EndBlock,
       Indent,
-      Annotation,
+      AnnotationLiteral,
       SIGN_EqualsAlias,
       SIGN_Restriction,
       GenericIdentifier,
@@ -284,7 +352,7 @@ const multiModeLexerDefinition = {
     ],
     data_field_definition: [
       EndBlock,
-      Annotation,
+      AnnotationLiteral,
       SIGN_Or,
       GenericIdentifier,
       Identifier,
@@ -294,6 +362,41 @@ const multiModeLexerDefinition = {
       EndBlock,
       WhiteSpace,
       CommentBlock
+    ],
+    view_definition: [
+      EndBlock,
+      StringLiteral,
+      KW_as,
+      SIGN_open,
+      SIGN_close,
+      DirectiveLiteral,
+      ViewIdentifier,
+      Identifier,
+      NewLine,
+      Indent,
+      EndBlock,
+      WhiteSpace,
+      CommentBlock
+    ],
+    choice_definition: [
+      EndBlock,
+      SIGN_Or,
+      SIGN_Equals,
+      Indent,
+      Identifier,
+      StringLiteral,
+      NumberLiteral,
+      NewLine,
+      WhiteSpace,
+      CommentBlock
+    ],
+    open_definition: [
+      Identifier,
+      KW_importing,
+      SIGN_dot,
+      SIGN_collectionOpen,
+      SIGN_collectionSeparator,
+      SIGN_collectionClose
     ]
     // restriction_field_definition: [
     //   SIGN_Or,
@@ -324,19 +427,29 @@ export const tokenLookup = {
   KW_data,
   KW_extends,
   KW_let,
+  KW_view,
+  KW_choice,
+  KW_pluck,
+  KW_open,
+  KW_importing,
 
   SIGN_Equals,
   SIGN_EqualsType,
   SIGN_EqualsData,
   SIGN_EqualsAlias,
-  SIGN_EqualsOption,
   SIGN_Or,
   SIGN_Restriction,
   SIGN_dot,
+  SIGN_open,
+  SIGN_close,
+  SIGN_collectionClose,
+  SIGN_collectionOpen,
+  SIGN_collectionSeparator,
   Operator,
 
-  Annotation,
+  AnnotationLiteral,
   Identifier,
+  ViewIdentifier,
   ValiableIdentifier,
   GenericIdentifier,
   GenericParameter,
@@ -346,6 +459,8 @@ export const tokenLookup = {
 
   CommentBlock,
 
+  DirectiveLiteral,
+  PragmaLiteral,
   BooleanLiteral,
   StringLiteral,
   NumberLiteral,

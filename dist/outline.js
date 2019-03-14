@@ -10,7 +10,7 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
         this.validateVisitor();
     }
     START(ctx) {
-        const expressions = ctx.EXPRESSION.map(expression => this.visit(expression));
+        const expressions = helpers_1.purge(ctx.EXPRESSION.map(expression => this.visit(expression)));
         return expressions;
     }
     EXPRESSION(ctx) {
@@ -51,48 +51,28 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
         }
     }
     TYPE(ctx) {
-        return Object.assign({ type: NodeType.TYPE_FIELD }, this.GetIdentity(ctx), { fields: ctx.SIGN_EqualsType ? ctx.TYPE_FIELD.map(f => this.visit(f)) : [] });
+        return Object.assign({ type: NodeType.TYPE }, this.visit(ctx.IDENTIFIER[0]), { extends: (ctx.Identifier || []).map(i => i.image), extends_start: (ctx.Identifier || []).map(helpers_1.getStartToken), fields: ctx.SIGN_EqualsType ? ctx.TYPE_FIELD.map(f => this.visit(f)) : [] });
     }
     TYPE_FIELD(ctx) {
-        const items = helpers_1.purge([
-            (ctx.GenericIdentifier || []).map(i => i.image),
-            (ctx.ConcreteIdentifier || []).map(i => i.image),
-            (ctx.Identifier || []).map(i => i.image),
-            (ctx.GenericParameter || []).map(i => i.image)
-        ]);
-        return Object.assign({ type: NodeType.TYPE_FIELD }, this.GetIdentity(ctx), { ofType: items, annotations: helpers_1.purge((ctx.ANNOTATIONS || []).map(a => this.visit(a))) });
+        return Object.assign({ type: NodeType.TYPE_FIELD }, this.visit(ctx.IDENTIFIER[0]), this.visit(ctx.TYPE_IDENTIFIER[0]), { restrictions: (ctx.RESTRICTION || []).map(r => this.visit(r)), annotations: helpers_1.purge((ctx.ANNOTATIONS || []).map(a => this.visit(a))) });
     }
     DATA(ctx) {
         const options = ctx.DATA_OPTION.map(d => this.visit(d));
-        return Object.assign({ type: NodeType.DATA }, this.GetIdentity(ctx), { options });
+        return Object.assign({ type: NodeType.DATA }, this.visit(ctx.IDENTIFIER[0]), { options });
     }
     DATA_OPTION(ctx) {
-        return Object.assign({ type: NodeType.DATA_OPTION }, this.GetIdentity(ctx));
+        return Object.assign({ type: NodeType.DATA_OPTION }, this.visit(ctx.IDENTIFIER[0]));
     }
     ALIAS(ctx) {
-        return Object.assign({ type: NodeType.ALIAS }, this.GetIdentity(ctx), this.visit(ctx.ALIAS_FOR[0]));
+        return Object.assign({ type: NodeType.ALIAS }, this.visit(ctx.IDENTIFIER[0]), this.visit(ctx.TYPE_IDENTIFIER[0]), { restrictions: (ctx.RESTRICTION || []).map(r => this.visit(r)) });
     }
-    ALIAS_FOR(ctx) {
-        const items = helpers_1.purge([
-            (ctx.GenericIdentifier || []).map(i => i.image),
-            (ctx.ConcreteIdentifier || []).map(i => i.image),
-            (ctx.Identifier || []).map(i => i.image),
-            (ctx.GenericParameter || []).map(i => i.image),
-            (ctx.StringLiteral || []).map(i => i.image),
-            (ctx.NumberLiteral || []).map(i => i.image),
-            (ctx.PatternLiteral || []).map(i => i.image)
-        ]);
-        return {
-            ofType: items
-        };
-    }
-    GetIdentity(ctx) {
+    IDENTIFIER(ctx) {
         if (ctx.GenericIdentifier) {
             return {
                 id: ctx.GenericIdentifier[0].image,
-                params: ctx.GenericParameter.map(g => g.image),
+                params: (ctx.GenericParameter || []).map(g => g.image),
                 id_start: helpers_1.getStartToken(ctx.GenericIdentifier[0]),
-                params_start: ctx.GenericParameter.map(helpers_1.getStartToken)
+                params_start: (ctx.GenericParameter || []).map(helpers_1.getStartToken)
             };
         }
         else if (ctx.FieldName) {
@@ -108,6 +88,50 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
             };
         }
     }
+    TYPE_IDENTIFIER(ctx) {
+        if (ctx.GenericIdentifier) {
+            return {
+                ofType: ctx.GenericIdentifier[0].image,
+                ofType_params: (ctx.GenericParameter || []).map(g => g.image),
+                ofType_start: helpers_1.getStartToken(ctx.GenericIdentifier[0]),
+                ofType_params_start: (ctx.GenericParameter || []).map(helpers_1.getStartToken)
+            };
+        }
+        else if (ctx.GenericParameter) {
+            return {
+                ofType: ctx.GenericParameter[0].image,
+                ofType_start: helpers_1.getStartToken(ctx.GenericParameter[0]),
+                ofType_params: [],
+                ofType_params_start: []
+            };
+        }
+        else {
+            let [ofType, ...ofType_params] = ctx.Identifier.map(i => i.image);
+            let [ofType_start, ...ofType_params_start] = ctx.Identifier.map(helpers_1.getStartToken);
+            return {
+                ofType,
+                ofType_start,
+                ofType_params,
+                ofType_params_start
+            };
+        }
+    }
+    RESTRICTION(ctx) {
+        return {
+            key: ctx.RestrictionIdentifier[0].image,
+            value: ctx.NumberLiteral
+                ? +ctx.NumberLiteral[0].image
+                : ctx.StringLiteral
+                    ? ctx.StringLiteral[0].image
+                    : ctx.PatternLiteral
+                        ? ctx.PatternLiteral[0].image
+                        : ctx.BooleanLiteral
+                            ? ctx.BooleanLiteral[0].image === "True"
+                            : false
+        };
+    }
+    // GetIdentity(ctx: any): IIdentity {
+    // }
     /* MARKDOWN */
     MARKDOWN_CHAPTER(ctx) {
         return {
@@ -207,5 +231,11 @@ var NodeType;
     NodeType["MARKDOWN_IMAGE"] = "MARKDOWN_IMAGE";
     NodeType["MARKDOWN_CHAPTER"] = "MARKDOWN_CHAPTER";
     NodeType["MARKDOWN_LIST"] = "MARKDOWN_LIST";
-})(NodeType || (NodeType = {}));
+})(NodeType = exports.NodeType || (exports.NodeType = {}));
+const defaultStart = {
+    startLineNumber: 0,
+    endLineNumber: 0,
+    startColumn: 0,
+    endColumn: 0
+};
 //# sourceMappingURL=outline.js.map

@@ -8,6 +8,15 @@ declare class DomainParser extends Parser {
     ALIAS_FOR: any;
     DATA: any;
     DATA_OPTION: any;
+    RESTRICTION: any;
+    ASSIGNMENT: any;
+    PARAMETERS: any;
+    STATEMENT: any;
+    BINARY_EXPRESSION: any;
+    VALUE_EXPRESSION: any;
+    FUNCTION_APPLICATION: any;
+    IDENTIFIER: any;
+    TYPE_IDENTIFIER: any;
     ROOT_ANNOTATIONS: any;
     ANNOTATIONS: any;
     ANNOTATION: any;
@@ -18,6 +27,8 @@ declare class DomainParser extends Parser {
     MARKDOWN_LIST: any;
     constructor();
     isAnnotation(): boolean | undefined;
+    isRestriction(): boolean | undefined;
+    isGenericParameter(): boolean | undefined;
 }
 export declare const parser: DomainParser;
 export {};

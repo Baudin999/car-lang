@@ -3,15 +3,21 @@ declare const BaseCstVisitorWithDefaults: any;
 export declare class OutlineVisitor extends BaseCstVisitorWithDefaults {
     tags: any;
     constructor();
-    START(ctx: any): any;
-    EXPRESSION(ctx: any): IType | IData | IAlias | IComment | null;
+    START(ctx: any): IExpression[];
+    EXPRESSION(ctx: any): IExpression | null;
     TYPE(ctx: any): IType;
     TYPE_FIELD(ctx: any): ITypeField;
     DATA(ctx: any): IData;
     DATA_OPTION(ctx: any): IDataOption;
     ALIAS(ctx: any): IAlias;
-    ALIAS_FOR(ctx: any): IAliasFor;
-    GetIdentity(ctx: any): IIdentity;
+    IDENTIFIER(ctx: any): IIdentity;
+    TYPE_IDENTIFIER(ctx: any): {
+        ofType: any;
+        ofType_start: any;
+        ofType_params: any;
+        ofType_params_start: any;
+    };
+    RESTRICTION(ctx: any): IRestriction;
     MARKDOWN_CHAPTER(ctx: any): IMarkdownChapter;
     MARKDOWN_IMAGE(ctx: any): IMarkdownImage;
     MARKDOWN_PARAGRAPH(ctx: any): IMarkdownParagraph;
@@ -24,14 +30,20 @@ export declare class OutlineVisitor extends BaseCstVisitorWithDefaults {
 export interface IType {
     type: NodeType;
     id: string;
+    extends: string[];
+    extends_start: ITokenStart[];
     params?: string[];
     fields: ITypeField[];
 }
 export interface ITypeField {
     type: NodeType;
     id: string;
-    ofType: string[];
+    ofType: string;
+    ofType_start: ITokenStart;
+    ofType_params: string[];
+    ofType_params_start: ITokenStart[];
     annotations: IAnnotation[];
+    source?: string;
 }
 export interface IData {
     type: NodeType;
@@ -47,6 +59,11 @@ export interface IDataOption {
 export interface IAlias {
     type: NodeType;
     id: string;
+    ofType: string;
+    ofType_start: ITokenStart;
+    ofType_params: string[];
+    ofType_params_start: ITokenStart[];
+    annotations: IAnnotation[];
 }
 export interface IComment {
     type: NodeType;
@@ -65,6 +82,10 @@ export interface IIdentity {
     id_start: ITokenStart;
     params?: string[];
     params_start?: ITokenStart[];
+}
+export interface IRestriction {
+    key: string;
+    value: string | number | boolean;
 }
 export interface IMarkdownChapter {
     type: NodeType;
@@ -90,7 +111,8 @@ export interface IMarkdownList {
     type: NodeType;
     items: string[];
 }
-declare enum NodeType {
+export declare type IExpression = IType | IAlias | IData | IComment | IMarkdownChapter | IMarkdownCode | IMarkdownImage | IMarkdownList | IMarkdownParagraph;
+export declare enum NodeType {
     TYPE = "TYPE",
     TYPE_FIELD = "TYPE_FIELD",
     ANNOTATION = "ANNOTATION",

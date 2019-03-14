@@ -72,7 +72,7 @@ alias MyAPI = Envelope MyAPIRequest MyAPIResponse
 
   const { tokens, cst, ast, errors } = transpile(source);
 
-  log(errors);
+  //log(errors);
   //log(ast);
 
   it("should have a test", () => {
