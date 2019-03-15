@@ -4,10 +4,11 @@ const parser_1 = require("./parser");
 const helpers_1 = require("./helpers");
 const BaseCstVisitorWithDefaults = parser_1.parser.getBaseCstVisitorConstructorWithDefaults();
 class OutlineVisitor extends BaseCstVisitorWithDefaults {
-    constructor() {
+    constructor(modules) {
         super();
-        this.tags = {};
+        this.modules = {};
         this.validateVisitor();
+        this.modules = modules;
     }
     START(ctx) {
         const expressions = helpers_1.purge(ctx.EXPRESSION.map(expression => this.visit(expression)));

@@ -5,6 +5,9 @@ const parser_1 = require("./parser");
 const outline_1 = require("./outline");
 const substitute_1 = require("./substitute");
 const tchecker_1 = require("./tchecker");
+// Modules is the associated hash for looking up module references
+// in the other modules (the imports).
+let modules = {};
 exports.transpile = (source) => {
     const lexedSource = lexer_1.DomainLexer.tokenize(source);
     parser_1.parser.input = lexedSource.tokens;

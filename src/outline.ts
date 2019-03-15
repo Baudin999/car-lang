@@ -4,11 +4,12 @@ import { purge, getStartToken, ITokenStart } from "./helpers";
 const BaseCstVisitorWithDefaults: any = parser.getBaseCstVisitorConstructorWithDefaults();
 
 export class OutlineVisitor extends BaseCstVisitorWithDefaults {
-  tags: any = {};
+  modules: any = {};
 
-  constructor() {
+  constructor(modules?: any) {
     super();
     this.validateVisitor();
+    this.modules = modules;
   }
 
   START(ctx: any): IExpression[] {

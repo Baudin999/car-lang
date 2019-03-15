@@ -1,8 +1,8 @@
 import { ITokenStart } from "./helpers";
 declare const BaseCstVisitorWithDefaults: any;
 export declare class OutlineVisitor extends BaseCstVisitorWithDefaults {
-    tags: any;
-    constructor();
+    modules: any;
+    constructor(modules?: any);
     START(ctx: any): IExpression[];
     EXPRESSION(ctx: any): IExpression | null;
     OPEN(ctx: any): IOpen;

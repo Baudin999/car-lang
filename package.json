@@ -2,15 +2,20 @@
   "name": "car-lang",
   "version": "0.0.1",
   "description": "The language to rule dragons",
-  "main": "dist/transpiler.js",
+  "main": "dist/ckc.js",
   "repository": "https://github.com/Baudin999/car-lang.git",
   "author": "Carlos Kelkboom <ckelkboom@protonmail.com>",
   "license": "MIT",
   "private": false,
+  "bin": "./dist/ckc.js",
   "scripts": {
     "test": "jest --watch",
     "build": "tsc --project ./",
-    "railroad": "ts-node ./src/railroad.ts"
+    "package": "yarn pkg . --out-path ./lib/",
+    "railroad": "ts-node ./src/railroad.ts",
+    "move": "cp ./lib/car-lang-macos /usr/local/bin/ckc",
+    "clean": "rm -rf ./dist; rm -rf ./lib",
+    "go": "yarn clean; yarn build; yarn railroad; yarn package; yarn move"
   },
   "dependencies": {
     "@types/jest": "^24.0.11",
@@ -21,6 +26,7 @@
     "commander": "^2.19.0",
     "jest": "^24.3.1",
     "lodash": "^4.17.11",
+    "pkg": "^4.3.7",
     "ramda": "^0.26.1",
     "ts-jest": "^24.0.0",
     "tslib": "^1.9.3",
@@ -28,5 +34,11 @@
   },
   "devDependencies": {
     "ts-node": "^8.0.3"
+  },
+  "pkg": {
+    "scripts": [
+      "./dist/**/*.js",
+      "./node_modules/chevrotain/lib/chevrotain.min.js"
+    ]
   }
 }

@@ -5,6 +5,10 @@ import { substituteExtensions, substituteAliases } from "./substitute";
 import { typeChecker, IError } from "./tchecker";
 import { IToken } from "chevrotain";
 
+// Modules is the associated hash for looking up module references
+// in the other modules (the imports).
+let modules = {};
+
 export const transpile = (source: string): ITranspilationResult => {
   const lexedSource = DomainLexer.tokenize(source);
   parser.input = lexedSource.tokens;
