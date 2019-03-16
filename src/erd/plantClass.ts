@@ -39,7 +39,7 @@ export class PlantClass {
   }
 
   annotations() {
-    return this.node.annotations.map(a => foldText(`<b>${a.key}</b>: ${a.value}`));
+    return this.node.annotations.map(a => foldText(`<b>${a.key}</b>: ${a.value}`)).join("\n");
   }
 
   source() {

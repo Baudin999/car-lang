@@ -1,0 +1,31 @@
+{*
+  We define APIs with a Request and a Response, this pattern
+  I'll be describing in the following sections will not work
+  for push notifications.
+*}
+
+type Meta =
+    Code: Number
+    Message: String
+
+@ code: 404
+@ message: Not Found
+type Error404 extends Meta
+
+@ code: 500
+@ message: Internal Server Error
+type Error500 extends Meta
+
+
+type Envelope req res extends Meta =
+    Request: req
+    Response: res
+
+type MyAPIRequest =
+    Something: String
+
+
+type MyAPIResponse =
+    AccountId: String
+
+alias MyAPI = Envelope MyAPIRequest MyAPIResponse
