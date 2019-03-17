@@ -1,5 +1,4 @@
 import { transpile } from "../src/transpiler";
-import { getFileFromModuleName } from "../src/fileManager";
 import { createERD } from "./../src/erd/createERD";
 
 const log = source => {
@@ -9,37 +8,25 @@ const log = source => {
 describe("Experiment with the language", () => {
   const source = `
 
-## Chapter
 
 data Maybe a =
     | Just a
     | Nothing
 
-type Entity =
-    Id: String
 
-alias MyEntity = Entity
+data List a =
+    | List a
+    | Nil
 
-choice Gender =
-    | "Male"
-    | "Female"
-    | "Other"
+type Branch a =
+    Left: a
+    Value: a
+    Right: a
 
-type Address =
-    Street: String
-    HouseNumber: Number
-    HouseNumberExtension: String
-    City: String
-    Country: String
+data Tree a =
+    | Nil
+    | Branch a
 
-@ This is the Person Entity which
-@ will be the basis for other types
-@ of entities.
-type Person extends MyEntity =
-    FirstName: Maybe String
-    LastName: String
-    Gender: Gender
-    Address: Address
 
 `;
 

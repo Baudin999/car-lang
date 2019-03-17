@@ -31,6 +31,8 @@ export const substituteAliases = (
         return node;
       }
 
+      if (baseTypes.indexOf(node.ofType) > -1) return originalType;
+
       let _node = clone(originalType) as any;
       _node.fields = _node.fields.map(field => {
         const fieldIndex = (_node.params || []).indexOf(field.ofType);

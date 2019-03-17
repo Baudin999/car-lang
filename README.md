@@ -79,4 +79,7 @@ The first thing I'll implement is the [type system](./documentation/types.md).
 For those of you who really want to understand the language instead of looking at examples you can
 look at the [Railroad](./railroad.html) diagram. This will give you everything you'll need to know.
 
-##
+## New Features
+
+A naive description of potential new features can be found on the
+[new page](./documentation/new.md).

@@ -1,5 +1,5 @@
 import { IExpression, IError } from "./outline";
-export declare const maybeRaiseError: (error: any) => void;
+export declare const runProgram: (projectName: any) => void;
 export interface IModule {
     name: string;
     ast: IExpression[];

@@ -398,23 +398,6 @@ const multiModeLexerDefinition = {
       SIGN_collectionSeparator,
       SIGN_collectionClose
     ]
-    // restriction_field_definition: [
-    //   SIGN_Or,
-    //   Annotation,
-    //   RestrictionIdentifier,
-    //   EndBlock,
-    //   CommentBlock
-    // ],
-    // let_definition: [
-    //   ValiableIdentifier,
-    //   SIGN_Equals,
-    //   SIGN_dot,
-    //   StringLiteral,
-    //   Operator,
-    //   NumberLiteral,
-    //   PatternLiteral,
-    //   EndBlock
-    // ]
   },
 
   defaultMode: "root"

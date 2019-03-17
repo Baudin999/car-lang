@@ -110,7 +110,17 @@ data Maybe a =
 
 data List a =
     | List a
-    | Nill
+    | Nil
+
+type Branch a =
+    Left: a
+    Value: a
+    Right: a
+
+data Tree a =
+    | Nil
+    | Branch a
+
 ```
 
 Because the `car` language does not do any form of implementation yet we can reduce the `List` type
