@@ -22,6 +22,7 @@ export class PlantClass {
 
   associations() {
     const normalFields = this.node.fields
+      .filter((field: any) => field.ofType !== "Maybe" && field.ofType !== "List")
       .filter(
         (field: any) =>
           this.lookup.types.indexOf(field.ofType) > -1 ||
@@ -32,12 +33,7 @@ export class PlantClass {
 
     const maybeFields = this.node.fields
       .filter((f: any) => f.ofType && f.ofType === "Maybe")
-      .filter(
-        (field: any) =>
-          this.lookup.types.indexOf(field.ofType_params[0]) > -1 ||
-          this.lookup.data.indexOf(field.ofType_params[0]) > -1 ||
-          this.lookup.enums.indexOf(field.ofType_params[0]) > -1
-      )
+      .filter((field: any) => baseTypes.indexOf(field.ofType_params[0]) === -1)
       .map(
         (field: any) =>
           `${field.ofType_params[0]} "0" --> "1" ${this.node.id} : Maybe ${field.ofType_params[0]}`
@@ -45,12 +41,7 @@ export class PlantClass {
 
     const listFields = this.node.fields
       .filter((f: any) => f.ofType && f.ofType === "List")
-      .filter(
-        (field: any) =>
-          this.lookup.types.indexOf(field.ofType_params[0]) > -1 ||
-          this.lookup.data.indexOf(field.ofType_params[0]) > -1 ||
-          this.lookup.enums.indexOf(field.ofType_params[0]) > -1
-      )
+      .filter((field: any) => baseTypes.indexOf(field.ofType_params[0]) === -1)
       .map(
         (field: any) =>
           `${field.ofType_params[0]} "0" --> "*" ${this.node.id} : List ${field.ofType_params[0]}`

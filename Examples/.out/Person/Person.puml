@@ -1,0 +1,21 @@
+abstract Maybe {
+	Just
+	Nothing
+}
+Just --> Maybe : Just
+Nothing --> Maybe : Nothing
+class Address {
+	Street: String 
+	PostalCode: String 
+	HouseNumber: Number 
+	HouseNumberExtension: String 
+	City: String 
+	CountryCode: String 
+	Country: String 
+}
+class Person {
+	FirstName: Maybe String
+	LastName: String 
+	Address: Address 
+}
+Address --> Person : Address

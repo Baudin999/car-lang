@@ -38,7 +38,16 @@ export const createHTML = (ast: IExpression[]) => {
       return null;
     });
 
-  return purge(transformedNodes.concat(tables)).join("\n");
+  return `
+<html>
+  <head>
+    <title></title>
+  </head>
+  <body>
+    ${purge(transformedNodes.concat(tables)).join("\n")}
+  </body>
+</html>
+  `.trim();
 };
 
 export interface ILookup {

@@ -1,11 +1,16 @@
 import { resolve, join } from "path";
-import { exists, readFile } from "fs";
+import { exists, readFile, existsSync } from "fs";
+import { removeSync, outputFile } from "fs-extra";
 import { watch } from "chokidar";
 import * as stringHash from "string-hash";
 import { IExpression, IError } from "./outline";
 import { maybeRaiseError } from "./ckc";
 import { transpile, resolveImports, substitute, typeCheck, createAST } from "./transpiler";
 import { createHTML } from "./html/createHTML";
+import { createERD } from "./erd/createERD";
+// @ts-ignore
+import { generateURL } from "./deflate/deflate";
+import { fetchImage } from "./helpers";
 
 export const runProgram = projectName => {
   const projectDirectory = resolve(projectName);
@@ -42,18 +47,50 @@ export const runProgram = projectName => {
       })
       .on("ready", () => {
         watcher.close();
+        let hasErrors = false;
         let moduleDictionary = typeCheck(substitute(resolveImports(modules)));
         for (let key in moduleDictionary) {
           if (moduleDictionary[key].errors && moduleDictionary[key].errors.length > 0) {
+            hasErrors = true;
             console.log("Found errors in: " + key);
             console.log(JSON.stringify(moduleDictionary[key].errors, null, 4));
           }
         }
 
+        // Can't continue if there are errors...
+        if (hasErrors) return;
+
+        // Check if the outpath exists and if so clean it.
+        const outPath = join(projectDirectory, ".out");
+        if (existsSync(outPath)) {
+          removeSync(outPath);
+        }
+
         for (let key in moduleDictionary) {
+          // Don't do sub directories yet...
+          // TODO: check to see to which Domain the sub-module belongs
+          //       create a sub-directory in that domain and generate
+          //       the relevant stuff in that sub-folder.
+          if (key.indexOf(".") > -1) return;
+
+          // Get the module.
           let module: IModule = moduleDictionary[key];
 
-          console.log(createHTML(module.ast));
+          // Generate the HTML and save it to the directory
+          const html = createHTML(module.ast);
+          const filePath = join(outPath, module.name, module.name + ".html");
+          outputFile(filePath, html);
+
+          // Save the plant UML file to the directory.
+          const puml = createERD(module.ast);
+          const filePathPuml = join(outPath, module.name, module.name + ".puml");
+          outputFile(filePathPuml, puml);
+
+          const url = generateURL(puml);
+          fetchImage(url).then(img => {
+            const filePathSVG = join(outPath, module.name, module.name + ".svg");
+            outputFile(filePathSVG, img);
+          });
         }
       });
   });

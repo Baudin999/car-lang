@@ -1171,7 +1171,7 @@ from2@^2.1.1:
     inherits "^2.0.1"
     readable-stream "^2.0.0"
 
-fs-extra@7.0.1:
+fs-extra@7.0.1, fs-extra@^7.0.1:
   version "7.0.1"
   resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-7.0.1.tgz#4f189c44aa123b895f722804f55ea23eadc348e9"
   dependencies:
@@ -2323,6 +2323,10 @@ needle@^2.2.1:
 nice-try@^1.0.4:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/nice-try/-/nice-try-1.0.5.tgz#a3378a7696ce7d223e88fc9b764bd7ef1089e366"
+
+node-fetch@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.3.0.tgz#1a1d940bbfb916a1d3e0219f037e89e71f8c5fa5"
 
 node-int64@^0.4.0:
   version "0.4.0"

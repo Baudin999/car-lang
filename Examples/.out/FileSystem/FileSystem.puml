@@ -1,0 +1,19 @@
+class List {
+}
+class FileInfo {
+	Size: Number 
+	LastModified: String 
+	FullPath: String 
+	CreatedBy: Author 
+	ModifiedBy: Author 
+}
+class DirectoryInfo {
+	Children: List FileSystemInfo
+}
+FileSystemInfo "0" --> "*" DirectoryInfo : List FileSystemInfo
+abstract FileSystemInfo {
+	FileInfo
+	DirectoryInfo
+}
+FileInfo --> FileSystemInfo : FileInfo
+DirectoryInfo --> FileSystemInfo : DirectoryInfo

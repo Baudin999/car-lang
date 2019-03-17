@@ -1,0 +1,16 @@
+abstract Maybe {
+	Just
+	Nothing
+}
+Just --> Maybe : Just
+Nothing --> Maybe : Nothing
+class List {
+}
+class Currency {
+	Sign: String 
+	Value: Number 
+  ---
+  <b>Currency is expressen like</b>:
+ $12,00
+    
+}

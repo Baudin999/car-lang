@@ -1,4 +1,5 @@
 import { IModuleDictionary, IModule } from "./ckc";
+import * as fetch from "node-fetch";
 
 /**
  *
@@ -87,6 +88,16 @@ export const fmapModules = (modules: IModuleDictionary) => {
       return newModuleDictionary;
     }
   };
+};
+
+export const fetchImage = url => {
+  return new Promise((resolve, reject) => {
+    fetch(url)
+      .then(r => r.text())
+      .then(r => {
+        resolve(r);
+      });
+  });
 };
 
 export const baseTypes = [

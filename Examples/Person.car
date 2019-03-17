@@ -1,5 +1,18 @@
 open Prelude importing (Maybe)
 
+type Address =
+    Street: String
+    PostalCode: String
+    HouseNumber: Number
+    HouseNumberExtension: String
+    City: String
+    CountryCode: String
+        | length 2
+        | pattern /[A-Z]{2}/
+    Country: String
+
+
 type Person =
     FirstName: Maybe String
     LastName: String
+    Address: Address
