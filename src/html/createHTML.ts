@@ -9,10 +9,13 @@ import {
   IMarkdownCode
 } from "../outline";
 import { purge } from "../helpers";
+import { createTableTYPE } from "./tableTYPE";
 
 const types = [NodeType.TYPE, NodeType.ALIAS, NodeType.DATA, NodeType.CHOICE];
 
 export const createHTML = (ast: IExpression[]) => {
+  const tables: string[] = [];
+
   const transformedNodes = ast
     .filter(node => node.type)
     .map(node => {
@@ -29,11 +32,13 @@ export const createHTML = (ast: IExpression[]) => {
       } else if (node.type === NodeType.MARKDOWN_CODE) {
         let code = node as IMarkdownCode;
         return `<pre><code>${code.content}</code></pre>`;
+      } else if (node.type === NodeType.TYPE) {
+        tables.push(createTableTYPE(node as IType));
       }
       return null;
     });
 
-  return purge(transformedNodes).join("\n");
+  return purge(transformedNodes.concat(tables)).join("\n");
 };
 
 export interface ILookup {

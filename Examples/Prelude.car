@@ -5,9 +5,7 @@ data Maybe a =
     | Nothing
 
 
-type List a =
-    | Nil
-    | Val a (List a)
+type List a
 
 @ Currency is expressen like: $12,00
 type Currency sign value =

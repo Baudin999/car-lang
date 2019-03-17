@@ -21,14 +21,42 @@ export class PlantClass {
   }
 
   associations() {
-    return this.node.fields
+    const normalFields = this.node.fields
       .filter(
         (field: any) =>
           this.lookup.types.indexOf(field.ofType) > -1 ||
+          this.lookup.data.indexOf(field.ofType) > -1 ||
           this.lookup.enums.indexOf(field.ofType) > -1
       )
-      .map((field: any) => `${field.id} --> ${this.node.id} : ${field.id}`)
-      .join("\n");
+      .map((field: any) => `${field.id} --> ${this.node.id} : ${field.id}`);
+
+    const maybeFields = this.node.fields
+      .filter((f: any) => f.ofType && f.ofType === "Maybe")
+      .filter(
+        (field: any) =>
+          this.lookup.types.indexOf(field.ofType_params[0]) > -1 ||
+          this.lookup.data.indexOf(field.ofType_params[0]) > -1 ||
+          this.lookup.enums.indexOf(field.ofType_params[0]) > -1
+      )
+      .map(
+        (field: any) =>
+          `${field.ofType_params[0]} "0" --> "1" ${this.node.id} : Maybe ${field.ofType_params[0]}`
+      );
+
+    const listFields = this.node.fields
+      .filter((f: any) => f.ofType && f.ofType === "List")
+      .filter(
+        (field: any) =>
+          this.lookup.types.indexOf(field.ofType_params[0]) > -1 ||
+          this.lookup.data.indexOf(field.ofType_params[0]) > -1 ||
+          this.lookup.enums.indexOf(field.ofType_params[0]) > -1
+      )
+      .map(
+        (field: any) =>
+          `${field.ofType_params[0]} "0" --> "*" ${this.node.id} : List ${field.ofType_params[0]}`
+      );
+
+    return [...normalFields, ...maybeFields, ...listFields].join("\n");
   }
 
   extensions() {
@@ -38,19 +66,25 @@ export class PlantClass {
       .join("\n");
   }
 
-  annotations() {
-    return this.node.annotations.map(a => foldText(`<b>${a.key}</b>: ${a.value}`)).join("\n");
-  }
-
   source() {
     return this.node.source ? `<${this.node.source}>` : "";
+  }
+
+  annotations() {
+    if (this.node.annotations.length === 0) return "";
+    const annotations = this.node.annotations
+      .map(a => foldText(`<b>${a.key}</b>: ${a.value}`))
+      .join("\n");
+    return `
+  ---
+  ${annotations}
+    `;
   }
 
   toString(): string {
     return `
 class ${this.node.id}${this.source()} {
 ${this.fields()}
----
 ${this.annotations()}
 }
 ${this.associations()}

@@ -21,7 +21,12 @@ export const substituteAliases = (
   const errors: IError[] = [];
   const newAST = ast.map((node: any) => {
     if (node.type !== NodeType.ALIAS) return node;
-    else {
+    else if (baseTypes.indexOf(node.ofType) > -1) {
+      // now we know it's a "simple type" a String or a Number,
+      // something we don't really have to substitute, so we can
+      // just return the actual ALIAS node.
+      return node;
+    } else {
       let originalType = getNodeById(ast, [], node.ofType);
       if (!originalType) {
         errors.push({

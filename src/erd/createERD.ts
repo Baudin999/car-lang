@@ -1,5 +1,6 @@
 import { IExpression, NodeType, IType, IChoice } from "./../outline";
 import { PlantClass } from "./plantClass";
+import { PlantData } from "./plantData";
 import { purge } from "../helpers";
 import { PlantEnum } from "./plantEnum";
 
@@ -12,7 +13,8 @@ export const createERD = (ast: IExpression[]) => {
       .map((n: any) => n.id),
     enums: ast
       .filter((node: any) => node.type && node.type === NodeType.CHOICE)
-      .map((n: any) => n.id)
+      .map((n: any) => n.id),
+    data: ast.filter((node: any) => node.type && node.type === NodeType.DATA).map((n: any) => n.id)
   };
 
   const transformedNodes = ast.map(node => {
@@ -20,6 +22,8 @@ export const createERD = (ast: IExpression[]) => {
       return new PlantClass(node as IType, lookup).toString();
     } else if (node.type && node.type === NodeType.CHOICE) {
       return new PlantEnum(node as any).toString();
+    } else if (node.type && node.type === NodeType.DATA) {
+      return new PlantData(node as any, lookup).toString();
     }
     return null;
   });
@@ -30,4 +34,5 @@ export const createERD = (ast: IExpression[]) => {
 export interface ILookup {
   types: string[];
   enums: string[];
+  data: string[];
 }

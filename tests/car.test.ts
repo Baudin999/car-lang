@@ -2,6 +2,7 @@ import { DomainLexer } from "../src/lexer";
 import { parser } from "../src/parser";
 import { OutlineVisitor } from "./../src/outline";
 import { transpile } from "../src/transpiler";
+import { createERD } from "../src/erd/createERD";
 
 const log = source => {
   console.log(JSON.stringify(source, null, 4));
@@ -177,6 +178,38 @@ fun sum a b => a + b
 
 `;
   const { tokens, cst, ast } = transpile(source);
+
+  it("Check the validity of the cst", () => {
+    expect(cst).toBeDefined();
+  });
+});
+
+describe("Mimic the file system", () => {
+  const source = `
+
+alias Author = String
+    | pattern /[A-Z][a-z]* [[A-Z][a-z]*]/
+
+type FileInfo =
+    Size: Number
+    LastModified: String
+    FullPath: String
+    CreatedBy: Author
+    ModifiedBy: Author
+
+type DirectoryInfo =
+    Children: List FileSystemInfo
+
+data FileSystemInfo =
+    | FileInfo
+    | DirectoryInfo
+
+`;
+  const { cst, ast, errors } = transpile(source);
+
+  //console.log(createERD(ast));
+
+  //console.log(ast);
 
   it("Check the validity of the cst", () => {
     expect(cst).toBeDefined();

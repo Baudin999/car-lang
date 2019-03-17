@@ -5,6 +5,7 @@ import * as stringHash from "string-hash";
 import { IExpression, IError } from "./outline";
 import { maybeRaiseError } from "./ckc";
 import { transpile, resolveImports, substitute, typeCheck, createAST } from "./transpiler";
+import { createHTML } from "./html/createHTML";
 
 export const runProgram = projectName => {
   const projectDirectory = resolve(projectName);
@@ -47,6 +48,12 @@ export const runProgram = projectName => {
             console.log("Found errors in: " + key);
             console.log(JSON.stringify(moduleDictionary[key].errors, null, 4));
           }
+        }
+
+        for (let key in moduleDictionary) {
+          let module: IModule = moduleDictionary[key];
+
+          console.log(createHTML(module.ast));
         }
       });
   });

@@ -55,7 +55,7 @@ export const resolveImports = (modules: IModuleDictionary) => {
           throw "Can't find module " + node.module;
         }
         node.imports.forEach(id => {
-          const ref = getNodeById(id, m.ast);
+          const ref = getNodeById(id, m.ast || []);
           if (ref) module.ast.unshift(clone(ref));
         });
         return module;
