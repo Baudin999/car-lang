@@ -8,8 +8,15 @@ We will need a function with which we can grab a node
 from the ast by the id
 */
 const getNodeById = (ast, params = [], id) => {
-    return (params.indexOf(id) > -1 ||
+    return (
+    // the type we're searching for might be in the params
+    // for example:
+    // type Foo a =
+    //    Bar: a
+    params.indexOf(id) > -1 ||
+        // It might be a baseType like "String"
         helpers_1.baseTypes.find(t => t === id) ||
+        // it Might be a real type like "Person" or "Address"
         ast.find((node) => node.id && node.id === id));
 };
 exports.typeChecker = (ast = []) => {

@@ -1,3 +1,4 @@
+import { IModuleDictionary, IModule } from "./ckc";
 /**
  *
  * "startLine": 2,
@@ -24,4 +25,7 @@ export declare const clone: (source: any) => any;
  * @param a - array used to build result, defaults to new array
  */
 export declare function foldText(s: string, split?: string, n?: number, useSpaces?: boolean, a?: string[]): string;
+export declare const fmapModules: (modules: IModuleDictionary) => {
+    map: (handler: (m: IModule) => IModule) => IModuleDictionary;
+};
 export declare const baseTypes: string[];

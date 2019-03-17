@@ -125,6 +125,7 @@ export interface IRestriction {
 export interface IMarkdownChapter {
     type: NodeType;
     content: string;
+    depth: number;
 }
 export interface IMarkdownImage {
     type: NodeType;
@@ -167,5 +168,12 @@ export declare enum NodeType {
     CHOICE = "CHOICE",
     PLUCKED_FIELD = "PLUCKED_FIELD",
     OPEN = "OPEN"
+}
+export interface IError {
+    message: string;
+    startLineNumber: number;
+    endLineNumber: number;
+    startColumn: number;
+    endColumn: number;
 }
 export {};

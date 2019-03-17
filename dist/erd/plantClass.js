@@ -30,7 +30,7 @@ class PlantClass {
             .join("\n");
     }
     annotations() {
-        return this.node.annotations.map(a => helpers_1.foldText(`<b>${a.key}</b>: ${a.value}`));
+        return this.node.annotations.map(a => helpers_1.foldText(`<b>${a.key}</b>: ${a.value}`)).join("\n");
     }
     source() {
         return this.node.source ? `<${this.node.source}>` : "";

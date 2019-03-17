@@ -59,6 +59,20 @@ function foldText(s, split = "\n", n = 40, useSpaces = true, a = []) {
     }
 }
 exports.foldText = foldText;
+/*
+Simple way to map through the modules
+*/
+exports.fmapModules = (modules) => {
+    return {
+        map: (handler) => {
+            let newModuleDictionary = {};
+            for (var moduleKey in modules) {
+                newModuleDictionary[moduleKey] = handler(modules[moduleKey]);
+            }
+            return newModuleDictionary;
+        }
+    };
+};
 exports.baseTypes = [
     "String",
     "Char",

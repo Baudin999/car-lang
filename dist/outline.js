@@ -215,9 +215,22 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
     // }
     /* MARKDOWN */
     MARKDOWN_CHAPTER(ctx) {
+        const content = ctx.MarkdownChapterLiteral[0].image;
+        const depth = content.startsWith("#####")
+            ? 5
+            : content.startsWith("####")
+                ? 4
+                : content.startsWith("###")
+                    ? 3
+                    : content.startsWith("##")
+                        ? 2
+                        : content.startsWith("#")
+                            ? 1
+                            : 1;
         return {
             type: NodeType.MARKDOWN_CHAPTER,
-            content: ctx.MarkdownChapterLiteral[0].image
+            content,
+            depth
         };
     }
     MARKDOWN_IMAGE(ctx) {

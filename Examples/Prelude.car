@@ -5,4 +5,13 @@ data Maybe a =
     | Nothing
 
 
+type List a
+
+@ Currency is expressen like: $12,00
+type Currency sign value =
+    Sign: String
+        | min 1
+        | max 25
+    Value: Number
+
 
