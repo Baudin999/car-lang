@@ -538,3 +538,11 @@ const defaultStart: ITokenStart = {
   startColumn: 0,
   endColumn: 0
 };
+
+export interface IError {
+  message: string;
+  startLineNumber: number;
+  endLineNumber: number;
+  startColumn: number;
+  endColumn: number;
+}

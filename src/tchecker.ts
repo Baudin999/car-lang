@@ -1,5 +1,5 @@
 import { baseTypes, ITokenStart } from "./helpers";
-import { IExpression, IType, IChoice, NodeType, ITypeField, IPluckedField } from "./outline";
+import { IExpression, IType, IError, NodeType, ITypeField, IPluckedField } from "./outline";
 
 const lookupTree = {};
 
@@ -9,8 +9,14 @@ from the ast by the id
 */
 const getNodeById = (ast: IExpression[], params: string[] = [], id: string) => {
   return (
+    // the type we're searching for might be in the params
+    // for example:
+    // type Foo a =
+    //    Bar: a
     params.indexOf(id) > -1 ||
+    // It might be a baseType like "String"
     baseTypes.find(t => t === id) ||
+    // it Might be a real type like "Person" or "Address"
     ast.find((node: any) => node.id && node.id === id)
   );
 };
@@ -27,6 +33,7 @@ export const typeChecker = (ast: IExpression[] = []): IError[] => {
           // the id of the field
           let typeId = field.ofType;
           let ref = getNodeById(ast, node.params, typeId);
+
           if (!ref) {
             errors.push({
               message: `Cannot find type "${typeId}" of field "${field.id}" of type "${node.id}"`,
@@ -92,7 +99,3 @@ export const typeChecker = (ast: IExpression[] = []): IError[] => {
 
   return errors;
 };
-
-export interface IError {
-  message: string;
-}

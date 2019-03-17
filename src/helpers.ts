@@ -1,3 +1,5 @@
+import { IModuleDictionary, IModule } from "./ckc";
+
 /**
  *
  * "startLine": 2,
@@ -71,6 +73,21 @@ export function foldText(
     return foldText(s.substring(nextIdx), split, n, useSpaces, a);
   }
 }
+
+/*
+Simple way to map through the modules
+*/
+export const fmapModules = (modules: IModuleDictionary) => {
+  return {
+    map: (handler: (m: IModule) => IModule): IModuleDictionary => {
+      let newModuleDictionary: IModuleDictionary = {};
+      for (var moduleKey in modules) {
+        newModuleDictionary[moduleKey] = handler(modules[moduleKey]);
+      }
+      return newModuleDictionary;
+    }
+  };
+};
 
 export const baseTypes = [
   "String",

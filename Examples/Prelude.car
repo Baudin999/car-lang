@@ -5,17 +5,4 @@ data Maybe a =
     | Nothing
 
 
-type Shelter =
-    Name: String
-
-
-choice Gender =
-    | "Male"
-    | "Female"
-
-choice Month =
-    | 1
-    | 2
-    | 3
-
 

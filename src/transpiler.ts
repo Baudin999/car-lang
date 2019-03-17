@@ -1,15 +1,36 @@
 import { DomainLexer } from "./lexer";
 import { parser } from "./parser";
-import { OutlineVisitor, IExpression } from "./outline";
+import { OutlineVisitor, NodeType, IExpression, IError, IOpen } from "./outline";
+import { resolve } from "./resolver";
 import { substituteExtensions, substituteAliases } from "./substitute";
-import { typeChecker, IError } from "./tchecker";
+import { typeChecker } from "./tchecker";
 import { IToken } from "chevrotain";
+import { IModule, IModuleDictionary } from "./ckc";
+import { fmapModules, clone } from "./helpers";
 
 // Modules is the associated hash for looking up module references
 // in the other modules (the imports).
-let modules = {};
 
 export const transpile = (source: string): ITranspilationResult => {
+  const { ast, cst, tokens } = createAST(source);
+
+  let rwAlias = substituteAliases(ast);
+  let rwAliasAST = rwAlias.newAST;
+  let rwAliasErrors = rwAlias.errors;
+
+  var { newAST, errors } = substituteExtensions(rwAliasAST);
+
+  const checkASTs = typeChecker(newAST) || [];
+
+  return {
+    tokens,
+    cst,
+    ast: newAST,
+    errors: [...rwAliasErrors, ...errors, ...checkASTs]
+  };
+};
+
+export const createAST = (source: string) => {
   const lexedSource = DomainLexer.tokenize(source);
   parser.input = lexedSource.tokens;
   const cst = parser.START();
@@ -21,20 +42,44 @@ export const transpile = (source: string): ITranspilationResult => {
   const visitor = new OutlineVisitor();
   const ast = visitor.visit(cst);
 
-  let rwAlias = substituteAliases(ast);
-  let rwAliasAST = rwAlias.newAST;
-  let rwAliasErrors = rwAlias.errors;
+  return { ast, tokens: lexedSource.tokens, cst };
+};
 
-  var { newAST, errors } = substituteExtensions(rwAliasAST);
+export const resolveImports = (modules: IModuleDictionary) => {
+  return fmapModules(modules).map(module => {
+    module.ast
+      .filter(node => node.type === NodeType.OPEN)
+      .map((node: any) => {
+        const m: IModule = modules[node.module];
+        if (!m) {
+          throw "Can't find module " + node.module;
+        }
+        node.imports.forEach(id => {
+          const ref = getNodeById(id, m.ast);
+          if (ref) module.ast.unshift(clone(ref));
+        });
+        return module;
+      });
+    return module;
+  });
+};
 
-  const checkASTs = typeChecker(newAST) || [];
+export const substitute = (modules: IModuleDictionary) => {
+  return fmapModules(modules).map(module => {
+    let { errors, newAST } = substituteExtensions(module.ast);
+    return { ...module, ast: newAST, errors: [...module.errors, ...errors] };
+  });
+};
 
-  return {
-    tokens: lexedSource.tokens,
-    cst,
-    ast: newAST,
-    errors: [...rwAliasErrors, ...errors, ...checkASTs]
-  };
+export const typeCheck = (modules: IModuleDictionary) => {
+  return fmapModules(modules).map(module => {
+    let errors = typeChecker(module.ast);
+    return { ...module, errors: [...module.errors, ...errors] };
+  });
+};
+
+const getNodeById = (id, ast) => {
+  return ast.find(node => node.id && node.id === id);
 };
 
 export interface ITranspilationResult {

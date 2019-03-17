@@ -1,5 +1,5 @@
 import { baseTypes, clone, purge } from "./helpers";
-import { IExpression, IType, NodeType, IAlias, ITypeField } from "./outline";
+import { IExpression, IType, NodeType, IError, ITypeField } from "./outline";
 
 const lookupTree = {};
 
@@ -89,7 +89,3 @@ export const substituteExtensions = (
   });
   return { newAST, errors };
 };
-
-export interface IError {
-  message: string;
-}

@@ -1,9 +1,12 @@
 import { readFile, writeFile } from "fs";
-import { transpile } from "./transpiler";
+import { transpile, resolveImports, substitute, typeCheck, createAST } from "./transpiler";
 import { createERD } from "./erd/createERD";
 import * as program from "commander";
 import { resolve, join } from "path";
 import { exists } from "fs";
+import { watch } from "chokidar";
+import * as stringHash from "string-hash";
+import { IExpression, IError } from "./outline";
 
 function id(val) {
   return val;
@@ -33,16 +36,52 @@ if (program.project) {
       process.exit(1);
     }
 
+    let modules: IModuleDictionary = {};
+
+    const watcher = watch(projectDirectory)
+      .on("all", (event, fullPath: string) => {
+        if (fullPath.endsWith(".car")) {
+          let moduleName = fullPath
+            .replace(projectDirectory, "")
+            .replace(/\//g, ".")
+            .replace(/^\./, "")
+            .replace(/\.car/, "");
+
+          readFile(fullPath, "utf8", (err, source: string) => {
+            maybeRaiseError(err);
+            const hash = stringHash(source);
+            const { ast } = createAST(source);
+            console.log(`Finished compiling: ${moduleName}`);
+            modules[moduleName] = {
+              name: moduleName,
+              ast,
+              errors: [],
+              hash,
+              timestamp: new Date()
+            };
+          });
+        }
+      })
+      .on("ready", () => {
+        watcher.close();
+
+        let moduleDictionary = typeCheck(substitute(resolveImports(modules)));
+
+        for (let key in moduleDictionary) {
+          if (moduleDictionary[key].errors && moduleDictionary[key].errors.length > 0) {
+            console.log("Found errors in: " + key);
+            console.log(JSON.stringify(moduleDictionary[key].errors, null, 4));
+          }
+        }
+      });
+
     // we can now assume that the carconfig.json file exits (TODO: use zdragon.json in zdragon projects)
   });
 }
 
 if (program.file) {
   readFile(program.file, "utf8", (err, sourceCode) => {
-    if (err) {
-      console.log(err);
-      process.exit(1);
-    }
+    maybeRaiseError(err);
 
     const { errors, ast, tokens, cst } = transpile(sourceCode);
 
@@ -66,9 +105,26 @@ if (program.init) {
     description: "The description"
   };
   writeFile(carconfigFile, JSON.stringify(body, null, 4), "utf8", (error: any) => {
-    if (error) {
-      console.log(error);
-    }
-    process.exit(error ? 1 : 0);
+    maybeRaiseError(error);
+    process.exit(0);
   });
+}
+
+const maybeRaiseError = error => {
+  if (error) {
+    console.log(error);
+    process.exit(1);
+  }
+};
+
+export interface IModule {
+  name: string;
+  ast: IExpression[];
+  hash: string;
+  errors: IError[];
+  timestamp: Date;
+}
+
+export interface IModuleDictionary {
+  [module: string]: IModule;
 }
