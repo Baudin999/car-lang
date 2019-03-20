@@ -7,7 +7,7 @@ export declare class PlantClass {
     fields(): string;
     associations(): string;
     extensions(): string;
-    annotations(): string;
     source(): string;
+    annotations(): string;
     toString(): string;
 }

@@ -2,10 +2,16 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const path_1 = require("path");
 const fs_1 = require("fs");
+const fs_extra_1 = require("fs-extra");
 const chokidar_1 = require("chokidar");
 const stringHash = require("string-hash");
 const ckc_1 = require("./ckc");
 const transpiler_1 = require("./transpiler");
+const createHTML_1 = require("./html/createHTML");
+const createERD_1 = require("./erd/createERD");
+// @ts-ignore
+const deflate_1 = require("./deflate/deflate");
+const helpers_1 = require("./helpers");
 exports.runProgram = projectName => {
     const projectDirectory = path_1.resolve(projectName);
     fs_1.exists(path_1.join(projectDirectory, "carconfig.json"), (e) => {
@@ -39,12 +45,45 @@ exports.runProgram = projectName => {
         })
             .on("ready", () => {
             watcher.close();
+            let hasErrors = false;
             let moduleDictionary = transpiler_1.typeCheck(transpiler_1.substitute(transpiler_1.resolveImports(modules)));
             for (let key in moduleDictionary) {
                 if (moduleDictionary[key].errors && moduleDictionary[key].errors.length > 0) {
+                    hasErrors = true;
                     console.log("Found errors in: " + key);
                     console.log(JSON.stringify(moduleDictionary[key].errors, null, 4));
                 }
+            }
+            // Can't continue if there are errors...
+            if (hasErrors)
+                return;
+            // Check if the outpath exists and if so clean it.
+            const outPath = path_1.join(projectDirectory, ".out");
+            if (fs_1.existsSync(outPath)) {
+                fs_extra_1.removeSync(outPath);
+            }
+            for (let key in moduleDictionary) {
+                // Don't do sub directories yet...
+                // TODO: check to see to which Domain the sub-module belongs
+                //       create a sub-directory in that domain and generate
+                //       the relevant stuff in that sub-folder.
+                if (key.indexOf(".") > -1)
+                    return;
+                // Get the module.
+                let module = moduleDictionary[key];
+                // Generate the HTML and save it to the directory
+                const html = createHTML_1.createHTML(module.ast);
+                const filePath = path_1.join(outPath, module.name, module.name + ".html");
+                fs_extra_1.outputFile(filePath, html);
+                // Save the plant UML file to the directory.
+                const puml = createERD_1.createERD(module.ast);
+                const filePathPuml = path_1.join(outPath, module.name, module.name + ".puml");
+                fs_extra_1.outputFile(filePathPuml, puml);
+                const url = deflate_1.generateURL(puml);
+                helpers_1.fetchImage(url).then(img => {
+                    const filePathSVG = path_1.join(outPath, module.name, module.name + ".svg");
+                    fs_extra_1.outputFile(filePathSVG, img);
+                });
             }
         });
     });

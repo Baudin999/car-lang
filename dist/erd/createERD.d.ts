@@ -3,4 +3,5 @@ export declare const createERD: (ast: IExpression[]) => string;
 export interface ILookup {
     types: string[];
     enums: string[];
+    data: string[];
 }

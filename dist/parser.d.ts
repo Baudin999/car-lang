@@ -12,7 +12,6 @@ declare class DomainParser extends Parser {
     CHOICE_OPTION: any;
     VIEW: any;
     RESTRICTION: any;
-    ASSIGNMENT: any;
     PARAMETERS: any;
     STATEMENT: any;
     BINARY_EXPRESSION: any;

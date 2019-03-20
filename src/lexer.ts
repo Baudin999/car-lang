@@ -1,6 +1,7 @@
 import { createToken, Lexer } from "chevrotain";
+import { KW_let, let_definition } from "./lexer.let";
 
-const EndBlock = createToken({
+export const EndBlock = createToken({
   name: "EndBlock",
   pattern: /\n(\s*\n)+(?!\s)/,
   push_mode: "root",
@@ -39,12 +40,6 @@ const KW_data = createToken({
   pattern: /data/,
   name: "KW_data",
   push_mode: "data_definition"
-});
-
-const KW_let = createToken({
-  pattern: /let/,
-  name: "KW_let",
-  push_mode: "let_definition"
 });
 
 const KW_view = createToken({
@@ -260,18 +255,6 @@ const MarkdownParagraphLiteral = createToken({
 
 /* OPEN DEFINITION */
 
-/* LET DEFINITION */
-
-const FunctionIdentifier = createToken({
-  name: "FunctionIdentifier",
-  pattern: /(?=let +)[a-z][a-zA-Z0-9_]*(?= +)/
-});
-
-const FunctionParameter = createToken({
-  name: "FunctionParameter",
-  pattern: /[a-z][a-zA-Z0-9_]*(?= +)/
-});
-
 /* SYSTEM TOKENS - END */
 
 const multiModeLexerDefinition = {
@@ -284,6 +267,7 @@ const multiModeLexerDefinition = {
       KW_view,
       KW_pluck,
       KW_open,
+      KW_let,
       AnnotationLiteral,
       EndBlock,
       CommentBlock,
@@ -397,7 +381,8 @@ const multiModeLexerDefinition = {
       SIGN_collectionOpen,
       SIGN_collectionSeparator,
       SIGN_collectionClose
-    ]
+    ],
+    let_definition
   },
 
   defaultMode: "root"
@@ -409,7 +394,6 @@ export const tokenLookup = {
   KW_alias,
   KW_data,
   KW_extends,
-  KW_let,
   KW_view,
   KW_choice,
   KW_pluck,
@@ -459,7 +443,6 @@ export const tokenLookup = {
   MarkdownListLiteral,
   MarkdownParagraphLiteral
 };
-
 export const DomainLexer = new Lexer(multiModeLexerDefinition);
 
 // selfService / Household / Calculate Estimate Consumption

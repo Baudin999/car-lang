@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const chevrotain_1 = require("chevrotain");
-const EndBlock = chevrotain_1.createToken({
+const lexer_let_1 = require("./lexer.let");
+exports.EndBlock = chevrotain_1.createToken({
     name: "EndBlock",
     pattern: /\n(\s*\n)+(?!\s)/,
     push_mode: "root",
@@ -34,11 +35,6 @@ const KW_data = chevrotain_1.createToken({
     pattern: /data/,
     name: "KW_data",
     push_mode: "data_definition"
-});
-const KW_let = chevrotain_1.createToken({
-    pattern: /let/,
-    name: "KW_let",
-    push_mode: "let_definition"
 });
 const KW_view = chevrotain_1.createToken({
     pattern: /view/,
@@ -215,15 +211,6 @@ const MarkdownParagraphLiteral = chevrotain_1.createToken({
     pattern: /(?![ ]+\*).(.|\n\r?\w)*/
 });
 /* OPEN DEFINITION */
-/* LET DEFINITION */
-const FunctionIdentifier = chevrotain_1.createToken({
-    name: "FunctionIdentifier",
-    pattern: /(?=let +)[a-z][a-zA-Z0-9_]*(?= +)/
-});
-const FunctionParameter = chevrotain_1.createToken({
-    name: "FunctionParameter",
-    pattern: /[a-z][a-zA-Z0-9_]*(?= +)/
-});
 /* SYSTEM TOKENS - END */
 const multiModeLexerDefinition = {
     modes: {
@@ -235,8 +222,9 @@ const multiModeLexerDefinition = {
             KW_view,
             KW_pluck,
             KW_open,
+            lexer_let_1.KW_let,
             AnnotationLiteral,
-            EndBlock,
+            exports.EndBlock,
             CommentBlock,
             MarkdownChapterLiteral,
             MarkdownCodeLiteral,
@@ -250,12 +238,12 @@ const multiModeLexerDefinition = {
             GenericParameter,
             GenericIdentifier,
             Identifier,
-            EndBlock,
+            exports.EndBlock,
             WhiteSpace,
             CommentBlock
         ],
         type_field_definition: [
-            EndBlock,
+            exports.EndBlock,
             Indent,
             AnnotationLiteral,
             FieldName,
@@ -276,7 +264,7 @@ const multiModeLexerDefinition = {
             CommentBlock
         ],
         alias_definition: [
-            EndBlock,
+            exports.EndBlock,
             Indent,
             AnnotationLiteral,
             SIGN_EqualsAlias,
@@ -297,12 +285,12 @@ const multiModeLexerDefinition = {
             GenericParameter,
             GenericIdentifier,
             Identifier,
-            EndBlock,
+            exports.EndBlock,
             WhiteSpace,
             CommentBlock
         ],
         data_field_definition: [
-            EndBlock,
+            exports.EndBlock,
             AnnotationLiteral,
             SIGN_Or,
             GenericIdentifier,
@@ -310,12 +298,12 @@ const multiModeLexerDefinition = {
             GenericParameter,
             NewLine,
             Indent,
-            EndBlock,
+            exports.EndBlock,
             WhiteSpace,
             CommentBlock
         ],
         view_definition: [
-            EndBlock,
+            exports.EndBlock,
             StringLiteral,
             KW_as,
             SIGN_open,
@@ -325,12 +313,12 @@ const multiModeLexerDefinition = {
             Identifier,
             NewLine,
             Indent,
-            EndBlock,
+            exports.EndBlock,
             WhiteSpace,
             CommentBlock
         ],
         choice_definition: [
-            EndBlock,
+            exports.EndBlock,
             SIGN_Or,
             SIGN_Equals,
             Indent,
@@ -348,34 +336,17 @@ const multiModeLexerDefinition = {
             SIGN_collectionOpen,
             SIGN_collectionSeparator,
             SIGN_collectionClose
-        ]
-        // restriction_field_definition: [
-        //   SIGN_Or,
-        //   Annotation,
-        //   RestrictionIdentifier,
-        //   EndBlock,
-        //   CommentBlock
-        // ],
-        // let_definition: [
-        //   ValiableIdentifier,
-        //   SIGN_Equals,
-        //   SIGN_dot,
-        //   StringLiteral,
-        //   Operator,
-        //   NumberLiteral,
-        //   PatternLiteral,
-        //   EndBlock
-        // ]
+        ],
+        let_definition: lexer_let_1.let_definition
     },
     defaultMode: "root"
 };
-exports.tokenLookup = {
+let baseTokenLookup = {
     // keywords
     KW_Type,
     KW_alias,
     KW_data,
     KW_extends,
-    KW_let,
     KW_view,
     KW_choice,
     KW_pluck,
@@ -412,13 +383,15 @@ exports.tokenLookup = {
     PatternLiteral,
     Indent,
     NewLine,
-    EndBlock,
+    EndBlock: exports.EndBlock,
     MarkdownChapterLiteral,
     MarkdownCodeLiteral,
     MarkdownImageLiteral,
     MarkdownListLiteral,
     MarkdownParagraphLiteral
 };
+lexer_let_1.modTokens(baseTokenLookup);
+exports.tokenLookup = baseTokenLookup;
 exports.DomainLexer = new chevrotain_1.Lexer(multiModeLexerDefinition);
 // selfService / Household / Calculate Estimate Consumption
 //# sourceMappingURL=lexer.js.map

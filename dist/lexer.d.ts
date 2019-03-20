@@ -1,10 +1,10 @@
 import { Lexer } from "chevrotain";
+export declare const EndBlock: import("chevrotain").TokenType;
 export declare const tokenLookup: {
     KW_Type: import("chevrotain").TokenType;
     KW_alias: import("chevrotain").TokenType;
     KW_data: import("chevrotain").TokenType;
     KW_extends: import("chevrotain").TokenType;
-    KW_let: import("chevrotain").TokenType;
     KW_view: import("chevrotain").TokenType;
     KW_choice: import("chevrotain").TokenType;
     KW_pluck: import("chevrotain").TokenType;

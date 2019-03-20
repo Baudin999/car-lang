@@ -9,42 +9,12 @@ const log = source => {
 describe("Experiment with the language", () => {
   const source = `
 
-## Chapter
-
-data Maybe a =
-    | Just a
-    | Nothing
-
-type Entity =
-    Id: String
-
-alias MyEntity = Entity
-
-choice Gender =
-    | "Male"
-    | "Female"
-    | "Other"
-
-type Address =
-    Street: String
-    HouseNumber: Number
-    HouseNumberExtension: String
-    City: String
-    Country: String
-
-@ This is the Person Entity which
-@ will be the basis for other types
-@ of entities.
-type Person extends MyEntity =
-    FirstName: Maybe String
-    LastName: String
-    Gender: Gender
-    Address: Address
+let foo = 12
 
 `;
 
   const { ast, cst, tokens, errors } = transpile(source);
-  //log(errors);
+  //log(tokens);
   //log(ast);
   //console.log(createERD(ast));
 

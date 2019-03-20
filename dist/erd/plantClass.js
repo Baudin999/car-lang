@@ -17,11 +17,21 @@ class PlantClass {
             .join("\n");
     }
     associations() {
-        return this.node.fields
+        const normalFields = this.node.fields
+            .filter((field) => field.ofType !== "Maybe" && field.ofType !== "List")
             .filter((field) => this.lookup.types.indexOf(field.ofType) > -1 ||
+            this.lookup.data.indexOf(field.ofType) > -1 ||
             this.lookup.enums.indexOf(field.ofType) > -1)
-            .map((field) => `${field.id} --> ${this.node.id} : ${field.id}`)
-            .join("\n");
+            .map((field) => `${field.id} --> ${this.node.id} : ${field.id}`);
+        const maybeFields = this.node.fields
+            .filter((f) => f.ofType && f.ofType === "Maybe")
+            .filter((field) => helpers_1.baseTypes.indexOf(field.ofType_params[0]) === -1)
+            .map((field) => `${field.ofType_params[0]} "0" --> "1" ${this.node.id} : Maybe ${field.ofType_params[0]}`);
+        const listFields = this.node.fields
+            .filter((f) => f.ofType && f.ofType === "List")
+            .filter((field) => helpers_1.baseTypes.indexOf(field.ofType_params[0]) === -1)
+            .map((field) => `${field.ofType_params[0]} "0" --> "*" ${this.node.id} : List ${field.ofType_params[0]}`);
+        return [...normalFields, ...maybeFields, ...listFields].join("\n");
     }
     extensions() {
         return this.node.extends
@@ -29,17 +39,24 @@ class PlantClass {
             .map((extension) => `${extension} --|> ${this.node.id}`)
             .join("\n");
     }
-    annotations() {
-        return this.node.annotations.map(a => helpers_1.foldText(`<b>${a.key}</b>: ${a.value}`)).join("\n");
-    }
     source() {
         return this.node.source ? `<${this.node.source}>` : "";
+    }
+    annotations() {
+        if (this.node.annotations.length === 0)
+            return "";
+        const annotations = this.node.annotations
+            .map(a => helpers_1.foldText(`<b>${a.key}</b>: ${a.value}`))
+            .join("\n");
+        return `
+  ---
+  ${annotations}
+    `;
     }
     toString() {
         return `
 class ${this.node.id}${this.source()} {
 ${this.fields()}
----
 ${this.annotations()}
 }
 ${this.associations()}

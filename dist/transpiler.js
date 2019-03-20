@@ -43,7 +43,7 @@ exports.resolveImports = (modules) => {
                 throw "Can't find module " + node.module;
             }
             node.imports.forEach(id => {
-                const ref = getNodeById(id, m.ast);
+                const ref = getNodeById(id, m.ast || []);
                 if (ref)
                     module.ast.unshift(helpers_1.clone(ref));
             });

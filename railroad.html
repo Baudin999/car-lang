@@ -22,6 +22,54 @@
     window.serializedGrammar = [
   {
     "type": "Rule",
+    "name": "LET",
+    "orgText": "() => {\n        $.CONSUME(exports.KW_let);\n        $.CONSUME(let_identifier);\n        $.MANY(() => $.CONSUME(let_parameter));\n        $.CONSUME(let_equals);\n        $.CONSUME(lexer_literals_1.NumberLiteral);\n        //$.OR([{ ALT: () => $.CONSUME(StringLiteral) }, { ALT: () => $.CONSUME(NumberLiteral) }]);\n    }",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "KW_let",
+        "label": "KW_let",
+        "idx": 0,
+        "pattern": "let"
+      },
+      {
+        "type": "Terminal",
+        "name": "let_identifier",
+        "label": "let_identifier",
+        "idx": 0,
+        "pattern": "[a-z][a-zA-Z0-9_]*(?= *(=|[a-z]))"
+      },
+      {
+        "type": "Repetition",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Terminal",
+            "name": "let_parameter",
+            "label": "let_parameter",
+            "idx": 0,
+            "pattern": "[a-z][a-zA-Z0-9_]*"
+          }
+        ]
+      },
+      {
+        "type": "Terminal",
+        "name": "let_equals",
+        "label": "let_equals",
+        "idx": 0,
+        "pattern": "="
+      },
+      {
+        "type": "Terminal",
+        "name": "NumberLiteral",
+        "label": "NumberLiteral",
+        "idx": 0,
+        "pattern": "-?(0|[1-9]\\d*)(\\.\\d+)?([eE][+-]?\\d+)?"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
     "name": "START",
     "orgText": "() => {\n            $.MANY(() => $.SUBRULE($.EXPRESSION));\n        }",
     "definition": [
@@ -41,7 +89,7 @@
   {
     "type": "Rule",
     "name": "EXPRESSION",
-    "orgText": "() => {\n            $.SUBRULE($.ROOT_ANNOTATIONS);\n            $.OR([\n                { ALT: () => $.SUBRULE($.TYPE) },\n                { ALT: () => $.SUBRULE($.ALIAS) },\n                { ALT: () => $.SUBRULE($.DATA) },\n                { ALT: () => $.SUBRULE($.VIEW) },\n                { ALT: () => $.SUBRULE($.CHOICE) },\n                { ALT: () => $.SUBRULE($.OPEN) },\n                { ALT: () => $.SUBRULE($.ASSIGNMENT) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_CHAPTER) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_PARAGRAPH) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_IMAGE) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_CODE) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_LIST) },\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.CommentBlock) }\n            ]);\n        }",
+    "orgText": "() => {\n            $.SUBRULE($.ROOT_ANNOTATIONS);\n            $.OR([\n                { ALT: () => $.SUBRULE($.TYPE) },\n                { ALT: () => $.SUBRULE($.ALIAS) },\n                { ALT: () => $.SUBRULE($.DATA) },\n                { ALT: () => $.SUBRULE($.VIEW) },\n                { ALT: () => $.SUBRULE($.CHOICE) },\n                { ALT: () => $.SUBRULE($.OPEN) },\n                // @ts-ignore\n                { ALT: () => $.SUBRULE($.LET) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_CHAPTER) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_PARAGRAPH) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_IMAGE) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_CODE) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_LIST) },\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.CommentBlock) }\n            ]);\n        }",
     "definition": [
       {
         "type": "NonTerminal",
@@ -117,7 +165,7 @@
             "definition": [
               {
                 "type": "NonTerminal",
-                "name": "ASSIGNMENT",
+                "name": "LET",
                 "idx": 0
               }
             ]
@@ -1070,184 +1118,6 @@
         "label": "MarkdownImageLiteral",
         "idx": 0,
         "pattern": "\\[.*\\]\\(.*\\)(?= *\\n)"
-      }
-    ]
-  },
-  {
-    "type": "Rule",
-    "name": "ASSIGNMENT",
-    "orgText": "() => {\n            $.CONSUME(lexer_1.tokenLookup.KW_let);\n            $.CONSUME(lexer_1.tokenLookup.ValiableIdentifier);\n            $.SUBRULE($.PARAMETERS);\n            $.CONSUME(lexer_1.tokenLookup.SIGN_Equals);\n            $.SUBRULE($.STATEMENT);\n        }",
-    "definition": [
-      {
-        "type": "Terminal",
-        "name": "KW_let",
-        "label": "KW_let",
-        "idx": 0,
-        "pattern": "let"
-      },
-      {
-        "type": "Terminal",
-        "name": "ValiableIdentifier",
-        "label": "ValiableIdentifier",
-        "idx": 0,
-        "pattern": "[a-z][a-zA-Z0-9_]*"
-      },
-      {
-        "type": "NonTerminal",
-        "name": "PARAMETERS",
-        "idx": 0
-      },
-      {
-        "type": "Terminal",
-        "name": "SIGN_Equals",
-        "label": "SIGN_Equals",
-        "idx": 0,
-        "pattern": "="
-      },
-      {
-        "type": "NonTerminal",
-        "name": "STATEMENT",
-        "idx": 0
-      }
-    ]
-  },
-  {
-    "type": "Rule",
-    "name": "PARAMETERS",
-    "orgText": "() => {\n            $.MANY(() => $.CONSUME(lexer_1.tokenLookup.ValiableIdentifier));\n        }",
-    "definition": [
-      {
-        "type": "Repetition",
-        "idx": 0,
-        "definition": [
-          {
-            "type": "Terminal",
-            "name": "ValiableIdentifier",
-            "label": "ValiableIdentifier",
-            "idx": 0,
-            "pattern": "[a-z][a-zA-Z0-9_]*"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "type": "Rule",
-    "name": "STATEMENT",
-    "orgText": "() => {\n            $.OR([\n                { ALT: () => $.SUBRULE($.BINARY_EXPRESSION) },\n                { ALT: () => $.SUBRULE($.VALUE_EXPRESSION) },\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.ValiableIdentifier) }\n            ]);\n        }",
-    "definition": [
-      {
-        "type": "Alternation",
-        "idx": 0,
-        "definition": [
-          {
-            "type": "Flat",
-            "definition": [
-              {
-                "type": "NonTerminal",
-                "name": "BINARY_EXPRESSION",
-                "idx": 0
-              }
-            ]
-          },
-          {
-            "type": "Flat",
-            "definition": [
-              {
-                "type": "NonTerminal",
-                "name": "VALUE_EXPRESSION",
-                "idx": 0
-              }
-            ]
-          },
-          {
-            "type": "Flat",
-            "definition": [
-              {
-                "type": "Terminal",
-                "name": "ValiableIdentifier",
-                "label": "ValiableIdentifier",
-                "idx": 0,
-                "pattern": "[a-z][a-zA-Z0-9_]*"
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "type": "Rule",
-    "name": "VALUE_EXPRESSION",
-    "orgText": "() => {\n            $.OR([\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.NumberLiteral) },\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.StringLiteral) },\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.PatternLiteral) }\n            ]);\n        }",
-    "definition": [
-      {
-        "type": "Alternation",
-        "idx": 0,
-        "definition": [
-          {
-            "type": "Flat",
-            "definition": [
-              {
-                "type": "Terminal",
-                "name": "NumberLiteral",
-                "label": "NumberLiteral",
-                "idx": 0,
-                "pattern": "-?(0|[1-9]\\d*)(\\.\\d+)?([eE][+-]?\\d+)?"
-              }
-            ]
-          },
-          {
-            "type": "Flat",
-            "definition": [
-              {
-                "type": "Terminal",
-                "name": "StringLiteral",
-                "label": "StringLiteral",
-                "idx": 0,
-                "pattern": "([\"'])(?:(?=(\\\\?))\\2.)*?\\1"
-              }
-            ]
-          },
-          {
-            "type": "Flat",
-            "definition": [
-              {
-                "type": "Terminal",
-                "name": "PatternLiteral",
-                "label": "PatternLiteral",
-                "idx": 0,
-                "pattern": "\\/.+\\/"
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "type": "Rule",
-    "name": "BINARY_EXPRESSION",
-    "orgText": "() => {\n            $.CONSUME(lexer_1.tokenLookup.ValiableIdentifier);\n            $.CONSUME(lexer_1.tokenLookup.Operator);\n            $.SUBRULE($.STATEMENT);\n        }",
-    "definition": [
-      {
-        "type": "Terminal",
-        "name": "ValiableIdentifier",
-        "label": "ValiableIdentifier",
-        "idx": 0,
-        "pattern": "[a-z][a-zA-Z0-9_]*"
-      },
-      {
-        "type": "Terminal",
-        "name": "Operator",
-        "label": "Operator",
-        "idx": 0,
-        "pattern": "[\\+\\-\\*%#\\|\\\\\\/&\\^!\\.><@]+"
-      },
-      {
-        "type": "NonTerminal",
-        "name": "STATEMENT",
-        "idx": 0
       }
     ]
   }

@@ -28,4 +28,5 @@ export declare function foldText(s: string, split?: string, n?: number, useSpace
 export declare const fmapModules: (modules: IModuleDictionary) => {
     map: (handler: (m: IModule) => IModule) => IModuleDictionary;
 };
+export declare const fetchImage: (url: any) => Promise<{}>;
 export declare const baseTypes: string[];

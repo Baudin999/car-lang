@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const chevrotain_1 = require("chevrotain");
 const lexer_1 = require("./lexer");
+const lexer_let_1 = require("./lexer.let");
 class DomainParser extends chevrotain_1.Parser {
     constructor() {
         super(lexer_1.tokenLookup, {
@@ -9,6 +10,7 @@ class DomainParser extends chevrotain_1.Parser {
         //errorMessageProvider: carErrorProvider
         });
         const $ = this;
+        lexer_let_1.Modify($, lexer_1.tokenLookup);
         $.RULE("START", () => {
             $.MANY(() => $.SUBRULE($.EXPRESSION));
         });
@@ -21,7 +23,8 @@ class DomainParser extends chevrotain_1.Parser {
                 { ALT: () => $.SUBRULE($.VIEW) },
                 { ALT: () => $.SUBRULE($.CHOICE) },
                 { ALT: () => $.SUBRULE($.OPEN) },
-                { ALT: () => $.SUBRULE($.ASSIGNMENT) },
+                // @ts-ignore
+                { ALT: () => $.SUBRULE($.LET) },
                 { ALT: () => $.SUBRULE($.MARKDOWN_CHAPTER) },
                 { ALT: () => $.SUBRULE($.MARKDOWN_PARAGRAPH) },
                 { ALT: () => $.SUBRULE($.MARKDOWN_IMAGE) },
@@ -230,36 +233,6 @@ class DomainParser extends chevrotain_1.Parser {
         });
         $.RULE("MARKDOWN_IMAGE", () => {
             $.CONSUME(lexer_1.tokenLookup.MarkdownImageLiteral);
-        });
-        /* WEAK ATTEMPT AT FUNCTIONS AND VARIABLES */
-        $.RULE("ASSIGNMENT", () => {
-            $.CONSUME(lexer_1.tokenLookup.KW_let);
-            $.CONSUME(lexer_1.tokenLookup.ValiableIdentifier);
-            $.SUBRULE($.PARAMETERS);
-            $.CONSUME(lexer_1.tokenLookup.SIGN_Equals);
-            $.SUBRULE($.STATEMENT);
-        });
-        $.RULE("PARAMETERS", () => {
-            $.MANY(() => $.CONSUME(lexer_1.tokenLookup.ValiableIdentifier));
-        });
-        $.RULE("STATEMENT", () => {
-            $.OR([
-                { ALT: () => $.SUBRULE($.BINARY_EXPRESSION) },
-                { ALT: () => $.SUBRULE($.VALUE_EXPRESSION) },
-                { ALT: () => $.CONSUME(lexer_1.tokenLookup.ValiableIdentifier) }
-            ]);
-        });
-        $.RULE("VALUE_EXPRESSION", () => {
-            $.OR([
-                { ALT: () => $.CONSUME(lexer_1.tokenLookup.NumberLiteral) },
-                { ALT: () => $.CONSUME(lexer_1.tokenLookup.StringLiteral) },
-                { ALT: () => $.CONSUME(lexer_1.tokenLookup.PatternLiteral) }
-            ]);
-        });
-        $.RULE("BINARY_EXPRESSION", () => {
-            $.CONSUME(lexer_1.tokenLookup.ValiableIdentifier);
-            $.CONSUME(lexer_1.tokenLookup.Operator);
-            $.SUBRULE($.STATEMENT);
         });
         this.performSelfAnalysis();
     }

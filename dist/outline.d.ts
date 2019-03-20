@@ -67,11 +67,13 @@ export interface IData {
     id: string;
     params?: string[];
     options: IDataOption[];
+    annotations: IAnnotation[];
 }
 export interface IDataOption {
     type: NodeType;
     id: string;
     params?: string[];
+    annotations: IAnnotation[];
 }
 export interface IView {
     type: NodeType;

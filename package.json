@@ -43,6 +43,7 @@
   "pkg": {
     "scripts": [
       "./dist/**/*.js",
+      "./src/defalte/deflate.js",
       "./node_modules/chevrotain/lib/chevrotain.min.js"
     ]
   }

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const fetch = require("node-fetch");
 /**
  *
  * "startLine": 2,
@@ -72,6 +73,15 @@ exports.fmapModules = (modules) => {
             return newModuleDictionary;
         }
     };
+};
+exports.fetchImage = url => {
+    return new Promise((resolve, reject) => {
+        fetch(url)
+            .then(r => r.text())
+            .then(r => {
+            resolve(r);
+        });
+    });
 };
 exports.baseTypes = [
     "String",

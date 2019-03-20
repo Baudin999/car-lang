@@ -17,12 +17,20 @@ exports.substituteAliases = (ast = []) => {
     const newAST = ast.map((node) => {
         if (node.type !== outline_1.NodeType.ALIAS)
             return node;
+        else if (helpers_1.baseTypes.indexOf(node.ofType) > -1) {
+            // now we know it's a "simple type" a String or a Number,
+            // something we don't really have to substitute, so we can
+            // just return the actual ALIAS node.
+            return node;
+        }
         else {
             let originalType = getNodeById(ast, [], node.ofType);
             if (!originalType) {
                 errors.push(Object.assign({ message: `Could not find type ${node.ofType}` }, node.ofType_start));
                 return node;
             }
+            if (helpers_1.baseTypes.indexOf(node.ofType) > -1)
+                return originalType;
             let _node = helpers_1.clone(originalType);
             _node.fields = _node.fields.map(field => {
                 const fieldIndex = (_node.params || []).indexOf(field.ofType);
