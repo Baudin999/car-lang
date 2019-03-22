@@ -17,3 +17,46 @@ abstract FileSystemInfo {
 }
 FileInfo --> FileSystemInfo : FileInfo
 DirectoryInfo --> FileSystemInfo : DirectoryInfo
+enum Gender {
+	Male
+	Female
+	Other
+}
+class Person {
+	FirstName: String 
+	Gender: Gender 
+	CustomerId: Id  <i>from Customer</i>
+}
+Gender --> Person : Gender
+Customer --|> Person
+class Company {
+	OrganisationName: String 
+	CustomerId: Id  <i>from Customer</i>
+}
+Customer --|> Company
+class Customer {
+	CustomerId: Id 
+}
+abstract Envelope {
+	ApiMessage
+	Error
+  ---
+  <b>description</b>: api
+    
+}
+ApiMessage --> Envelope : ApiMessage
+Error --> Envelope : Error
+class Message {
+	HttpCode: Number 
+	Message: String 
+	Body: a 
+}
+class OtherCustomer {
+	Something: String 
+	CustomerId: Id 
+	Size: Number 
+}
+class Error {
+	HttpCode: Number 
+	Message: String 
+}

@@ -229,7 +229,7 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
                             : 1;
         return {
             type: NodeType.MARKDOWN_CHAPTER,
-            content,
+            content: content.replace(/#+/, ""),
             depth
         };
     }

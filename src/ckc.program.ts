@@ -5,7 +5,7 @@ import { watch } from "chokidar";
 import * as stringHash from "string-hash";
 import { IExpression, IError } from "./outline";
 import { maybeRaiseError } from "./ckc";
-import { transpile, resolveImports, substitute, typeCheck, createAST } from "./transpiler";
+import { transpile, resolveImports, substitute, typeCheck, pluck, createAST } from "./transpiler";
 import { createHTML } from "./html/createHTML";
 import { createERD } from "./erd/createERD";
 // @ts-ignore
@@ -48,7 +48,7 @@ export const runProgram = projectName => {
       .on("ready", () => {
         watcher.close();
         let hasErrors = false;
-        let moduleDictionary = typeCheck(substitute(resolveImports(modules)));
+        let moduleDictionary = typeCheck(substitute(pluck(resolveImports(modules))));
         for (let key in moduleDictionary) {
           if (moduleDictionary[key].errors && moduleDictionary[key].errors.length > 0) {
             hasErrors = true;
@@ -125,6 +125,11 @@ const styleCSS = `
 *, *:before, *:after {
   box-sizing: border-box;
 }
+
+html, body {
+  font-family: 'Roboto', 'Verdana', sans-serif;
+}
+
 
 table, table tr, table tr td, tr table th {
     border: none;

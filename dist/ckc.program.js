@@ -96,6 +96,11 @@ exports.runProgram = projectName => {
 const styleCSS = `
 
 /* RESET */
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
 table, table tr, table tr td, tr table th {
     border: none;
     border-width: 0px;

@@ -6,6 +6,11 @@
   box-sizing: border-box;
 }
 
+html, body {
+  font-family: 'Roboto', 'Verdana', sans-serif;
+}
+
+
 table, table tr, table tr td, tr table th {
     border: none;
     border-width: 0px;

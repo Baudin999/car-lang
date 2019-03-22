@@ -1,5 +1,5 @@
 import { baseTypes, clone, purge } from "./helpers";
-import { IExpression, IType, NodeType, IError, ITypeField } from "./outline";
+import { IExpression, IType, NodeType, IError, ITypeField, IPluckedField } from "./outline";
 
 const lookupTree = {};
 
@@ -55,6 +55,33 @@ export const substituteAliases = (
   });
   return { newAST, errors };
 };
+
+export const substitutePluckedFields = (
+  ast: IExpression[] = []
+): { newAST: IExpression[]; errors: IError[] } => {
+
+  const errors: IError[] = [];
+  const newAST = ast.map((node: IType) => {
+    if (node.type !== NodeType.TYPE) return node;
+    else {
+      let newNode = node as IType;
+      newNode.fields = node.fields
+        .map((field: any) => {
+          if (field.type !== NodeType.PLUCKED_FIELD) return field;
+          let [ofType, fieldName] = field.parts;
+          let targetNode = getNodeById(ast, [], ofType) as any;
+          if (!targetNode) return field;
+          let targetField = (targetNode.fields || []).find(f => f.id === fieldName);
+          return clone(targetField) ;
+        });
+
+      return newNode;
+    }
+  });
+
+  return { newAST, errors };
+};
+
 
 export const substituteExtensions = (
   ast: IExpression[] = []

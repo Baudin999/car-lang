@@ -2,7 +2,7 @@ import { DomainLexer } from "./lexer";
 import { parser } from "./parser";
 import { OutlineVisitor, NodeType, IExpression, IError, IOpen } from "./outline";
 import { resolve } from "./resolver";
-import { substituteExtensions, substituteAliases } from "./substitute";
+import { substituteExtensions, substituteAliases, substitutePluckedFields } from "./substitute";
 import { typeChecker } from "./tchecker";
 import { IToken } from "chevrotain";
 import { IModule, IModuleDictionary } from "./ckc";
@@ -14,7 +14,11 @@ import { fmapModules, clone } from "./helpers";
 export const transpile = (source: string): ITranspilationResult => {
   const { ast, cst, tokens } = createAST(source);
 
-  let rwAlias = substituteAliases(ast);
+
+  let pluckResult = substitutePluckedFields(ast);
+  let pluckAST = pluckResult.newAST;
+
+  let rwAlias = substituteAliases(pluckAST);
   let rwAliasAST = rwAlias.newAST;
   let rwAliasErrors = rwAlias.errors;
 
@@ -74,6 +78,14 @@ export const resolveImports = (modules: IModuleDictionary) => {
 export const substitute = (modules: IModuleDictionary) => {
   return fmapModules(modules).map(module => {
     let { errors, newAST } = substituteExtensions(module.ast);
+    return { ...module, ast: newAST, errors: [...module.errors, ...errors] };
+  });
+};
+
+
+export const pluck = (modules: IModuleDictionary) => {
+  return fmapModules(modules).map(module => {
+    let { errors, newAST } = substitutePluckedFields(module.ast);
     return { ...module, ast: newAST, errors: [...module.errors, ...errors] };
   });
 };

@@ -12,11 +12,11 @@ exports.createHTML = (ast, moduleName) => {
     const transformedNodes = ast
         .filter(node => node.type)
         .map(node => {
-        if (node.type === outline_1.NodeType.CHAPTER) {
+        if (node.type === outline_1.NodeType.MARKDOWN_CHAPTER) {
             let chapter = node;
             return `<h${chapter.depth}>${chapter.content}</h${chapter.depth}>`;
         }
-        else if (node.type === outline_1.NodeType.PARAGRAPH) {
+        else if (node.type === outline_1.NodeType.MARKDOWN_PARAGRAPH) {
             let p = node;
             return `<p>${p.content}</p>`;
         }
