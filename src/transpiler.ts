@@ -31,6 +31,13 @@ export const transpile = (source: string): ITranspilationResult => {
 };
 
 export const createAST = (source: string) => {
+  if (!source || source.length === 0) {
+    return {
+      ast: {},
+      tokens: [],
+      cst: []
+    }
+  }
   const lexedSource = DomainLexer.tokenize(source);
   parser.input = lexedSource.tokens;
   const cst = parser.START();

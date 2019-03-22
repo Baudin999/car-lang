@@ -6,23 +6,27 @@ import {
   IMarkdownChapter,
   IMarkdownParagraph,
   IMarkdownList,
-  IMarkdownCode
+  IMarkdownCode,
+  IView
 } from "../outline";
 import { purge } from "../helpers";
 import { createTableTYPE } from "./tableTYPE";
+// @ts-ignore
+import { generateURL } from "./../deflate/deflate";
+import { createView } from '../erd/createERD';
 
 const types = [NodeType.TYPE, NodeType.ALIAS, NodeType.DATA, NodeType.CHOICE];
 
-export const createHTML = (ast: IExpression[]) => {
+export const createHTML = (ast: IExpression[], moduleName?:string) => {
   const tables: string[] = [];
 
   const transformedNodes = ast
     .filter(node => node.type)
     .map(node => {
-      if (node.type === NodeType.CHAPTER) {
+      if (node.type === NodeType.MARKDOWN_CHAPTER) {
         let chapter = node as IMarkdownChapter;
         return `<h${chapter.depth}>${chapter.content}</h${chapter.depth}>`;
-      } else if (node.type === NodeType.PARAGRAPH) {
+      } else if (node.type === NodeType.MARKDOWN_PARAGRAPH) {
         let p = node as IMarkdownParagraph;
         return `<p>${p.content}</p>`;
       } else if (node.type === NodeType.MARKDOWN_LIST) {
@@ -34,7 +38,11 @@ export const createHTML = (ast: IExpression[]) => {
         return `<pre><code>${code.content}</code></pre>`;
       } else if (node.type === NodeType.TYPE) {
         tables.push(createTableTYPE(node as IType));
-      }
+      } else if (node.type === NodeType.VIEW) {
+        let plantSource = createView(node as any, ast);
+        let url = generateURL(plantSource);
+        return `<div class="image-container"><img src="${url}" /></div>`;
+      } 
       return null;
     });
 
@@ -42,9 +50,14 @@ export const createHTML = (ast: IExpression[]) => {
 <html>
   <head>
     <title></title>
+    <link rel="stylesheet" href="./../style.css">
   </head>
   <body>
-    ${purge(transformedNodes.concat(tables)).join("\n")}
+  ${purge(transformedNodes).join("\n")}
+  <h1>ERD</h1>
+  ${moduleName ? `<div class="image-container"><img src="${moduleName}.svg" /></div>` : ""}
+  <h1>Appendix: Entities</h1>
+  ${purge(tables).join("\n")}
   </body>
 </html>
   `.trim();

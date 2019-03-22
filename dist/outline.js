@@ -11,7 +11,7 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
         this.modules = modules;
     }
     START(ctx) {
-        const expressions = helpers_1.purge(ctx.EXPRESSION.map(expression => this.visit(expression)));
+        const expressions = helpers_1.purge((ctx.EXPRESSION || []).map(expression => this.visit(expression)));
         return expressions;
     }
     EXPRESSION(ctx) {

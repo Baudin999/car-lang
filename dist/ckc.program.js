@@ -62,6 +62,8 @@ exports.runProgram = projectName => {
             if (fs_1.existsSync(outPath)) {
                 fs_extra_1.removeSync(outPath);
             }
+            const stylePath = path_1.join(outPath, "style.css");
+            fs_extra_1.outputFile(stylePath, styleCSS);
             for (let key in moduleDictionary) {
                 // Don't do sub directories yet...
                 // TODO: check to see to which Domain the sub-module belongs
@@ -71,21 +73,54 @@ exports.runProgram = projectName => {
                     return;
                 // Get the module.
                 let module = moduleDictionary[key];
+                // Save the plant UML file to the directory. And generate a 
+                // svg which we can also save to the directory
+                const puml = createERD_1.createERD(module.ast);
+                if (puml) {
+                    const filePathPuml = path_1.join(outPath, module.name, module.name + ".puml");
+                    fs_extra_1.outputFile(filePathPuml, puml);
+                    const url = deflate_1.generateURL(puml);
+                    helpers_1.fetchImage(url).then(img => {
+                        const filePathSVG = path_1.join(outPath, module.name, module.name + ".svg");
+                        fs_extra_1.outputFile(filePathSVG, img);
+                    });
+                }
                 // Generate the HTML and save it to the directory
-                const html = createHTML_1.createHTML(module.ast);
+                const html = createHTML_1.createHTML(module.ast, puml ? module.name : undefined);
                 const filePath = path_1.join(outPath, module.name, module.name + ".html");
                 fs_extra_1.outputFile(filePath, html);
-                // Save the plant UML file to the directory.
-                const puml = createERD_1.createERD(module.ast);
-                const filePathPuml = path_1.join(outPath, module.name, module.name + ".puml");
-                fs_extra_1.outputFile(filePathPuml, puml);
-                const url = deflate_1.generateURL(puml);
-                helpers_1.fetchImage(url).then(img => {
-                    const filePathSVG = path_1.join(outPath, module.name, module.name + ".svg");
-                    fs_extra_1.outputFile(filePathSVG, img);
-                });
             }
         });
     });
 };
+const styleCSS = `
+
+/* RESET */
+table, table tr, table tr td, tr table th {
+    border: none;
+    border-width: 0px;
+    border-image-width: 0px;
+    padding: 0;
+    margin: 0;
+    outline: none;
+    border-collapse: collapse;
+}
+
+/* TABEL STYLES */
+table {
+    width: 100%;
+    margin: 1rem;
+    border: 1px solid lightgray;
+}
+
+table tr:nth-child(even){background-color: #f2f2f2;}
+  
+table tr:hover {background-color: #ddd;}
+  
+table th {
+    text-align: left;
+    background-color: maroon;
+    color: white;
+}
+`;
 //# sourceMappingURL=ckc.program.js.map

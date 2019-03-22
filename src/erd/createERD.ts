@@ -1,4 +1,4 @@
-import { IExpression, NodeType, IType, IChoice } from "./../outline";
+import { IExpression, NodeType, IType, IChoice, IView } from "./../outline";
 import { PlantClass } from "./plantClass";
 import { PlantData } from "./plantData";
 import { purge } from "../helpers";
@@ -6,7 +6,7 @@ import { PlantEnum } from "./plantEnum";
 
 const types = [NodeType.TYPE, NodeType.ALIAS, NodeType.DATA, NodeType.CHOICE];
 
-export const createERD = (ast: IExpression[]) => {
+export const createERD = (ast: IExpression[], title?:string) => {
   let lookup: ILookup = {
     types: ast
       .filter((node: any) => node.type && node.type === NodeType.TYPE)
@@ -28,7 +28,19 @@ export const createERD = (ast: IExpression[]) => {
     return null;
   });
 
+  if (title) {
+    transformedNodes.unshift(`title: ${title}\n`);
+  }
+
   return purge(transformedNodes).join("\n");
+};
+
+export const createView = (view: IView, ast: IExpression[]) => {
+  const title = view.directives.find(d => d.key === "title");
+  const viewAST = view.nodes.map(node => {
+    return ast.find((n: any) => n.id && n.id === node);
+  }) as IExpression[];
+  return createERD(viewAST, title ? title.value : undefined);
 };
 
 export interface ILookup {

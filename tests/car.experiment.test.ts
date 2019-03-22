@@ -1,6 +1,7 @@
 import { transpile } from "../src/transpiler";
 import { getFileFromModuleName } from "../src/fileManager";
-import { createERD } from "./../src/erd/createERD";
+import { createERD, createView } from "./../src/erd/createERD";
+import { NodeType, IView } from "../src/outline";
 
 const log = source => {
   console.log(JSON.stringify(source, null, 4));
@@ -9,14 +10,22 @@ const log = source => {
 describe("Experiment with the language", () => {
   const source = `
 
-let foo = 12
+type Person =
+    Address: Address
+
+type Address =
+    Street: String
+
+view {
+    Person
+}
 
 `;
 
   const { ast, cst, tokens, errors } = transpile(source);
   //log(tokens);
   //log(ast);
-  //console.log(createERD(ast));
+  //log(createView(ast.find(n => n.type === NodeType.VIEW) as any, ast));
 
   it("should have a test", () => {
     expect(cst).toBeDefined();

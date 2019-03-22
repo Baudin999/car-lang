@@ -1,5 +1,18 @@
 open Prelude importing (Maybe)
 
+# Person
+
+This document will show the way we're going to work with
+People in the application. People have an Address where
+they live.
+
+
+These are the fields which are important for Person:
+
+ * Person
+ * Address
+
+
 type Address =
     Street: String
     PostalCode: String
@@ -16,3 +29,13 @@ type Person =
     FirstName: Maybe String
     LastName: String
     Address: Address
+
+## Person Aggregate
+
+This is the person aggregate.
+
+view {
+    % title: Person Aggregate
+
+    Person
+}

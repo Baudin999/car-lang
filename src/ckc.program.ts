@@ -66,6 +66,9 @@ export const runProgram = projectName => {
           removeSync(outPath);
         }
 
+        const stylePath = join(outPath, "style.css");
+        outputFile(stylePath, styleCSS);
+
         for (let key in moduleDictionary) {
           // Don't do sub directories yet...
           // TODO: check to see to which Domain the sub-module belongs
@@ -76,21 +79,26 @@ export const runProgram = projectName => {
           // Get the module.
           let module: IModule = moduleDictionary[key];
 
+          // Save the plant UML file to the directory. And generate a 
+          // svg which we can also save to the directory
+          const puml = createERD(module.ast);
+          if (puml) {
+            const filePathPuml = join(outPath, module.name, module.name + ".puml");
+            outputFile(filePathPuml, puml);
+
+            const url = generateURL(puml);
+            fetchImage(url).then(img => {
+              const filePathSVG = join(outPath, module.name, module.name + ".svg");
+              outputFile(filePathSVG, img);
+            });
+          }
+
           // Generate the HTML and save it to the directory
-          const html = createHTML(module.ast);
+          const html = createHTML(module.ast, puml ? module.name : undefined);
           const filePath = join(outPath, module.name, module.name + ".html");
           outputFile(filePath, html);
 
-          // Save the plant UML file to the directory.
-          const puml = createERD(module.ast);
-          const filePathPuml = join(outPath, module.name, module.name + ".puml");
-          outputFile(filePathPuml, puml);
 
-          const url = generateURL(puml);
-          fetchImage(url).then(img => {
-            const filePathSVG = join(outPath, module.name, module.name + ".svg");
-            outputFile(filePathSVG, img);
-          });
         }
       });
   });
@@ -107,3 +115,41 @@ export interface IModule {
 export interface IModuleDictionary {
   [module: string]: IModule;
 }
+
+
+
+const styleCSS = `
+
+/* RESET */
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+table, table tr, table tr td, tr table th {
+    border: none;
+    border-width: 0px;
+    border-image-width: 0px;
+    padding: 0;
+    margin: 0;
+    outline: none;
+    border-collapse: collapse;
+}
+
+/* TABEL STYLES */
+table {
+    width: 100%;
+    margin: 1rem;
+    border: 1px solid lightgray;
+}
+
+table tr:nth-child(even){background-color: #f2f2f2;}
+  
+table tr:hover {background-color: #ddd;}
+  
+table th {
+    text-align: left;
+    background-color: maroon;
+    color: white;
+}
+`;

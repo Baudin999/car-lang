@@ -3,8 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const outline_1 = require("../outline");
 const helpers_1 = require("../helpers");
 const tableTYPE_1 = require("./tableTYPE");
+// @ts-ignore
+const deflate_1 = require("./../deflate/deflate");
+const createERD_1 = require("../erd/createERD");
 const types = [outline_1.NodeType.TYPE, outline_1.NodeType.ALIAS, outline_1.NodeType.DATA, outline_1.NodeType.CHOICE];
-exports.createHTML = (ast) => {
+exports.createHTML = (ast, moduleName) => {
     const tables = [];
     const transformedNodes = ast
         .filter(node => node.type)
@@ -29,15 +32,25 @@ exports.createHTML = (ast) => {
         else if (node.type === outline_1.NodeType.TYPE) {
             tables.push(tableTYPE_1.createTableTYPE(node));
         }
+        else if (node.type === outline_1.NodeType.VIEW) {
+            let plantSource = createERD_1.createView(node, ast);
+            let url = deflate_1.generateURL(plantSource);
+            return `<div class="image-container"><img src="${url}" /></div>`;
+        }
         return null;
     });
     return `
 <html>
   <head>
     <title></title>
+    <link rel="stylesheet" href="./../style.css">
   </head>
   <body>
-    ${helpers_1.purge(transformedNodes.concat(tables)).join("\n")}
+  ${helpers_1.purge(transformedNodes).join("\n")}
+  <h1>ERD</h1>
+  ${moduleName ? `<div class="image-container"><img src="${moduleName}.svg" /></div>` : ""}
+  <h1>Appendix: Entities</h1>
+  ${helpers_1.purge(tables).join("\n")}
   </body>
 </html>
   `.trim();

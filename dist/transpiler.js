@@ -23,6 +23,13 @@ exports.transpile = (source) => {
     };
 };
 exports.createAST = (source) => {
+    if (!source || source.length === 0) {
+        return {
+            ast: {},
+            tokens: [],
+            cst: []
+        };
+    }
     const lexedSource = lexer_1.DomainLexer.tokenize(source);
     parser_1.parser.input = lexedSource.tokens;
     const cst = parser_1.parser.START();

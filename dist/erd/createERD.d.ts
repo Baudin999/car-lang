@@ -1,5 +1,6 @@
-import { IExpression } from "./../outline";
-export declare const createERD: (ast: IExpression[]) => string;
+import { IExpression, IView } from "./../outline";
+export declare const createERD: (ast: IExpression[], title?: string | undefined) => string;
+export declare const createView: (view: IView, ast: IExpression[]) => string;
 export interface ILookup {
     types: string[];
     enums: string[];

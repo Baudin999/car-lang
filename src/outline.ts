@@ -14,7 +14,7 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
 
   START(ctx: any): IExpression[] {
     const expressions = purge<IExpression>(
-      ctx.EXPRESSION.map(expression => this.visit(expression))
+      (ctx.EXPRESSION || []).map(expression => this.visit(expression))
     );
 
     return expressions;
@@ -273,7 +273,7 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
       : 1;
     return {
       type: NodeType.MARKDOWN_CHAPTER,
-      content,
+      content: content.replace(/#+/, ""),
       depth
     };
   }

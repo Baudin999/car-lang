@@ -6,7 +6,7 @@ const plantData_1 = require("./plantData");
 const helpers_1 = require("../helpers");
 const plantEnum_1 = require("./plantEnum");
 const types = [outline_1.NodeType.TYPE, outline_1.NodeType.ALIAS, outline_1.NodeType.DATA, outline_1.NodeType.CHOICE];
-exports.createERD = (ast) => {
+exports.createERD = (ast, title) => {
     let lookup = {
         types: ast
             .filter((node) => node.type && node.type === outline_1.NodeType.TYPE)
@@ -28,6 +28,16 @@ exports.createERD = (ast) => {
         }
         return null;
     });
+    if (title) {
+        transformedNodes.unshift(`title: ${title}\n`);
+    }
     return helpers_1.purge(transformedNodes).join("\n");
+};
+exports.createView = (view, ast) => {
+    const title = view.directives.find(d => d.key === "title");
+    const viewAST = view.nodes.map(node => {
+        return ast.find((n) => n.id && n.id === node);
+    });
+    return exports.createERD(viewAST, title ? title.value : undefined);
 };
 //# sourceMappingURL=createERD.js.map
