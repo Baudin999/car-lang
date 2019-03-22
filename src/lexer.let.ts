@@ -40,21 +40,6 @@ export const Modify = ($: any, tokenLookup: any = {}) => {
     $.CONSUME(let_identifier);
     $.MANY(() => $.CONSUME(let_parameter));
     $.CONSUME(let_equals);
-    //$.CONSUME(NumberLiteral);
-
-    console.log($.tokVector);
-    console.log($.CONSUME);
-    $.OR([
-      {
-        ALT: () => {
-          $.CONSUME(StringLiteral);
-        }
-      },
-      {
-        ALT: () => {
-          $.CONSUME(NumberLiteral);
-        }
-      }
-    ]);
+    $.CONSUME(NumberLiteral);
   });
 };

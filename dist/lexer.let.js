@@ -27,15 +27,15 @@ exports.modTokens = (tokens) => {
     tokens["let_equals"] = let_equals;
     tokens["let_identifier"] = let_identifier;
     tokens["let_parameter"] = let_parameter;
+    return tokens;
 };
 exports.Modify = ($, tokenLookup = {}) => {
-    $.RULE("LET", () => {
+    $.RULE("LET", function () {
         $.CONSUME(exports.KW_let);
         $.CONSUME(let_identifier);
         $.MANY(() => $.CONSUME(let_parameter));
         $.CONSUME(let_equals);
         $.CONSUME(lexer_literals_1.NumberLiteral);
-        //$.OR([{ ALT: () => $.CONSUME(StringLiteral) }, { ALT: () => $.CONSUME(NumberLiteral) }]);
     });
 };
 //# sourceMappingURL=lexer.let.js.map

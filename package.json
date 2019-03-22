@@ -11,7 +11,7 @@
   "scripts": {
     "test": "jest --watch",
     "run": "ts-node ./src/ckc.ts -p ./Examples",
-    "build": "tsc --project ./",
+    "build": "tsc --project ./; mkdir ./dist/deflate/; cp ./src/deflate/deflate.js ./dist/deflate/",
     "package": "yarn pkg . --out-path ./lib/",
     "railroad": "ts-node ./src/railroad.ts",
     "move": "cp ./lib/car-lang-macos /usr/local/bin/ckc",
@@ -43,7 +43,7 @@
   "pkg": {
     "scripts": [
       "./dist/**/*.js",
-      "./src/defalte/deflate.js",
+      "./deflate.js",
       "./node_modules/chevrotain/lib/chevrotain.min.js"
     ]
   }

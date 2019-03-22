@@ -23,7 +23,7 @@
   {
     "type": "Rule",
     "name": "LET",
-    "orgText": "() => {\n        $.CONSUME(exports.KW_let);\n        $.CONSUME(let_identifier);\n        $.MANY(() => $.CONSUME(let_parameter));\n        $.CONSUME(let_equals);\n        $.CONSUME(lexer_literals_1.NumberLiteral);\n        //$.OR([{ ALT: () => $.CONSUME(StringLiteral) }, { ALT: () => $.CONSUME(NumberLiteral) }]);\n    }",
+    "orgText": "function () {\n        $.CONSUME(exports.KW_let);\n        $.CONSUME(let_identifier);\n        $.MANY(() => $.CONSUME(let_parameter));\n        $.CONSUME(let_equals);\n        $.CONSUME(lexer_literals_1.NumberLiteral);\n    }",
     "definition": [
       {
         "type": "Terminal",

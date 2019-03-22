@@ -5,7 +5,8 @@ const lexer_1 = require("./lexer");
 const lexer_let_1 = require("./lexer.let");
 class DomainParser extends chevrotain_1.Parser {
     constructor() {
-        super(lexer_1.tokenLookup, {
+        let tokens = lexer_let_1.modTokens(lexer_1.tokenLookup);
+        super(tokens, {
         // passing our custom error message provider
         //errorMessageProvider: carErrorProvider
         });

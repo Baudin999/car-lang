@@ -341,7 +341,7 @@ const multiModeLexerDefinition = {
     },
     defaultMode: "root"
 };
-let baseTokenLookup = {
+exports.tokenLookup = {
     // keywords
     KW_Type,
     KW_alias,
@@ -390,8 +390,6 @@ let baseTokenLookup = {
     MarkdownListLiteral,
     MarkdownParagraphLiteral
 };
-lexer_let_1.modTokens(baseTokenLookup);
-exports.tokenLookup = baseTokenLookup;
 exports.DomainLexer = new chevrotain_1.Lexer(multiModeLexerDefinition);
 // selfService / Household / Calculate Estimate Consumption
 //# sourceMappingURL=lexer.js.map
