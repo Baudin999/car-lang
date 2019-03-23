@@ -31,7 +31,7 @@ export const createHTML = (ast: IExpression[], moduleName?:string) => {
         return `<p>${p.content}</p>`;
       } else if (node.type === NodeType.MARKDOWN_LIST) {
         let list = node as IMarkdownList;
-        let list_items = list.items.map(i => `<li>${i}</li>`);
+        let list_items = list.items.map(i => `<li>${i}</li>`).join("\n");
         return `<ul>${list_items}</ul>`;
       } else if (node.type === NodeType.MARKDOWN_CODE) {
         let code = node as IMarkdownCode;

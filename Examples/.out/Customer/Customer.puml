@@ -1,10 +1,4 @@
-abstract Maybe {
-	Just
-	Nothing
-}
-Just --> Maybe : Just
-Nothing --> Maybe : Nothing
-class Address {
+class "Address" as Address  {
 	Street: String 
 	PostalCode: String 
 	HouseNumber: Number 
@@ -13,7 +7,7 @@ class Address {
 	CountryCode: String 
 	Country: String 
 }
-class Person {
+class "Person" as Person  {
 	FirstName: Maybe String
 	LastName: String 
 	Address: Address 
@@ -24,9 +18,9 @@ enum Gender {
 	Female
 	Other
 }
-class Company {
+class "Company" as Company  {
 	OrganisationName: String 
 }
-class Customer {
+class "Customer" as Customer  {
 	CustomerId: Id 
 }

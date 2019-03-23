@@ -1,8 +1,8 @@
-class Meta {
+class "Meta" as Meta  {
 	Code: Number 
 	Message: String 
 }
-class Error404 {
+class "Error404 " as Error404  {
 	Code: Number  <i>from Meta</i>
 	Message: String  <i>from Meta</i>
   ---
@@ -11,7 +11,7 @@ class Error404 {
     
 }
 Meta --|> Error404
-class Error500 {
+class "Error500 " as Error500  {
 	Code: Number  <i>from Meta</i>
 	Message: String  <i>from Meta</i>
   ---
@@ -20,20 +20,20 @@ class Error500 {
     
 }
 Meta --|> Error500
-class Envelope<< (T,orchid) >> {
+class "Envelope req res" as Envelope << (T,orchid) >> {
 	Request: req 
 	Response: res 
 	Code: Number  <i>from Meta</i>
 	Message: String  <i>from Meta</i>
 }
 Meta --|> Envelope
-class MyAPIRequest {
+class "MyAPIRequest" as MyAPIRequest  {
 	Something: String 
 }
-class MyAPIResponse {
+class "MyAPIResponse" as MyAPIResponse  {
 	AccountId: String 
 }
-class MyAPI<Envelope> {
+class "MyAPI " as MyAPI <Envelope> {
 	Request: MyAPIRequest 
 	Response: MyAPIResponse 
 	Code: Number  <i>from Meta</i>

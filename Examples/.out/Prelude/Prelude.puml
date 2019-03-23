@@ -1,12 +1,10 @@
-abstract Maybe {
-	Just
-	Nothing
+abstract "Maybe a" as Maybe {
+	Just a
+	Nothing 
 }
-Just --> Maybe : Just
-Nothing --> Maybe : Nothing
-class List<< (T,orchid) >> {
+class "List a" as List << (T,orchid) >> {
 }
-class Currency<< (T,orchid) >> {
+class "Currency sign value" as Currency << (T,orchid) >> {
 	Sign: String 
 	Value: Number 
   ---

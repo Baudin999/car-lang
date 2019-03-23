@@ -379,6 +379,7 @@ export interface IType {
   fields: (ITypeField | IPluckedField)[];
   source?: string;
   annotations: IAnnotation[];
+  imported?: boolean;
 }
 
 export interface ITypeField {

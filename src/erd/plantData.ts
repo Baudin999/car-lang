@@ -5,21 +5,24 @@ import { ILookup } from "./createERD";
 export class PlantData {
   node: IData;
   lookup: ILookup;
+  lookupValues: string[];
   constructor(node: IData, lookup: ILookup) {
     this.node = node;
     this.lookup = lookup;
+    this.lookupValues = [...lookup.data, ...lookup.enums, ...lookup.types];
   }
 
   options() {
     return this.node.options
       .map((f: IDataOption) => {
-        return `\t${f.id}`;
+        return `\t${f.id} ${(f.params || []).join(" ")}`;
       })
       .join("\n");
   }
 
   associations() {
     return this.node.options
+      .filter(field => this.lookupValues.indexOf(field.id) > -1)
       .map((field: any) => `${field.id} --> ${this.node.id} : ${field.id}`)
       .join("\n");
   }
@@ -35,9 +38,14 @@ export class PlantData {
     `;
   }
 
+  params() {
+    return this.node.params ?
+      " " + this.node.params.join(" ") : "";
+  }
+
   toString(): string {
     return `
-abstract ${this.node.id} {
+abstract "${this.node.id}${this.params()}" as ${this.node.id} {
 ${this.options()}
 ${this.annotations()}
 }

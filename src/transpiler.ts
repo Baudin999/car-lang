@@ -67,7 +67,7 @@ export const resolveImports = (modules: IModuleDictionary) => {
         }
         node.imports.forEach(id => {
           const ref = getNodeById(id, m.ast || []);
-          if (ref) module.ast.unshift(clone(ref));
+          if (ref) module.ast.unshift(clone(ref, {imported: true }));
         });
         return module;
       });

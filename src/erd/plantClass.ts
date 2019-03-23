@@ -76,6 +76,11 @@ export class PlantClass {
     `;
   }
 
+  params() {
+    return this.node.params ?
+      " " + this.node.params.join(" ") : "";
+  }
+
   template() {
     if (this.node.params && this.node.params.length > 0) {
       return "<< (T,orchid) >>";
@@ -86,7 +91,7 @@ export class PlantClass {
 
   toString(): string {
     return `
-class ${this.node.id}${this.source()}${this.template()} {
+class "${this.node.id}${this.params()}" as ${this.node.id} ${this.source()}${this.template()} {
 ${this.fields()}
 ${this.annotations()}
 }

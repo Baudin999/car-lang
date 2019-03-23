@@ -1,32 +1,29 @@
-class Customer {
-	CustomerId: Id 
-}
-abstract Envelope {
-	ApiMessage
-	Error
+abstract "Envelope" as Envelope {
+	ApiMessage 
+	Error 
   ---
   <b>description</b>: api
     
 }
 ApiMessage --> Envelope : ApiMessage
 Error --> Envelope : Error
-class Message<< (T,orchid) >> {
+class "Message a" as Message << (T,orchid) >> {
 	HttpCode: Number 
 	Message: String 
 	Body: a 
 }
-class OtherCustomer {
+class "OtherCustomer" as OtherCustomer  {
 	Something: String 
 	CustomerId: Id 
 }
-class ApiMessage<Message> {
+class "ApiMessage " as ApiMessage <Message> {
 	HttpCode: Number 
 	Message: String 
 	Body: OtherCustomer 
 }
 OtherCustomer --> ApiMessage : Body
 Message --* ApiMessage: ALIAS
-class Error {
+class "Error" as Error  {
 	HttpCode: Number 
 	Message: String 
 }

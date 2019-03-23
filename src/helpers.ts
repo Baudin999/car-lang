@@ -33,8 +33,13 @@ export const purge = <T>(items: T[]): T[] => {
   return flatten(items).filter(i => !!i);
 };
 
-export const clone = source => {
-  return JSON.parse(JSON.stringify(source));
+export const clone = (source: any, template?: any) => {
+  if (template) {
+    return { ...JSON.parse(JSON.stringify(source)), ...template };
+  }
+  else {
+    return JSON.parse(JSON.stringify(source));
+  }
 };
 
 /**
