@@ -19,3 +19,14 @@ class Person {
 	Address: Address 
 }
 Address --> Person : Address
+enum Gender {
+	Male
+	Female
+	Other
+}
+class Company {
+	OrganisationName: String 
+}
+class Customer {
+	CustomerId: Id 
+}

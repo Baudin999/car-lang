@@ -1,0 +1,32 @@
+class Customer {
+	CustomerId: Id 
+}
+abstract Envelope {
+	ApiMessage
+	Error
+  ---
+  <b>description</b>: api
+    
+}
+ApiMessage --> Envelope : ApiMessage
+Error --> Envelope : Error
+class Message<< (T,orchid) >> {
+	HttpCode: Number 
+	Message: String 
+	Body: a 
+}
+class OtherCustomer {
+	Something: String 
+	CustomerId: Id 
+}
+class ApiMessage<Message> {
+	HttpCode: Number 
+	Message: String 
+	Body: OtherCustomer 
+}
+Body --> ApiMessage : Body
+Message --* ApiMessage: ALIAS
+class Error {
+	HttpCode: Number 
+	Message: String 
+}

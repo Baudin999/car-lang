@@ -1,0 +1,21 @@
+open Customer importing (Customer, Id)
+
+@ api
+data Envelope =
+    | ApiMessage
+    | Error
+
+type Message a =
+    HttpCode: Number
+    Message: String
+    Body: a
+
+type OtherCustomer =
+    Something: String
+    pluck Customer.CustomerId
+
+alias ApiMessage = Message OtherCustomer
+
+type Error =
+    HttpCode: Number
+    Message: String

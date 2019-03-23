@@ -30,6 +30,26 @@ type Person =
     LastName: String
     Address: Address
 
+## Customer Models
+
+
+alias Id = String
+    | min 2
+    | max 2
+    | pattern /[A-Z]{2}/
+
+choice Gender =
+    | "Male"
+    | "Female"
+    | "Other"
+
+type Company =
+    OrganisationName: String
+
+type Customer =
+    CustomerId: Id
+
+
 ## Person Aggregate
 
 This is the person aggregate.
