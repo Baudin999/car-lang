@@ -24,7 +24,7 @@ class ApiMessage<Message> {
 	Message: String 
 	Body: OtherCustomer 
 }
-Body --> ApiMessage : Body
+OtherCustomer --> ApiMessage : Body
 Message --* ApiMessage: ALIAS
 class Error {
 	HttpCode: Number 

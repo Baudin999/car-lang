@@ -39,7 +39,7 @@ class MyAPI<Envelope> {
 	Code: Number  <i>from Meta</i>
 	Message: String  <i>from Meta</i>
 }
-Request --> MyAPI : Request
-Response --> MyAPI : Response
+MyAPIRequest --> MyAPI : Request
+MyAPIResponse --> MyAPI : Response
 Meta --|> MyAPI
 Envelope --* MyAPI: ALIAS

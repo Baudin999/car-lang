@@ -8,6 +8,10 @@ export class PlantClass {
   constructor(node: IType, lookup: ILookup) {
     this.node = node;
     this.lookup = lookup; 
+
+    if (node.id === "ApiMessage") {
+      //console.log(JSON.stringify(lookup, null, 4))
+    }
   }
 
   fields() {
@@ -29,7 +33,7 @@ export class PlantClass {
           this.lookup.data.indexOf(field.ofType) > -1 ||
           this.lookup.enums.indexOf(field.ofType) > -1
       )
-      .map((field: any) => `${field.id} --> ${this.node.id} : ${field.id}`);
+      .map((field: any) => `${field.ofType} --> ${this.node.id} : ${field.id}`);
 
     const maybeFields = this.node.fields
       .filter((f: any) => f.ofType && f.ofType === "Maybe")
