@@ -1,4 +1,4 @@
-class List {
+class List<< (T,orchid) >> {
 }
 class FileInfo {
 	Size: Number 
@@ -46,7 +46,7 @@ abstract Envelope {
 }
 ApiMessage --> Envelope : ApiMessage
 Error --> Envelope : Error
-class Message {
+class Message<< (T,orchid) >> {
 	HttpCode: Number 
 	Message: String 
 	Body: a 
@@ -56,6 +56,13 @@ class OtherCustomer {
 	CustomerId: Id 
 	Size: Number 
 }
+class ApiMessage<Message> {
+	HttpCode: Number 
+	Message: String 
+	Body: OtherCustomer 
+}
+Body --> ApiMessage : Body
+Message --* ApiMessage: ALIAS
 class Error {
 	HttpCode: Number 
 	Message: String 

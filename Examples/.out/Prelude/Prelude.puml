@@ -4,9 +4,9 @@ abstract Maybe {
 }
 Just --> Maybe : Just
 Nothing --> Maybe : Nothing
-class List {
+class List<< (T,orchid) >> {
 }
-class Currency {
+class Currency<< (T,orchid) >> {
 	Sign: String 
 	Value: Number 
   ---

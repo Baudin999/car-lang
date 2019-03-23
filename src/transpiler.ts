@@ -75,7 +75,7 @@ export const resolveImports = (modules: IModuleDictionary) => {
   });
 };
 
-export const substitute = (modules: IModuleDictionary) => {
+export const extensions = (modules: IModuleDictionary) => {
   return fmapModules(modules).map(module => {
     let { errors, newAST } = substituteExtensions(module.ast);
     return { ...module, ast: newAST, errors: [...module.errors, ...errors] };
@@ -90,11 +90,23 @@ export const pluck = (modules: IModuleDictionary) => {
   });
 };
 
+export const resolveAlias = (modules: IModuleDictionary) => {
+  return fmapModules(modules).map(module => {
+    const { newAST, errors } = substituteAliases(module.ast);
+    return { ...module, ast: newAST, errors: [...module.errors, ...errors] };
+  });
+};
+
 export const typeCheck = (modules: IModuleDictionary) => {
   return fmapModules(modules).map(module => {
     let errors = typeChecker(module.ast);
     return { ...module, errors: [...module.errors, ...errors] };
   });
+};
+
+
+export const compile = (modules: IModuleDictionary) => {
+  return typeCheck(pluck(resolveAlias(extensions(resolveImports(modules)))));
 };
 
 const getNodeById = (id, ast) => {

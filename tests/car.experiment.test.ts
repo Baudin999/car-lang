@@ -11,14 +11,14 @@ describe("Experiment with the language", () => {
   const source = `
 
 type Person =
-    Address: Address
+    FirstName: String
 
-type Address =
-    Street: String
+type Foo a =
+    Bar: a
+    Name: String
 
-view {
-    Person
-}
+alias Footje = Foo Person
+  
 
 `;
 

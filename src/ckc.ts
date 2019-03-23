@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "fs";
-import { transpile, resolveImports, substitute, typeCheck, createAST } from "./transpiler";
+import { transpile, compile } from "./transpiler";
 import { createERD } from "./erd/createERD";
 import * as program from "commander";
 import { resolve, join } from "path";

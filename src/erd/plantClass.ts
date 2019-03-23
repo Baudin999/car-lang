@@ -7,7 +7,7 @@ export class PlantClass {
   lookup: ILookup;
   constructor(node: IType, lookup: ILookup) {
     this.node = node;
-    this.lookup = lookup;
+    this.lookup = lookup; 
   }
 
   fields() {
@@ -72,9 +72,17 @@ export class PlantClass {
     `;
   }
 
+  template() {
+    if (this.node.params && this.node.params.length > 0) {
+      return "<< (T,orchid) >>";
+    } else {
+      return "";
+    }
+  }
+
   toString(): string {
     return `
-class ${this.node.id}${this.source()} {
+class ${this.node.id}${this.source()}${this.template()} {
 ${this.fields()}
 ${this.annotations()}
 }

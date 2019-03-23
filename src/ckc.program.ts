@@ -5,7 +5,7 @@ import { watch } from "chokidar";
 import * as stringHash from "string-hash";
 import { IExpression, IError } from "./outline";
 import { maybeRaiseError } from "./ckc";
-import { transpile, resolveImports, substitute, typeCheck, pluck, createAST } from "./transpiler";
+import { compile, createAST } from "./transpiler";
 import { createHTML } from "./html/createHTML";
 import { createERD } from "./erd/createERD";
 // @ts-ignore
@@ -48,7 +48,7 @@ export const runProgram = projectName => {
       .on("ready", () => {
         watcher.close();
         let hasErrors = false;
-        let moduleDictionary = typeCheck(substitute(pluck(resolveImports(modules))));
+        let moduleDictionary = compile(modules);
         for (let key in moduleDictionary) {
           if (moduleDictionary[key].errors && moduleDictionary[key].errors.length > 0) {
             hasErrors = true;
@@ -58,7 +58,10 @@ export const runProgram = projectName => {
         }
 
         // Can't continue if there are errors...
-        if (hasErrors) return;
+        if (hasErrors) {
+          console.log("Quitting the process because I've found errors.")
+          return;
+        }
 
         // Check if the outpath exists and if so clean it.
         const outPath = join(projectDirectory, ".out");
