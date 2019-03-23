@@ -1,3 +1,8 @@
+enum Gender {
+	Male
+	Female
+	Other
+}
 class "Address" as Address  {
 	Street: String 
 	PostalCode: String 
@@ -14,20 +19,17 @@ class "Address" as Address  {
  Dutch address system.
     
 }
-class "Person" as Person  {
+class "Person " as Person  {
 	FirstName: Maybe String
 	LastName: String 
 	Address: Address 
 }
 Address --> Person : Address
-enum Gender {
-	Male
-	Female
-	Other
-}
-class "Company" as Company  {
+Customer --|> Person
+class "Company " as Company  {
 	OrganisationName: String 
 }
+Customer --|> Company
 class "Customer" as Customer  {
 	CustomerId: Id 
 }

@@ -22,7 +22,7 @@ export const runProgram = projectName => {
       process.exit(1);
     }
     let modules: IModuleDictionary = {};
-    const watcher = watch(projectDirectory)
+    const watcher = watch(projectDirectory,{ignored: join(projectDirectory, ".out") })
       .on("all", (event, fullPath: string) => {
         if (fullPath.endsWith(".car")) {
           let moduleName = fullPath

@@ -11,6 +11,7 @@
   "scripts": {
     "test": "jest --watch",
     "run": "ts-node ./src/ckc.ts -p ./Examples",
+    "watch": "ts-node ./src/ckc.ts -p ./Examples -w",
     "build": "tsc --project ./; mkdir ./dist/deflate/; cp ./src/deflate/deflate.js ./dist/deflate/",
     "package": "yarn pkg . --out-path ./lib/",
     "railroad": "ts-node ./src/railroad.ts",

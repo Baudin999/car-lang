@@ -13,6 +13,15 @@ These are the fields which are important for Person:
  * Address
 
 
+alias Id = String
+    | min 2
+    | max 2
+    | pattern /[A-Z]{2}/
+
+choice Gender =
+    | "Male"
+    | "Female"
+    | "Other"
 
 @ The address of a person. This is the functional 
 @ location of where a person lives. This type is 
@@ -31,30 +40,27 @@ type Address =
     Country: String
 
 
-type Person =
+type Person extends Customer =
     FirstName: Maybe String
     LastName: String
     Address: Address
 
 ## Customer Models
 
-
-alias Id = String
-    | min 2
-    | max 2
-    | pattern /[A-Z]{2}/
-
-choice Gender =
-    | "Male"
-    | "Female"
-    | "Other"
-
-type Company =
+type Company extends Customer  =
     OrganisationName: String
 
 type Customer =
     CustomerId: Id
 
+
+view {
+    % title: Customer 
+
+    Person
+    Company
+    Customer
+}
 
 ## Person Aggregate
 

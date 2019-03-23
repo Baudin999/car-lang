@@ -4,6 +4,7 @@ import { createERD } from "./erd/createERD";
 import * as program from "commander";
 import { resolve, join } from "path";
 import { runProgram } from "./ckc.program";
+import { watchProgram } from "./ckc.program.watch";
 import { IExpression, IError } from "./outline";
 import { init } from "./ckc.init";
 
@@ -20,10 +21,16 @@ program
   .option("-p, --project <s>", "Specify the project directory, the 'carconfig.json' location")
   .option("-u, --uml", "Output the UML")
   .option("-o, --out <s>", "The output file", id)
+  .option("-w, --watch", "Watch for file changes, can only be used together with the <project> flag.")
   .option("-d, --deflate", "Output the deflated uml url")
   .parse(process.argv);
 
-if (program.project) {
+
+if (program.project && program.watch) {
+  // we'll watch the file system on save...
+  watchProgram(program.project);
+}
+else if (program.project) {
   // if we look at a project we'll want to the parse every file, then
   // include all the imports and do the rest...
   runProgram(program.project);
