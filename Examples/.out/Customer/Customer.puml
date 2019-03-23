@@ -6,6 +6,13 @@ class "Address" as Address  {
 	City: String 
 	CountryCode: String 
 	Country: String 
+--
+  <b>description</b>: The address of a
+ person. This is the functional
+ location of where a person lives. This
+ type is of course designed for the
+ Dutch address system.
+    
 }
 class "Person" as Person  {
 	FirstName: Maybe String

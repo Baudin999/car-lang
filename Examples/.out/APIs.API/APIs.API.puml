@@ -5,7 +5,7 @@ class "Meta" as Meta  {
 class "Error404 " as Error404  {
 	Code: Number  <i>from Meta</i>
 	Message: String  <i>from Meta</i>
-  ---
+--
   <b>code</b>: 404
 <b>message</b>: Not Found
     
@@ -14,7 +14,7 @@ Meta --|> Error404
 class "Error500 " as Error500  {
 	Code: Number  <i>from Meta</i>
 	Message: String  <i>from Meta</i>
-  ---
+--
   <b>code</b>: 500
 <b>message</b>: Internal Server Error
     

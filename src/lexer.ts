@@ -220,7 +220,6 @@ const AnnotationLiteral = createToken({
   name: "AnnotationLiteral",
   pattern: /(@{2})([^@]*)(@{2})|@.*\n/
 });
-
 const Operator = createToken({
   name: "Operator",
   pattern: /[\+\-\*%#\|\\\/&\^!\.><@]+/

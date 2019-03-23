@@ -71,7 +71,7 @@ export class PlantClass {
       .map(a => foldText(`<b>${a.key}</b>: ${a.value}`))
       .join("\n");
     return `
-  ---
+--
   ${annotations}
     `;
   }

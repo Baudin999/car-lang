@@ -391,6 +391,7 @@ export interface ITypeField {
   ofType_params_start: ITokenStart[];
   annotations: IAnnotation[];
   source?: string;
+  restrictions: IRestriction[];
 }
 
 export interface IPluckedField {

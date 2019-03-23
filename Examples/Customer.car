@@ -13,12 +13,18 @@ These are the fields which are important for Person:
  * Address
 
 
+
+@ The address of a person. This is the functional 
+@ location of where a person lives. This type is 
+@ of course designed for the Dutch address system.
 type Address =
     Street: String
     PostalCode: String
     HouseNumber: Number
     HouseNumberExtension: String
     City: String
+    @ The country code is a two letter code
+    @ all in capital letters.
     CountryCode: String
         | length 2
         | pattern /[A-Z]{2}/
