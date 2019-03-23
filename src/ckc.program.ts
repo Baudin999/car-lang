@@ -73,12 +73,6 @@ export const runProgram = projectName => {
         outputFile(stylePath, styleCSS);
 
         for (let key in moduleDictionary) {
-          // Don't do sub directories yet...
-          // TODO: check to see to which Domain the sub-module belongs
-          //       create a sub-directory in that domain and generate
-          //       the relevant stuff in that sub-folder.
-          if (key.indexOf(".") > -1) return;
-
           // Get the module.
           let module: IModule = moduleDictionary[key];
 

@@ -1,0 +1,45 @@
+class Meta {
+	Code: Number 
+	Message: String 
+}
+class Error404 {
+	Code: Number  <i>from Meta</i>
+	Message: String  <i>from Meta</i>
+  ---
+  <b>code</b>: 404
+<b>message</b>: Not Found
+    
+}
+Meta --|> Error404
+class Error500 {
+	Code: Number  <i>from Meta</i>
+	Message: String  <i>from Meta</i>
+  ---
+  <b>code</b>: 500
+<b>message</b>: Internal Server Error
+    
+}
+Meta --|> Error500
+class Envelope<< (T,orchid) >> {
+	Request: req 
+	Response: res 
+	Code: Number  <i>from Meta</i>
+	Message: String  <i>from Meta</i>
+}
+Meta --|> Envelope
+class MyAPIRequest {
+	Something: String 
+}
+class MyAPIResponse {
+	AccountId: String 
+}
+class MyAPI<Envelope> {
+	Request: MyAPIRequest 
+	Response: MyAPIResponse 
+	Code: Number  <i>from Meta</i>
+	Message: String  <i>from Meta</i>
+}
+Request --> MyAPI : Request
+Response --> MyAPI : Response
+Meta --|> MyAPI
+Envelope --* MyAPI: ALIAS
