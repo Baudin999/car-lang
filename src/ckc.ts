@@ -13,7 +13,7 @@ function id(val) {
 }
 
 program
-  .version("0.0.1", "-v, --version")
+  .version("1.1.0", "-v, --version")
   .option("-a", "Output the AST, default is true")
   .option("-c", "Output the CST, default is false")
   .option("-f, --file <s>", "The input file", id)

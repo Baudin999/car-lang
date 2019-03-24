@@ -12,6 +12,7 @@ const createERD_1 = require("./erd/createERD");
 // @ts-ignore
 const deflate_1 = require("./deflate/deflate");
 const helpers_1 = require("./helpers");
+const ckc_2 = require("./ckc");
 let modules;
 exports.watchProgram = projectName => {
     const projectDirectory = path_1.resolve(projectName);
@@ -20,9 +21,11 @@ exports.watchProgram = projectName => {
             console.log(`ERROR: 'carconfig.json' does not exists. Please run ckc --init to initialize the project directory or manually create a carconfig.json`);
             process.exit(1);
         }
+        let isReady = false;
         modules = {};
         const watcher = chokidar_1.watch(projectDirectory, { ignored: path_1.join(projectDirectory, ".out") })
-            .on("add", (fullPath) => {
+            .on("all", (event, fullPath) => {
+            // (event === "add" || event === "change") && 
             if (fullPath.endsWith(".car")) {
                 let moduleName = fullPath
                     .replace(projectDirectory, "")
@@ -31,6 +34,8 @@ exports.watchProgram = projectName => {
                     .replace(/\.car/, "");
                 fs_1.readFile(fullPath, "utf8", (err, source) => {
                     ckc_1.maybeRaiseError(err);
+                    if (err)
+                        return;
                     const hash = stringHash(source);
                     const { ast } = transpiler_1.createAST(source);
                     console.log(`Finished compiling: ${moduleName}`);
@@ -42,34 +47,17 @@ exports.watchProgram = projectName => {
                         timestamp: new Date()
                     };
                 });
-            }
-        })
-            .on("change", (fullPath) => {
-            if (fullPath.endsWith(".car")) {
-                let moduleName = fullPath
-                    .replace(projectDirectory, "")
-                    .replace(/\//g, ".")
-                    .replace(/^\./, "")
-                    .replace(/\.car/, "");
-                fs_1.readFile(fullPath, "utf8", (err, source) => {
-                    ckc_1.maybeRaiseError(err);
-                    const hash = stringHash(source);
-                    const { ast } = transpiler_1.createAST(source);
-                    console.log(`Finished compiling: ${moduleName}`);
-                    modules[moduleName] = {
-                        name: moduleName,
-                        ast,
-                        errors: [],
-                        hash,
-                        timestamp: new Date(),
-                        erdURL: modules[moduleName] ? modules[moduleName].erdURL : undefined
-                    };
-                    parseModule(projectDirectory, modules[moduleName]);
-                });
+                // if (modules[moduleName]) {
+                //   parseModule(projectDirectory, modules[moduleName]);
+                // }
+                if (isReady) {
+                    parseModules(projectDirectory, modules);
+                }
             }
         })
             .on("ready", () => {
             parseModules(projectDirectory, modules);
+            isReady = true;
         });
     });
 };
@@ -121,7 +109,7 @@ const parseModules = (projectDirectory, modules) => {
         fs_extra_1.removeSync(outPath);
     }
     const stylePath = path_1.join(outPath, "style.css");
-    fs_extra_1.outputFile(stylePath, styleCSS);
+    fs_extra_1.outputFile(stylePath, ckc_2.styleCSS);
     for (let key in moduleDictionary) {
         // Get the module.
         let module = moduleDictionary[key];
@@ -143,44 +131,4 @@ const parseModules = (projectDirectory, modules) => {
         fs_extra_1.outputFile(filePath, html);
     }
 };
-const styleCSS = `
-
-/* RESET */
-
-*, *:before, *:after {
-  box-sizing: border-box;
-}
-
-html, body {
-  font-family: 'Roboto', 'Verdana', sans-serif;
-}
-
-
-table, table tr, table tr td, tr table th {
-    border: none;
-    border-width: 0px;
-    border-image-width: 0px;
-    padding: 0;
-    margin: 0;
-    outline: none;
-    border-collapse: collapse;
-}
-
-/* TABEL STYLES */
-table {
-    width: 100%;
-    margin: 1rem;
-    border: 1px solid lightgray;
-}
-
-table tr:nth-child(even){background-color: #f2f2f2;}
-  
-table tr:hover {background-color: #ddd;}
-  
-table th {
-    text-align: left;
-    background-color: maroon;
-    color: white;
-}
-`;
 //# sourceMappingURL=ckc.program.watch.js.map

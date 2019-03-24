@@ -22,7 +22,7 @@ const getNodeById = (ast, params = [], id) => {
 exports.typeChecker = (ast = []) => {
     let errors = [];
     ast
-        .filter(node => node.type === outline_1.NodeType.TYPE)
+        .filter(node => node.type === outline_1.NodeType.TYPE && !node.imported)
         .forEach((node) => {
         // check the normal fields for errors
         node.fields

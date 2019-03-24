@@ -16,7 +16,7 @@ exports.createERD = (ast, title) => {
             .map((n) => n.id),
         data: ast.filter((node) => node.type && node.type === outline_1.NodeType.DATA).map((n) => n.id)
     };
-    const transformedNodes = ast.filter((node) => !node.imported).map(node => {
+    const transformedNodes = ast.map(node => {
         if (node.type && node.type === outline_1.NodeType.TYPE) {
             return new plantClass_1.PlantClass(node, lookup).toString();
         }

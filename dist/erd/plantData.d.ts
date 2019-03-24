@@ -8,6 +8,7 @@ export declare class PlantData {
     options(): string;
     associations(): string;
     annotations(): string;
+    paramAssociations(): string;
     params(): string;
     toString(): string;
 }

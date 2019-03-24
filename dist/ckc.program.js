@@ -12,6 +12,7 @@ const createERD_1 = require("./erd/createERD");
 // @ts-ignore
 const deflate_1 = require("./deflate/deflate");
 const helpers_1 = require("./helpers");
+const ckc_2 = require("./ckc");
 exports.runProgram = projectName => {
     const projectDirectory = path_1.resolve(projectName);
     fs_1.exists(path_1.join(projectDirectory, "carconfig.json"), (e) => {
@@ -65,7 +66,7 @@ exports.runProgram = projectName => {
                 fs_extra_1.removeSync(outPath);
             }
             const stylePath = path_1.join(outPath, "style.css");
-            fs_extra_1.outputFile(stylePath, styleCSS);
+            fs_extra_1.outputFile(stylePath, ckc_2.styleCSS);
             for (let key in moduleDictionary) {
                 // Get the module.
                 let module = moduleDictionary[key];
@@ -89,44 +90,4 @@ exports.runProgram = projectName => {
         });
     });
 };
-const styleCSS = `
-
-/* RESET */
-
-*, *:before, *:after {
-  box-sizing: border-box;
-}
-
-html, body {
-  font-family: 'Roboto', 'Verdana', sans-serif;
-}
-
-
-table, table tr, table tr td, tr table th {
-    border: none;
-    border-width: 0px;
-    border-image-width: 0px;
-    padding: 0;
-    margin: 0;
-    outline: none;
-    border-collapse: collapse;
-}
-
-/* TABEL STYLES */
-table {
-    width: 100%;
-    margin: 1rem;
-    border: 1px solid lightgray;
-}
-
-table tr:nth-child(even){background-color: #f2f2f2;}
-  
-table tr:hover {background-color: #ddd;}
-  
-table th {
-    text-align: left;
-    background-color: maroon;
-    color: white;
-}
-`;
 //# sourceMappingURL=ckc.program.js.map

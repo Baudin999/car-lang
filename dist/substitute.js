@@ -32,21 +32,54 @@ exports.substituteAliases = (ast = []) => {
             if (helpers_1.baseTypes.indexOf(node.ofType) > -1)
                 return originalType;
             let _node = helpers_1.clone(originalType);
-            _node.fields = _node.fields.map(field => {
+            let newChildren = (_node.fields || _node.options).map(field => {
+                // Check if the field is in the parameters list...
                 const fieldIndex = (_node.params || []).indexOf(field.ofType);
                 if (fieldIndex > -1) {
                     field.ofType = node.ofType_params[fieldIndex];
                     field.ofType_start = node.ofType_params_start[fieldIndex];
+                    return field;
                 }
-                return field;
+                // else we'll check if the field is a type itself...
+                const ref = getNodeById(ast, [], field.id);
+                if (ref && ref.params && ref.params.length === 0) {
+                    // no paramters means a plane type, something we can just
+                    // return without doing extra work.
+                    return field;
+                }
+                else if (ref && ref.params && ref.params.length > 0) {
+                    // here we're in the situation where we're passing a 
+                    // parameter through to another type.
+                    // Example:
+                    /*
+                    type Foo a =
+                        Something: a
+                    
+                    data Option a =
+                        | Person
+                        | Foo a   <-- here we're passing the 'a' through to Foo
+                    */
+                    //console.log(node.ofType_params)
+                    node.ofType_params.forEach((p, i) => {
+                        field.params[i] = p;
+                    });
+                    return field;
+                }
+                else {
+                    return field;
+                }
             });
+            if (_node.options)
+                _node.options = newChildren;
+            else if (_node.fields)
+                _node.fields = newChildren;
             _node.params = [];
             _node.id = node.id;
             _node.source = `${node.ofType}`;
             return _node;
         }
     });
-    return { newAST, errors };
+    return { newAST: helpers_1.purge(newAST), errors };
 };
 exports.substitutePluckedFields = (ast = []) => {
     const errors = [];

@@ -11,7 +11,7 @@ function id(val) {
     return val;
 }
 program
-    .version("0.0.1", "-v, --version")
+    .version("1.1.0", "-v, --version")
     .option("-a", "Output the AST, default is true")
     .option("-c", "Output the CST, default is false")
     .option("-f, --file <s>", "The input file", id)
@@ -56,4 +56,45 @@ exports.maybeRaiseError = error => {
         process.exit(1);
     }
 };
+exports.styleCSS = `
+/* RESET */
+
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+
+html, body {
+  font-family: 'Roboto', 'Verdana', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+
+table, table tr, table tr td, tr table th {
+    border: none;
+    border-width: 0px;
+    border-image-width: 0px;
+    padding: 0;
+    margin: 0;
+    outline: none;
+    border-collapse: collapse;
+}
+
+/* TABEL STYLES */
+table {
+    width: 100%;
+    border: 1px solid lightgray;
+    margin-bottom: 1rem;
+}
+
+table tr:nth-child(even){background-color: #f2f2f2;}
+
+table tr:hover {background-color: #ddd;}
+
+table th {
+    text-align: left;
+    background-color: maroon;
+    color: white;
+}
+`;
 //# sourceMappingURL=ckc.js.map
