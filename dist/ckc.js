@@ -5,6 +5,7 @@ const transpiler_1 = require("./transpiler");
 const createERD_1 = require("./erd/createERD");
 const program = require("commander");
 const ckc_program_1 = require("./ckc.program");
+const ckc_program_watch_1 = require("./ckc.program.watch");
 const ckc_init_1 = require("./ckc.init");
 function id(val) {
     return val;
@@ -18,9 +19,14 @@ program
     .option("-p, --project <s>", "Specify the project directory, the 'carconfig.json' location")
     .option("-u, --uml", "Output the UML")
     .option("-o, --out <s>", "The output file", id)
+    .option("-w, --watch", "Watch for file changes, can only be used together with the <project> flag.")
     .option("-d, --deflate", "Output the deflated uml url")
     .parse(process.argv);
-if (program.project) {
+if (program.project && program.watch) {
+    // we'll watch the file system on save...
+    ckc_program_watch_1.watchProgram(program.project);
+}
+else if (program.project) {
     // if we look at a project we'll want to the parse every file, then
     // include all the imports and do the rest...
     ckc_program_1.runProgram(program.project);

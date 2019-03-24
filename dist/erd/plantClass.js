@@ -6,6 +6,9 @@ class PlantClass {
     constructor(node, lookup) {
         this.node = node;
         this.lookup = lookup;
+        if (node.id === "ApiMessage") {
+            //console.log(JSON.stringify(lookup, null, 4))
+        }
     }
     fields() {
         return this.node.fields
@@ -22,7 +25,7 @@ class PlantClass {
             .filter((field) => this.lookup.types.indexOf(field.ofType) > -1 ||
             this.lookup.data.indexOf(field.ofType) > -1 ||
             this.lookup.enums.indexOf(field.ofType) > -1)
-            .map((field) => `${field.id} --> ${this.node.id} : ${field.id}`);
+            .map((field) => `${field.ofType} --> ${this.node.id} : ${field.id}`);
         const maybeFields = this.node.fields
             .filter((f) => f.ofType && f.ofType === "Maybe")
             .filter((field) => helpers_1.baseTypes.indexOf(field.ofType_params[0]) === -1)
@@ -49,13 +52,25 @@ class PlantClass {
             .map(a => helpers_1.foldText(`<b>${a.key}</b>: ${a.value}`))
             .join("\n");
         return `
-  ---
+--
   ${annotations}
     `;
     }
+    params() {
+        return this.node.params ?
+            " " + this.node.params.join(" ") : "";
+    }
+    template() {
+        if (this.node.params && this.node.params.length > 0) {
+            return "<< (T,orchid) >>";
+        }
+        else {
+            return "";
+        }
+    }
     toString() {
         return `
-class ${this.node.id}${this.source()} {
+class "${this.node.id}${this.params()}" as ${this.node.id} ${this.source()}${this.template()} {
 ${this.fields()}
 ${this.annotations()}
 }

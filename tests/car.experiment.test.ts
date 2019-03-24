@@ -10,15 +10,39 @@ const log = source => {
 describe("Experiment with the language", () => {
   const source = `
 
-type Person =
-    FirstName: String
 
-type Foo a =
-    Bar: a
-    Name: String
+type HttpResponse =
+    HttpCode: Number
+    Message: String
 
-alias Footje = Foo Person
-  
+@ code: 404
+@ message: Not Found
+type Error404 extends HttpResponse
+
+
+@ code: 401
+@ message: Unauthorised
+type Error401 extends HttpResponse
+
+
+@ code: 500
+@ message: Internal Server Error
+type Error500 extends HttpResponse
+
+
+@ code: 200
+@ message: OK
+type Response a extends HttpResponse =
+    Body: a
+
+
+data ApiResponse a =
+    | Error401
+    | Error404
+    | Error500
+    | Response a
+
+alias CustomerResponse = ApiResponse Cusomer
 
 `;
 

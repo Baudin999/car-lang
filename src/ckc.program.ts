@@ -1,5 +1,5 @@
 import { resolve, join } from "path";
-import { exists, readFile, existsSync } from "fs";
+import { exists, readFile, existsSync, readFileSync } from "fs";
 import { removeSync, outputFile } from "fs-extra";
 import { watch } from "chokidar";
 import * as stringHash from "string-hash";
@@ -11,6 +11,7 @@ import { createERD } from "./erd/createERD";
 // @ts-ignore
 import { generateURL } from "./deflate/deflate";
 import { fetchImage } from "./helpers";
+import { styleCSS } from "./ckc";
 
 export const runProgram = projectName => {
   const projectDirectory = resolve(projectName);
@@ -114,44 +115,3 @@ export interface IModuleDictionary {
 }
 
 
-
-const styleCSS = `
-
-/* RESET */
-
-*, *:before, *:after {
-  box-sizing: border-box;
-}
-
-html, body {
-  font-family: 'Roboto', 'Verdana', sans-serif;
-}
-
-
-table, table tr, table tr td, tr table th {
-    border: none;
-    border-width: 0px;
-    border-image-width: 0px;
-    padding: 0;
-    margin: 0;
-    outline: none;
-    border-collapse: collapse;
-}
-
-/* TABEL STYLES */
-table {
-    width: 100%;
-    margin: 1rem;
-    border: 1px solid lightgray;
-}
-
-table tr:nth-child(even){background-color: #f2f2f2;}
-  
-table tr:hover {background-color: #ddd;}
-  
-table th {
-    text-align: left;
-    background-color: maroon;
-    color: white;
-}
-`;

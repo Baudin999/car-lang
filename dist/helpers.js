@@ -24,8 +24,13 @@ exports.flatten = (items) => {
 exports.purge = (items) => {
     return exports.flatten(items).filter(i => !!i);
 };
-exports.clone = source => {
-    return JSON.parse(JSON.stringify(source));
+exports.clone = (source, template) => {
+    if (template) {
+        return Object.assign({}, JSON.parse(JSON.stringify(source)), template);
+    }
+    else {
+        return JSON.parse(JSON.stringify(source));
+    }
 };
 /**
  * Fold a long line and intersperse with newlines at certain intervals

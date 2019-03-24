@@ -10,8 +10,8 @@ exports.createTableTYPE = (node) => {
   <tr>
     <td>${f.id}</td>
     <td>${f.ofType} ${f.ofType_params.join(" ")}</td>
-    <td></td>
-    <td></td>
+    <td>${f.restrictions.map(r => `<div><b>${r.key}</b>: ${r.value}</div>`).join("\n")}</td>
+    <td>${f.annotations.map(r => `<div><b>${r.key}</b>: ${r.value}</div>`).join("\n")}</td>
   </tr>
   `.trim())
         .join("\n");

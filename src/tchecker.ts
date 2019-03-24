@@ -24,7 +24,7 @@ const getNodeById = (ast: IExpression[], params: string[] = [], id: string) => {
 export const typeChecker = (ast: IExpression[] = []): IError[] => {
   let errors: IError[] = [];
   ast
-    .filter(node => node.type === NodeType.TYPE)
+    .filter(node => node.type === NodeType.TYPE && !(node as any).imported)
     .forEach((node: IType) => {
       // check the normal fields for errors
       node.fields

@@ -1,5 +1,5 @@
 import { IType, NodeType, ITypeField, IExpression, IData, IDataOption } from "../outline";
-import { baseTypes, foldText } from "../helpers";
+import { baseTypes, foldText, purge } from "../helpers";
 import { ILookup } from "./createERD";
 
 export class PlantData {
@@ -38,6 +38,16 @@ export class PlantData {
     `;
   }
 
+  paramAssociations() {
+    const fieldParams = this.node.options
+      .map(option => {
+        return (option.params || []).filter(p => /[A-Z].*/.test(p)).map(param => {
+          return `${param} ..|> ${this.node.id} : ${option.id} <i>${param}</i>`;
+        })
+      });  
+    return purge(fieldParams).join("\n");
+  }
+
   params() {
     return this.node.params ?
       " " + this.node.params.join(" ") : "";
@@ -50,6 +60,7 @@ ${this.options()}
 ${this.annotations()}
 }
 ${this.associations()}
+${this.paramAssociations()}
 `
       .trim()
       .replace(/\n\n+/g, "\n");

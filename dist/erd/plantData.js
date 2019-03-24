@@ -5,16 +5,18 @@ class PlantData {
     constructor(node, lookup) {
         this.node = node;
         this.lookup = lookup;
+        this.lookupValues = [...lookup.data, ...lookup.enums, ...lookup.types];
     }
     options() {
         return this.node.options
             .map((f) => {
-            return `\t${f.id}`;
+            return `\t${f.id} ${(f.params || []).join(" ")}`;
         })
             .join("\n");
     }
     associations() {
         return this.node.options
+            .filter(field => this.lookupValues.indexOf(field.id) > -1)
             .map((field) => `${field.id} --> ${this.node.id} : ${field.id}`)
             .join("\n");
     }
@@ -29,9 +31,13 @@ class PlantData {
   ${annotations}
     `;
     }
+    params() {
+        return this.node.params ?
+            " " + this.node.params.join(" ") : "";
+    }
     toString() {
         return `
-abstract ${this.node.id} {
+abstract "${this.node.id}${this.params()}" as ${this.node.id} {
 ${this.options()}
 ${this.annotations()}
 }

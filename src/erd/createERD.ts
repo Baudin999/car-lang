@@ -17,7 +17,7 @@ export const createERD = (ast: IExpression[], title?:string) => {
     data: ast.filter((node: any) => node.type && node.type === NodeType.DATA).map((n: any) => n.id)
   };
 
-  const transformedNodes = ast.filter((node:any) => !node.imported).map(node => {
+  const transformedNodes = ast.map(node => {
     if (node.type && node.type === NodeType.TYPE) {
       return new PlantClass(node as IType, lookup).toString();
     } else if (node.type && node.type === NodeType.CHOICE) {

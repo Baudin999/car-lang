@@ -20,7 +20,7 @@ exports.runProgram = projectName => {
             process.exit(1);
         }
         let modules = {};
-        const watcher = chokidar_1.watch(projectDirectory)
+        const watcher = chokidar_1.watch(projectDirectory, { ignored: path_1.join(projectDirectory, ".out") })
             .on("all", (event, fullPath) => {
             if (fullPath.endsWith(".car")) {
                 let moduleName = fullPath
@@ -46,7 +46,7 @@ exports.runProgram = projectName => {
             .on("ready", () => {
             watcher.close();
             let hasErrors = false;
-            let moduleDictionary = transpiler_1.typeCheck(transpiler_1.substitute(transpiler_1.resolveImports(modules)));
+            let moduleDictionary = transpiler_1.compile(modules);
             for (let key in moduleDictionary) {
                 if (moduleDictionary[key].errors && moduleDictionary[key].errors.length > 0) {
                     hasErrors = true;
@@ -55,8 +55,10 @@ exports.runProgram = projectName => {
                 }
             }
             // Can't continue if there are errors...
-            if (hasErrors)
+            if (hasErrors) {
+                console.log("Quitting the process because I've found errors.");
                 return;
+            }
             // Check if the outpath exists and if so clean it.
             const outPath = path_1.join(projectDirectory, ".out");
             if (fs_1.existsSync(outPath)) {
@@ -65,12 +67,6 @@ exports.runProgram = projectName => {
             const stylePath = path_1.join(outPath, "style.css");
             fs_extra_1.outputFile(stylePath, styleCSS);
             for (let key in moduleDictionary) {
-                // Don't do sub directories yet...
-                // TODO: check to see to which Domain the sub-module belongs
-                //       create a sub-directory in that domain and generate
-                //       the relevant stuff in that sub-folder.
-                if (key.indexOf(".") > -1)
-                    return;
                 // Get the module.
                 let module = moduleDictionary[key];
                 // Save the plant UML file to the directory. And generate a 
@@ -100,6 +96,11 @@ const styleCSS = `
 *, *:before, *:after {
   box-sizing: border-box;
 }
+
+html, body {
+  font-family: 'Roboto', 'Verdana', sans-serif;
+}
+
 
 table, table tr, table tr td, tr table th {
     border: none;

@@ -46,6 +46,7 @@ export interface IType {
     fields: (ITypeField | IPluckedField)[];
     source?: string;
     annotations: IAnnotation[];
+    imported?: boolean;
 }
 export interface ITypeField {
     type: NodeType;
@@ -56,6 +57,7 @@ export interface ITypeField {
     ofType_params_start: ITokenStart[];
     annotations: IAnnotation[];
     source?: string;
+    restrictions: IRestriction[];
 }
 export interface IPluckedField {
     type: NodeType;

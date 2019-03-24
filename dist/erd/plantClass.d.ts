@@ -9,5 +9,7 @@ export declare class PlantClass {
     extensions(): string;
     source(): string;
     annotations(): string;
+    params(): string;
+    template(): "" | "<< (T,orchid) >>";
     toString(): string;
 }

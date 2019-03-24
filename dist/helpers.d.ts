@@ -16,7 +16,7 @@ export interface ITokenStart {
 }
 export declare const flatten: <T>(items: T[]) => T[];
 export declare const purge: <T>(items: T[]) => T[];
-export declare const clone: (source: any) => any;
+export declare const clone: (source: any, template?: any) => any;
 /**
  * Fold a long line and intersperse with newlines at certain intervals
  * @param s - input string

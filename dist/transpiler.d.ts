@@ -8,8 +8,11 @@ export declare const createAST: (source: string) => {
     cst: any;
 };
 export declare const resolveImports: (modules: IModuleDictionary) => IModuleDictionary;
-export declare const substitute: (modules: IModuleDictionary) => IModuleDictionary;
+export declare const extensions: (modules: IModuleDictionary) => IModuleDictionary;
+export declare const pluck: (modules: IModuleDictionary) => IModuleDictionary;
+export declare const resolveAlias: (modules: IModuleDictionary) => IModuleDictionary;
 export declare const typeCheck: (modules: IModuleDictionary) => IModuleDictionary;
+export declare const compile: (modules: IModuleDictionary) => IModuleDictionary;
 export interface ITranspilationResult {
     tokens: IToken[];
     cst: any[];

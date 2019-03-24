@@ -11,6 +11,7 @@ import { createERD } from "./erd/createERD";
 // @ts-ignore
 import { generateURL } from "./deflate/deflate";
 import { fetchImage } from "./helpers";
+import { styleCSS } from "./ckc";
 
 let modules: IModuleDictionary;
 
@@ -23,57 +24,45 @@ export const watchProgram = projectName => {
       );
       process.exit(1);
     }
+    let isReady = false;
     modules = {};
     const watcher = watch(projectDirectory, {ignored: join(projectDirectory, ".out") })
-      .on("add", (fullPath: string) => {
+      .on("all", (event:string, fullPath: string) => {
+        // (event === "add" || event === "change") && 
         if (fullPath.endsWith(".car")) {
-          let moduleName = fullPath
-            .replace(projectDirectory, "")
-            .replace(/\//g, ".")
-            .replace(/^\./, "")
-            .replace(/\.car/, "");
-          readFile(fullPath, "utf8", (err, source: string) => {
-            maybeRaiseError(err);
-            const hash = stringHash(source);
-            const { ast } = createAST(source);
-            console.log(`Finished compiling: ${moduleName}`);
-            modules[moduleName] = {
-              name: moduleName,
-              ast,
-              errors: [],
-              hash,
-              timestamp: new Date()
-            };
-          });
-        }
-      })
-      .on("change", (fullPath: string) => {
-        if (fullPath.endsWith(".car")) {
-          let moduleName = fullPath
-            .replace(projectDirectory, "")
-            .replace(/\//g, ".")
-            .replace(/^\./, "")
-            .replace(/\.car/, "");
-          readFile(fullPath, "utf8", (err, source: string) => {
-            maybeRaiseError(err);
-            const hash = stringHash(source);
-            const { ast } = createAST(source);
-            console.log(`Finished compiling: ${moduleName}`);
-            modules[moduleName] = {
-              name: moduleName,
-              ast,
-              errors: [],
-              hash,
-              timestamp: new Date(),
-              erdURL: modules[moduleName] ? modules[moduleName].erdURL : undefined
-            };
+            let moduleName = fullPath
+              .replace(projectDirectory, "")
+              .replace(/\//g, ".")
+              .replace(/^\./, "")
+              .replace(/\.car/, "");
 
-            parseModule(projectDirectory, modules[moduleName]);
-          });
-        }
+            readFile(fullPath, "utf8", (err, source: string) => {
+              maybeRaiseError(err);
+              if (err) return;
+
+              const hash = stringHash(source);
+              const { ast } = createAST(source);
+              console.log(`Finished compiling: ${moduleName}`);
+              modules[moduleName] = {
+                name: moduleName,
+                ast,
+                errors: [],
+                hash,
+                timestamp: new Date()
+              };
+            });
+
+            // if (modules[moduleName]) {
+            //   parseModule(projectDirectory, modules[moduleName]);
+            // }
+            if (isReady) {
+              parseModules(projectDirectory, modules);
+            }
+          }
       })
       .on("ready", () => {
         parseModules(projectDirectory, modules);
+        isReady = true;
       });
   });
 };
@@ -175,45 +164,3 @@ export interface IModuleDictionary {
   [module: string]: IModule;
 }
 
-
-
-const styleCSS = `
-
-/* RESET */
-
-*, *:before, *:after {
-  box-sizing: border-box;
-}
-
-html, body {
-  font-family: 'Roboto', 'Verdana', sans-serif;
-}
-
-
-table, table tr, table tr td, tr table th {
-    border: none;
-    border-width: 0px;
-    border-image-width: 0px;
-    padding: 0;
-    margin: 0;
-    outline: none;
-    border-collapse: collapse;
-}
-
-/* TABEL STYLES */
-table {
-    width: 100%;
-    margin: 1rem;
-    border: 1px solid lightgray;
-}
-
-table tr:nth-child(even){background-color: #f2f2f2;}
-  
-table tr:hover {background-color: #ddd;}
-  
-table th {
-    text-align: left;
-    background-color: maroon;
-    color: white;
-}
-`;

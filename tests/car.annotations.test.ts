@@ -20,7 +20,7 @@ type Person =
   const { tokens, errors, ast } = transpile(source);
   //log(tokens);
   //log(cst);
-  log(ast);
+  //log(ast);
   //log(errors);
 
   it("AST should be defined", () => {

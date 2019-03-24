@@ -22,7 +22,7 @@ exports.createHTML = (ast, moduleName) => {
         }
         else if (node.type === outline_1.NodeType.MARKDOWN_LIST) {
             let list = node;
-            let list_items = list.items.map(i => `<li>${i}</li>`);
+            let list_items = list.items.map(i => `<li>${i}</li>`).join("\n");
             return `<ul>${list_items}</ul>`;
         }
         else if (node.type === outline_1.NodeType.MARKDOWN_CODE) {
@@ -43,6 +43,7 @@ exports.createHTML = (ast, moduleName) => {
 <html>
   <head>
     <title></title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
     <link rel="stylesheet" href="./../style.css">
   </head>
   <body>

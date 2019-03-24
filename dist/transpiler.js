@@ -10,7 +10,9 @@ const helpers_1 = require("./helpers");
 // in the other modules (the imports).
 exports.transpile = (source) => {
     const { ast, cst, tokens } = exports.createAST(source);
-    let rwAlias = substitute_1.substituteAliases(ast);
+    let pluckResult = substitute_1.substitutePluckedFields(ast);
+    let pluckAST = pluckResult.newAST;
+    let rwAlias = substitute_1.substituteAliases(pluckAST);
     let rwAliasAST = rwAlias.newAST;
     let rwAliasErrors = rwAlias.errors;
     var { newAST, errors } = substitute_1.substituteExtensions(rwAliasAST);
@@ -52,16 +54,28 @@ exports.resolveImports = (modules) => {
             node.imports.forEach(id => {
                 const ref = getNodeById(id, m.ast || []);
                 if (ref)
-                    module.ast.unshift(helpers_1.clone(ref));
+                    module.ast.unshift(helpers_1.clone(ref, { imported: true }));
             });
             return module;
         });
         return module;
     });
 };
-exports.substitute = (modules) => {
+exports.extensions = (modules) => {
     return helpers_1.fmapModules(modules).map(module => {
         let { errors, newAST } = substitute_1.substituteExtensions(module.ast);
+        return Object.assign({}, module, { ast: newAST, errors: [...module.errors, ...errors] });
+    });
+};
+exports.pluck = (modules) => {
+    return helpers_1.fmapModules(modules).map(module => {
+        let { errors, newAST } = substitute_1.substitutePluckedFields(module.ast);
+        return Object.assign({}, module, { ast: newAST, errors: [...module.errors, ...errors] });
+    });
+};
+exports.resolveAlias = (modules) => {
+    return helpers_1.fmapModules(modules).map(module => {
+        const { newAST, errors } = substitute_1.substituteAliases(module.ast);
         return Object.assign({}, module, { ast: newAST, errors: [...module.errors, ...errors] });
     });
 };
@@ -70,6 +84,9 @@ exports.typeCheck = (modules) => {
         let errors = tchecker_1.typeChecker(module.ast);
         return Object.assign({}, module, { errors: [...module.errors, ...errors] });
     });
+};
+exports.compile = (modules) => {
+    return exports.typeCheck(exports.pluck(exports.resolveAlias(exports.extensions(exports.resolveImports(modules)))));
 };
 const getNodeById = (id, ast) => {
     return ast.find(node => node.id && node.id === id);

@@ -48,6 +48,29 @@ exports.substituteAliases = (ast = []) => {
     });
     return { newAST, errors };
 };
+exports.substitutePluckedFields = (ast = []) => {
+    const errors = [];
+    const newAST = ast.map((node) => {
+        if (node.type !== outline_1.NodeType.TYPE)
+            return node;
+        else {
+            let newNode = node;
+            newNode.fields = node.fields
+                .map((field) => {
+                if (field.type !== outline_1.NodeType.PLUCKED_FIELD)
+                    return field;
+                let [ofType, fieldName] = field.parts;
+                let targetNode = getNodeById(ast, [], ofType);
+                if (!targetNode)
+                    return field;
+                let targetField = (targetNode.fields || []).find(f => f.id === fieldName);
+                return helpers_1.clone(targetField);
+            });
+            return newNode;
+        }
+    });
+    return { newAST, errors };
+};
 exports.substituteExtensions = (ast = []) => {
     const errors = [];
     const newAST = ast.map((node) => {
