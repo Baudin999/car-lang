@@ -1,3 +1,7 @@
+abstract "Maybe a" as Maybe {
+	Just a
+	Nothing 
+}
 enum Gender {
 	Male
 	Female
@@ -23,11 +27,13 @@ class "Person " as Person  {
 	FirstName: Maybe String
 	LastName: String 
 	Address: Address 
+	CustomerId: Id  <i>from Customer</i>
 }
 Address --> Person : Address
 Customer --|> Person
 class "Company " as Company  {
 	OrganisationName: String 
+	CustomerId: Id  <i>from Customer</i>
 }
 Customer --|> Company
 class "Customer" as Customer  {

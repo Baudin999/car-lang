@@ -1,21 +1,38 @@
-open Customer importing (Customer, Id)
+open Customer importing (Customer)
 
-@ api
-data Envelope =
-    | ApiMessage
-    | Error
-
-type Message a =
-    HttpCode: Number
-    Message: String
-    Body: a
-
-type OtherCustomer =
-    Something: String
-    pluck Customer.CustomerId
-
-alias ApiMessage = Message OtherCustomer
 
 type Error =
     HttpCode: Number
     Message: String
+
+@ code: 404
+@ message: Not Found
+type Error404 extends Error
+
+
+@ code: 401
+@ message: Unauthorised
+type Error401 extends Error
+
+
+@ code: 500
+@ message: Internal Server Error
+type Error500 extends Error
+ 
+
+@ code: 200
+@ message: OK
+type Response a =
+    Code: Number
+    Message: String 
+    Body: a
+
+
+data ApiResponse a =
+    | Error401
+    | Error404
+    | Error500
+    | Response a
+
+alias CustomerResponse = ApiResponse Customer
+
