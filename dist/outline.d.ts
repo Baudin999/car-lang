@@ -47,6 +47,7 @@ export interface IType {
     source?: string;
     annotations: IAnnotation[];
     imported?: boolean;
+    ignore: boolean;
 }
 export interface ITypeField {
     type: NodeType;
@@ -70,6 +71,7 @@ export interface IData {
     params?: string[];
     options: IDataOption[];
     annotations: IAnnotation[];
+    ignore: boolean;
 }
 export interface IDataOption {
     type: NodeType;

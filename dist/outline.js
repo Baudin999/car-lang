@@ -16,11 +16,13 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
     }
     EXPRESSION(ctx) {
         const annotations = helpers_1.purge(ctx.ROOT_ANNOTATIONS.map(a => this.visit(a)));
+        const ignoreAttribute = annotations.find((a) => a.key === "ignore");
+        const ignore = ignoreAttribute ? ignoreAttribute.value === "true" : false;
         if (ctx.TYPE) {
-            return Object.assign({ annotations }, this.visit(ctx.TYPE[0]));
+            return Object.assign({ annotations }, this.visit(ctx.TYPE[0]), { ignore });
         }
         else if (ctx.DATA) {
-            return Object.assign({ annotations }, this.visit(ctx.DATA[0]));
+            return Object.assign({ annotations }, this.visit(ctx.DATA[0]), { ignore });
         }
         else if (ctx.ALIAS) {
             return Object.assign({ annotations }, this.visit(ctx.ALIAS[0]));

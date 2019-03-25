@@ -6,7 +6,7 @@ const plantData_1 = require("./plantData");
 const helpers_1 = require("../helpers");
 const plantEnum_1 = require("./plantEnum");
 const types = [outline_1.NodeType.TYPE, outline_1.NodeType.ALIAS, outline_1.NodeType.DATA, outline_1.NodeType.CHOICE];
-exports.createERD = (ast, title) => {
+exports.createERD = (ast, title, depth = 0) => {
     let lookup = {
         types: ast
             .filter((node) => node.type && node.type === outline_1.NodeType.TYPE)
@@ -16,7 +16,7 @@ exports.createERD = (ast, title) => {
             .map((n) => n.id),
         data: ast.filter((node) => node.type && node.type === outline_1.NodeType.DATA).map((n) => n.id)
     };
-    const transformedNodes = ast.map(node => {
+    const transformedNodes = ast.filter((n) => !n.ignore).map(node => {
         if (node.type && node.type === outline_1.NodeType.TYPE) {
             return new plantClass_1.PlantClass(node, lookup).toString();
         }
@@ -35,6 +35,8 @@ exports.createERD = (ast, title) => {
 };
 exports.createView = (view, ast) => {
     const title = view.directives.find(d => d.key === "title");
+    //const depthDirective = view.directives.find(d => d.key === "depth");
+    //const depth = depthDirective ? 0 : +depthDirective.value;
     const viewAST = view.nodes.map(node => {
         return ast.find((n) => n.id && n.id === node);
     });

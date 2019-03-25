@@ -150,7 +150,7 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
     let directives: IDirective[] = (ctx.DirectiveLiteral || []).map(d => {
       const segments = pattern.exec(d.image);
       if (segments) {
-        const result = {
+        return {
           key: segments[3].trim(),
           value: segments[5].trim()
         };

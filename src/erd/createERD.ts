@@ -37,13 +37,13 @@ export const createERD = (ast: IExpression[], title?:string, depth:number = 0) =
 
 export const createView = (view: IView, ast: IExpression[]) => {
   const title = view.directives.find(d => d.key === "title");
-  const depthDirective = view.directives.find(d => d.key === "depth");
-  const depth = depthDirective ? 0 : +(depthDirective as unknown as IDirective).value;
+  //const depthDirective = view.directives.find(d => d.key === "depth");
+  //const depth = depthDirective ? 0 : +(depthDirective as unknown as IDirective).value;
 
   const viewAST = view.nodes.map(node => {
     return ast.find((n: any) => n.id && n.id === node);
   }) as IExpression[];
-  return createERD(viewAST, title ? title.value : undefined, depth);
+  return createERD(viewAST, title ? title.value : undefined);
 };
 
 export interface ILookup {
