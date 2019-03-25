@@ -22,15 +22,21 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
 
   EXPRESSION(ctx: any): IExpression | null {
     const annotations = purge(ctx.ROOT_ANNOTATIONS.map(a => this.visit(a)));
+    const ignoreAttribute:any = annotations.find((a: IAnnotation) => a.key === "ignore");
+    const ignore = ignoreAttribute ? ignoreAttribute.value === "true" : false;
+
+
     if (ctx.TYPE) {
       return {
         annotations,
-        ...this.visit(ctx.TYPE[0])
+        ...this.visit(ctx.TYPE[0]),
+        ignore
       };
     } else if (ctx.DATA) {
       return {
         annotations,
-        ...this.visit(ctx.DATA[0])
+        ...this.visit(ctx.DATA[0]),
+        ignore
       };
     } else if (ctx.ALIAS) {
       return {
@@ -144,7 +150,7 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
     let directives: IDirective[] = (ctx.DirectiveLiteral || []).map(d => {
       const segments = pattern.exec(d.image);
       if (segments) {
-        return {
+        const result = {
           key: segments[3].trim(),
           value: segments[5].trim()
         };
@@ -380,6 +386,7 @@ export interface IType {
   source?: string;
   annotations: IAnnotation[];
   imported?: boolean;
+  ignore: boolean;
 }
 
 export interface ITypeField {
@@ -406,6 +413,7 @@ export interface IData {
   params?: string[];
   options: IDataOption[];
   annotations: IAnnotation[];
+  ignore: boolean;
 }
 
 export interface IDataOption {

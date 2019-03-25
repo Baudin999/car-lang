@@ -1,5 +1,3 @@
-class "List a" as List << (T,orchid) >> {
-}
 class "FileInfo" as FileInfo  {
 	Size: Number 
 	LastModified: String 

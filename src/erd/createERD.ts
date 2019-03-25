@@ -1,4 +1,4 @@
-import { IExpression, NodeType, IType, IChoice, IView } from "./../outline";
+import { IExpression, NodeType, IType, IChoice, IView, IDirective } from "./../outline";
 import { PlantClass } from "./plantClass";
 import { PlantData } from "./plantData";
 import { purge } from "../helpers";
@@ -6,7 +6,7 @@ import { PlantEnum } from "./plantEnum";
 
 const types = [NodeType.TYPE, NodeType.ALIAS, NodeType.DATA, NodeType.CHOICE];
 
-export const createERD = (ast: IExpression[], title?:string) => {
+export const createERD = (ast: IExpression[], title?:string, depth:number = 0) => {
   let lookup: ILookup = {
     types: ast
       .filter((node: any) => node.type && node.type === NodeType.TYPE)
@@ -17,7 +17,7 @@ export const createERD = (ast: IExpression[], title?:string) => {
     data: ast.filter((node: any) => node.type && node.type === NodeType.DATA).map((n: any) => n.id)
   };
 
-  const transformedNodes = ast.map(node => {
+  const transformedNodes = ast.filter((n: any) => !n.ignore).map(node => {
     if (node.type && node.type === NodeType.TYPE) {
       return new PlantClass(node as IType, lookup).toString();
     } else if (node.type && node.type === NodeType.CHOICE) {
@@ -37,10 +37,13 @@ export const createERD = (ast: IExpression[], title?:string) => {
 
 export const createView = (view: IView, ast: IExpression[]) => {
   const title = view.directives.find(d => d.key === "title");
+  const depthDirective = view.directives.find(d => d.key === "depth");
+  const depth = depthDirective ? 0 : +(depthDirective as unknown as IDirective).value;
+
   const viewAST = view.nodes.map(node => {
     return ast.find((n: any) => n.id && n.id === node);
   }) as IExpression[];
-  return createERD(viewAST, title ? title.value : undefined);
+  return createERD(viewAST, title ? title.value : undefined, depth);
 };
 
 export interface ILookup {

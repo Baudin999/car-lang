@@ -1,0 +1,100 @@
+open Prelude importing (List, Maybe)
+
+# Aria
+
+Aria is a pen & paper RPG. This `car` file will give the structure 
+for the types in the Aria RPG.
+
+## Statistics
+
+A statistic is the base value for someone's potential in Aria
+
+view {
+    Statistic
+    Character
+}
+
+## Buyable things
+
+You can buy, for example, skills, resistances, feat ranks and sometimes specials.
+
+ * Bought: 3 XP (You can now roll a d20 instead of a d10)
+ * Skilled: 4 XP (Add your Statistic as a bonus)
+ * Professional: 5 XP (Add you Expertese as a bonus)
+ * Master: 6 XP (TODO: Describe master)
+
+In the next breakdown you can see the relationships on how the Buyable and Namable 
+things are ordened in the Aria game system.
+
+view {
+    
+    % depth: 0
+
+    Skill
+    Namable
+    Buyable
+}
+
+{* The types as described by Aria *}
+
+alias XP = Number
+    | min 0
+
+choice BoughtFrom =
+    | "Racial Package"
+    | "Professional Package"
+    | "XP"
+    | "Gift"
+    | "Other"
+
+data Stat =
+    | Strength
+    | Agility
+    | Intuition
+    | Perception
+    | Charisma
+    | None
+
+type Namable =
+    Name: String
+    Description: String
+
+type Buyable =
+    Source: BoughtFrom
+    Stat: Stat
+    Bought: Boolean
+    Skilled: Boolean
+    Professional: Boolean
+    Master: Boolean
+
+@ A skill is something a character can do
+type Skill extends Namable, Buyable
+    
+type Resistance extends Namable, Buyable
+
+type Special extends Namable, Buyable
+
+type Feat extends Namable =
+    Rank: Number
+    XP: Number
+    Stat: Stat
+
+@ A statistic is a base value for a character's potential
+@ Statistics serve as a base bonus for certain abilities.
+type Statistic =
+    Stat: Stat
+    Description: String
+    XP: XP
+    @ This is XP / 10 and rounded up
+    Value: Number
+
+type Character =
+    Name: String
+    Skills: List Skill
+    Specials: List Special
+    Feats: List Feat
+    Strength: Statistic
+    Agility: Statistic
+    Intuition: Statistic
+    Perception: Statistic
+    Charisma: Statistic

@@ -1,10 +1,11 @@
 
 
+@ ignore: true
 data Maybe a =
     | Just a
     | Nothing
 
-
+@ ignore: true
 type List a
 
 @ Currency is expressen like: $12,00

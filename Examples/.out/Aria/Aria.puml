@@ -1,0 +1,116 @@
+enum BoughtFrom {
+	Racial Package
+	Professional Package
+	XP
+	Gift
+	Other
+}
+abstract "Stat" as Stat {
+	Strength 
+	Agility 
+	Intuition 
+	Perception 
+	Charisma 
+	None 
+}
+class "Namable" as Namable  {
+	Name: String 
+	Description: String 
+}
+class "Buyable" as Buyable  {
+	Source: BoughtFrom 
+	Stat: Stat 
+	Bought: Boolean 
+	Skilled: Boolean 
+	Professional: Boolean 
+	Master: Boolean 
+}
+BoughtFrom --> Buyable : Source
+Stat --> Buyable : Stat
+class "Skill " as Skill  {
+	Name: String  <i>from Namable</i>
+	Description: String  <i>from Namable</i>
+	Source: BoughtFrom  <i>from Buyable</i>
+	Stat: Stat  <i>from Buyable</i>
+	Bought: Boolean  <i>from Buyable</i>
+	Skilled: Boolean  <i>from Buyable</i>
+	Professional: Boolean  <i>from Buyable</i>
+	Master: Boolean  <i>from Buyable</i>
+--
+  <b>description</b>: A skill is
+ something a character can do
+    
+}
+BoughtFrom --> Skill : Source
+Stat --> Skill : Stat
+Namable --|> Skill
+Buyable --|> Skill
+class "Resistance " as Resistance  {
+	Name: String  <i>from Namable</i>
+	Description: String  <i>from Namable</i>
+	Source: BoughtFrom  <i>from Buyable</i>
+	Stat: Stat  <i>from Buyable</i>
+	Bought: Boolean  <i>from Buyable</i>
+	Skilled: Boolean  <i>from Buyable</i>
+	Professional: Boolean  <i>from Buyable</i>
+	Master: Boolean  <i>from Buyable</i>
+}
+BoughtFrom --> Resistance : Source
+Stat --> Resistance : Stat
+Namable --|> Resistance
+Buyable --|> Resistance
+class "Special " as Special  {
+	Name: String  <i>from Namable</i>
+	Description: String  <i>from Namable</i>
+	Source: BoughtFrom  <i>from Buyable</i>
+	Stat: Stat  <i>from Buyable</i>
+	Bought: Boolean  <i>from Buyable</i>
+	Skilled: Boolean  <i>from Buyable</i>
+	Professional: Boolean  <i>from Buyable</i>
+	Master: Boolean  <i>from Buyable</i>
+}
+BoughtFrom --> Special : Source
+Stat --> Special : Stat
+Namable --|> Special
+Buyable --|> Special
+class "Feat " as Feat  {
+	Rank: Number 
+	XP: Number 
+	Stat: Stat 
+	Name: String  <i>from Namable</i>
+	Description: String  <i>from Namable</i>
+}
+Stat --> Feat : Stat
+Namable --|> Feat
+class "Statistic" as Statistic  {
+	Stat: Stat 
+	Description: String 
+	XP: XP 
+	Value: Number 
+--
+  <b>description</b>: A statistic is a
+ base value for a character's potential
+ Statistics serve as a base bonus for
+ certain abilities.
+    
+}
+Stat --> Statistic : Stat
+class "Character" as Character  {
+	Name: String 
+	Skills: List Skill
+	Specials: List Special
+	Feats: List Feat
+	Strength: Statistic 
+	Agility: Statistic 
+	Intuition: Statistic 
+	Perception: Statistic 
+	Charisma: Statistic 
+}
+Statistic --> Character : Strength
+Statistic --> Character : Agility
+Statistic --> Character : Intuition
+Statistic --> Character : Perception
+Statistic --> Character : Charisma
+Skill "0" --> "*" Character : List Skill
+Special "0" --> "*" Character : List Special
+Feat "0" --> "*" Character : List Feat

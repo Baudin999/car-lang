@@ -1,6 +1,33 @@
 class "Customer" as Customer  {
 	CustomerId: Id 
 }
+class "Customer" as Customer  {
+	CustomerId: Id 
+}
+class "Customer" as Customer  {
+	CustomerId: Id 
+}
+class "Customer" as Customer  {
+	CustomerId: Id 
+}
+class "Customer" as Customer  {
+	CustomerId: Id 
+}
+class "Customer" as Customer  {
+	CustomerId: Id 
+}
+class "Customer" as Customer  {
+	CustomerId: Id 
+}
+class "Customer" as Customer  {
+	CustomerId: Id 
+}
+class "Customer" as Customer  {
+	CustomerId: Id 
+}
+class "Customer" as Customer  {
+	CustomerId: Id 
+}
 class "Error" as Error  {
 	HttpCode: Number 
 	Message: String 
