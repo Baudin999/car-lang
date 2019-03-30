@@ -1,0 +1,18 @@
+class "List a" as List << (T,orchid) >> {
+}
+class "Person" as Person  {
+	FirstName: String 
+	Address: List Address
+}
+Address "0" --> "*" Person : List Address
+class "Address" as Address  {
+	Street: String 
+}
+class "Something a" as Something << (T,orchid) >> {
+	Body: a 
+	Header: String 
+--
+  <b>description</b>: THis is the the
+ Something type
+    
+}

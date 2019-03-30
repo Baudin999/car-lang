@@ -51,14 +51,3 @@ Error401 --> ApiResponse : Error401
 Error404 --> ApiResponse : Error404
 Error500 --> ApiResponse : Error500
 Response --> ApiResponse : Response
-abstract "CustomerResponse " as CustomerResponse {
-	Error401 
-	Error404 
-	Error500 
-	Response Customer
-}
-Error401 --> CustomerResponse : Error401
-Error404 --> CustomerResponse : Error404
-Error500 --> CustomerResponse : Error500
-Response --> CustomerResponse : Response
-Customer ..|> CustomerResponse : Response <i>Customer</i>

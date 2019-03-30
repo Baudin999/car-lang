@@ -9,14 +9,16 @@ const types = [outline_1.NodeType.TYPE, outline_1.NodeType.ALIAS, outline_1.Node
 exports.createERD = (ast, title, depth = 0) => {
     let lookup = {
         types: ast
-            .filter((node) => node.type && node.type === outline_1.NodeType.TYPE)
+            .filter((node) => node && node.type && node.type === outline_1.NodeType.TYPE)
             .map((n) => n.id),
         enums: ast
-            .filter((node) => node.type && node.type === outline_1.NodeType.CHOICE)
+            .filter((node) => node && node.type && node.type === outline_1.NodeType.CHOICE)
             .map((n) => n.id),
-        data: ast.filter((node) => node.type && node.type === outline_1.NodeType.DATA).map((n) => n.id)
+        data: ast.filter((node) => node && node.type && node.type === outline_1.NodeType.DATA).map((n) => n.id)
     };
-    const transformedNodes = ast.filter((n) => !n.ignore).map(node => {
+    const transformedNodes = ast.filter((n) => n && !n.ignore).map(node => {
+        if (!node)
+            return null;
         if (node.type && node.type === outline_1.NodeType.TYPE) {
             return new plantClass_1.PlantClass(node, lookup).toString();
         }
@@ -36,7 +38,7 @@ exports.createERD = (ast, title, depth = 0) => {
 exports.createView = (view, ast) => {
     const title = view.directives.find(d => d.key === "title");
     //const depthDirective = view.directives.find(d => d.key === "depth");
-    //const depth = depthDirective ? 0 : +depthDirective.value;
+    //const depth = depthDirective ? 0 : +(depthDirective as unknown as IDirective).value;
     const viewAST = view.nodes.map(node => {
         return ast.find((n) => n.id && n.id === node);
     });

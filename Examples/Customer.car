@@ -1,5 +1,10 @@
 open Prelude importing (Maybe)
 
+% domain: Customer
+% service: DefaultCustomer
+% version: 0.1
+
+
 # Person
 
 This document will show the way we're going to work with

@@ -43,11 +43,11 @@ exports.createAST = (source) => {
     return { ast, tokens: lexedSource.tokens, cst };
 };
 exports.resolveImports = (modules) => {
-    return helpers_1.fmapModules(modules).map(module => {
+    return modules.map(module => {
         module.ast
             .filter(node => node.type === outline_1.NodeType.OPEN)
             .map((node) => {
-            const m = modules[node.module];
+            const m = modules.getModule(node.module);
             if (!m) {
                 throw "Can't find module " + node.module;
             }
@@ -62,25 +62,25 @@ exports.resolveImports = (modules) => {
     });
 };
 exports.extensions = (modules) => {
-    return helpers_1.fmapModules(modules).map(module => {
+    return modules.map(module => {
         let { errors, newAST } = substitute_1.substituteExtensions(module.ast);
         return Object.assign({}, module, { ast: newAST, errors: [...module.errors, ...errors] });
     });
 };
 exports.pluck = (modules) => {
-    return helpers_1.fmapModules(modules).map(module => {
+    return modules.map(module => {
         let { errors, newAST } = substitute_1.substitutePluckedFields(module.ast);
         return Object.assign({}, module, { ast: newAST, errors: [...module.errors, ...errors] });
     });
 };
 exports.resolveAlias = (modules) => {
-    return helpers_1.fmapModules(modules).map(module => {
+    return modules.map(module => {
         const { newAST, errors } = substitute_1.substituteAliases(module.ast);
         return Object.assign({}, module, { ast: newAST, errors: [...module.errors, ...errors] });
     });
 };
 exports.typeCheck = (modules) => {
-    return helpers_1.fmapModules(modules).map(module => {
+    return modules.map(module => {
         let errors = tchecker_1.typeChecker(module.ast);
         return Object.assign({}, module, { errors: [...module.errors, ...errors] });
     });

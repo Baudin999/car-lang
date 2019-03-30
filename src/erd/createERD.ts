@@ -9,15 +9,17 @@ const types = [NodeType.TYPE, NodeType.ALIAS, NodeType.DATA, NodeType.CHOICE];
 export const createERD = (ast: IExpression[], title?:string, depth:number = 0) => {
   let lookup: ILookup = {
     types: ast
-      .filter((node: any) => node.type && node.type === NodeType.TYPE)
+      .filter((node: any) => node && node.type && node.type === NodeType.TYPE)
       .map((n: any) => n.id),
     enums: ast
-      .filter((node: any) => node.type && node.type === NodeType.CHOICE)
+      .filter((node: any) => node && node.type && node.type === NodeType.CHOICE)
       .map((n: any) => n.id),
-    data: ast.filter((node: any) => node.type && node.type === NodeType.DATA).map((n: any) => n.id)
+    data: ast.filter((node: any) => node && node.type && node.type === NodeType.DATA).map((n: any) => n.id)
   };
 
-  const transformedNodes = ast.filter((n: any) => !n.ignore).map(node => {
+  const transformedNodes = ast.filter((n: any) => n && !n.ignore).map(node => {
+    if (!node) return null;
+
     if (node.type && node.type === NodeType.TYPE) {
       return new PlantClass(node as IType, lookup).toString();
     } else if (node.type && node.type === NodeType.CHOICE) {

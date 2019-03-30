@@ -65,20 +65,6 @@ function foldText(s, split = "\n", n = 40, useSpaces = true, a = []) {
     }
 }
 exports.foldText = foldText;
-/*
-Simple way to map through the modules
-*/
-exports.fmapModules = (modules) => {
-    return {
-        map: (handler) => {
-            let newModuleDictionary = {};
-            for (var moduleKey in modules) {
-                newModuleDictionary[moduleKey] = handler(modules[moduleKey]);
-            }
-            return newModuleDictionary;
-        }
-    };
-};
 exports.fetchImage = url => {
     return new Promise((resolve, reject) => {
         fetch(url)
@@ -100,4 +86,57 @@ exports.baseTypes = [
     "Time",
     "DateTime"
 ];
+exports.baseTypeToXSDType = (b) => {
+    switch (b) {
+        case "String":
+            return "xsd:string";
+        case "Number":
+            return "xsd:integer";
+        case "Boolean":
+            return "xsd:boolean";
+        case "Date":
+            return "xsd:date";
+        case "DateTime":
+            return "xsd:dateTime";
+        case "Time":
+            return "xsd:time";
+        default:
+            return "xsd:string";
+    }
+};
+exports.mapRestrictionToXSD = (baseType, restriction) => {
+    switch (baseType) {
+        case "String":
+            switch (restriction.key) {
+                case "min":
+                    return `<xsd:minLength value="${restriction.value}" />`;
+                case "max":
+                    return `<xsd:maxLength value="${restriction.value}" />`;
+                case "length":
+                    return `<xsd:length value="${restriction.value}" />`;
+                case "pattern":
+                    return `<xsd:pattern value="${restriction.value}" />`;
+                default:
+                    return "";
+            }
+        case "Char":
+            return `
+      <xsd:minLength value="1" />
+      <xsd:maxLength value="1" />
+      `.trim();
+        case "Number":
+            switch (restriction.key) {
+                case "min":
+                    return `<xsd:minInclusive value="${restriction.value}" />`;
+                case "max":
+                    return `<xsd:maxInclusive value="${restriction.value}" />`;
+                case "pattern":
+                    return `<xsd:pattern value="${restriction.value}" />`;
+                default:
+                    return "";
+            }
+        default:
+            return "";
+    }
+};
 //# sourceMappingURL=helpers.js.map
