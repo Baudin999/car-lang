@@ -42,7 +42,7 @@ export class Project {
         });
     }
 
-    async init(): Promise<boolean> {
+    init(): Promise<boolean> {
         const defaultConfig = {
             name: "Unknown",
             description: "No description",
@@ -54,6 +54,7 @@ export class Project {
                 namespace: "https://example.com"
             }
         };
+
         const prelude = `
 # Prelude
 
@@ -71,18 +72,26 @@ data Maybe a =
 
         `.trim();
 
-        return new Promise<boolean>(async (resolve, reject) => {
-            exists(this.configPath, async e => {
-                try {
-                    if (e) {
-                        let isRemoved = await remove(this.configPath);
+        return new Promise<boolean | any>((resolve, reject) => {
+            console.log("Check existance");
+            exists(this.configPath, e => {
+                remove(this.configPath, e2 => {
+                    try {
+                        let promises = [
+                            outputFile(this.configPath, JSON.stringify(defaultConfig, null, 4)),
+                            outputFile(this.preludePath, prelude, err3 => {
+                                console.log(err3);
+                            })
+                        ];
+
+                        Promise.all(promises).then(results => {
+                            resolve(true);
+                        });
+                    } catch (err) {
+                        console.log(err);
+                        reject(err);
                     }
-                    outputFile(this.configPath, JSON.stringify(defaultConfig, null, 4));
-                    outputFile(this.preludePath, prelude);
-                    resolve(true);
-                } catch (err) {
-                    reject(err);
-                }
+                });
             });
         });
     }

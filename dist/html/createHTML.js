@@ -47,6 +47,11 @@ exports.createHTML = (ast, moduleName) => {
     <link rel="stylesheet" href="./../style.css">
   </head>
   <body>
+
+  <h1>Links</h1>
+  <a href="${moduleName}.xsd">XSD</a>
+  <a href="${moduleName}.json">JSON schema</a>
+
   ${helpers_1.purge(transformedNodes).join("\n")}
   <h1>ERD</h1>
   ${moduleName ? `<div class="image-container"><img src="${moduleName}.svg" /></div>` : ""}

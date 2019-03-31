@@ -1,52 +1,52 @@
 import {
-  IExpression,
-  NodeType,
-  IType,
-  IChoice,
-  IMarkdownChapter,
-  IMarkdownParagraph,
-  IMarkdownList,
-  IMarkdownCode,
-  IView
+    IExpression,
+    NodeType,
+    IType,
+    IChoice,
+    IMarkdownChapter,
+    IMarkdownParagraph,
+    IMarkdownList,
+    IMarkdownCode,
+    IView
 } from "../outline";
 import { purge } from "../helpers";
 import { createTableTYPE } from "./tableTYPE";
 // @ts-ignore
 import { generateURL } from "./../deflate/deflate";
-import { createView } from '../erd/createERD';
+import { createView } from "../erd/createERD";
 
 const types = [NodeType.TYPE, NodeType.ALIAS, NodeType.DATA, NodeType.CHOICE];
 
-export const createHTML = (ast: IExpression[], moduleName?:string) => {
-  const tables: string[] = [];
+export const createHTML = (ast: IExpression[], moduleName?: string) => {
+    const tables: string[] = [];
 
-  const transformedNodes = ast
-    .filter(node => node.type)
-    .map(node => {
-      if (node.type === NodeType.MARKDOWN_CHAPTER) {
-        let chapter = node as IMarkdownChapter;
-        return `<h${chapter.depth}>${chapter.content}</h${chapter.depth}>`;
-      } else if (node.type === NodeType.MARKDOWN_PARAGRAPH) {
-        let p = node as IMarkdownParagraph;
-        return `<p>${p.content}</p>`;
-      } else if (node.type === NodeType.MARKDOWN_LIST) {
-        let list = node as IMarkdownList;
-        let list_items = list.items.map(i => `<li>${i}</li>`).join("\n");
-        return `<ul>${list_items}</ul>`;
-      } else if (node.type === NodeType.MARKDOWN_CODE) {
-        let code = node as IMarkdownCode;
-        return `<pre><code>${code.content}</code></pre>`;
-      } else if (node.type === NodeType.TYPE) {
-        tables.push(createTableTYPE(node as IType));
-      } else if (node.type === NodeType.VIEW) {
-        let plantSource = createView(node as any, ast);
-        let url = generateURL(plantSource);
-        return `<div class="image-container"><img src="${url}" /></div>`;
-      } 
-      return null;
-    });
+    const transformedNodes = ast
+        .filter(node => node.type)
+        .map(node => {
+            if (node.type === NodeType.MARKDOWN_CHAPTER) {
+                let chapter = node as IMarkdownChapter;
+                return `<h${chapter.depth}>${chapter.content}</h${chapter.depth}>`;
+            } else if (node.type === NodeType.MARKDOWN_PARAGRAPH) {
+                let p = node as IMarkdownParagraph;
+                return `<p>${p.content}</p>`;
+            } else if (node.type === NodeType.MARKDOWN_LIST) {
+                let list = node as IMarkdownList;
+                let list_items = list.items.map(i => `<li>${i}</li>`).join("\n");
+                return `<ul>${list_items}</ul>`;
+            } else if (node.type === NodeType.MARKDOWN_CODE) {
+                let code = node as IMarkdownCode;
+                return `<pre><code>${code.content}</code></pre>`;
+            } else if (node.type === NodeType.TYPE) {
+                tables.push(createTableTYPE(node as IType));
+            } else if (node.type === NodeType.VIEW) {
+                let plantSource = createView(node as any, ast);
+                let url = generateURL(plantSource);
+                return `<div class="image-container"><img src="${url}" /></div>`;
+            }
+            return null;
+        });
 
-  return `
+    return `
 <html>
   <head>
     <title></title>
@@ -54,6 +54,11 @@ export const createHTML = (ast: IExpression[], moduleName?:string) => {
     <link rel="stylesheet" href="./../style.css">
   </head>
   <body>
+
+  <h1>Links</h1>
+  <a href="${moduleName}.xsd">XSD</a>
+  <a href="${moduleName}.json">JSON schema</a>
+
   ${purge(transformedNodes).join("\n")}
   <h1>ERD</h1>
   ${moduleName ? `<div class="image-container"><img src="${moduleName}.svg" /></div>` : ""}
@@ -65,6 +70,6 @@ export const createHTML = (ast: IExpression[], moduleName?:string) => {
 };
 
 export interface ILookup {
-  types: string[];
-  enums: string[];
+    types: string[];
+    enums: string[];
 }

@@ -10,6 +10,7 @@ import { IToken } from "chevrotain";
 import { generateURL } from "./deflate/deflate";
 import { createERD } from "./erd/createERD";
 import { createHTML } from "./html/createHTML";
+import { createXSD } from "./xsd/createXSD";
 
 export class Module implements IModule {
     name: string;
@@ -62,11 +63,13 @@ export class Module implements IModule {
 
     generateFullOutput(outPath: string): Promise<string> {
         return new Promise(resolve => {
+            // Save the plantUML code to a .puml file
             const savePlantUML = (puml: string) => {
                 const filePathPuml = join(outPath, this.name, this.name + ".puml");
                 outputFile(filePathPuml, puml);
             };
 
+            // Generate the SVG by going to the site and generating the svg
             const generateSVG = (puml: string) => {
                 const url = generateURL(puml);
                 fetchImage(url).then(img => {
@@ -75,15 +78,22 @@ export class Module implements IModule {
                 });
             };
 
+            // Create the entire ERD
             const puml = createERD(this.ast);
             if (puml) {
                 savePlantUML(puml);
                 generateSVG(puml);
             }
 
+            // Generate the XSD file
+            const xsd = createXSD(this.ast);
+            const filePathXSD = join(outPath, this.name, this.name + ".xsd");
+            outputFile(filePathXSD, xsd);
+
+            // Generate the HTML file
             const html = createHTML(this.ast, puml ? this.name : undefined);
-            const filePath = join(outPath, this.name, this.name + ".html");
-            outputFile(filePath, html);
+            const filePathHTML = join(outPath, this.name, this.name + ".html");
+            outputFile(filePathHTML, html);
 
             resolve(puml);
             console.log("Compiled: ", this.name);

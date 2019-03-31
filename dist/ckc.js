@@ -25,7 +25,7 @@ function setProject(p) {
     console.log(`Opening project at: ${projectPath}`);
 }
 program
-    .version("1.1.0", "-v, --version")
+    .version("1.2.0", "-v, --version")
     .option("-a", "Output the AST, default is true")
     .option("-c", "Output the CST, default is false")
     .option("-f, --file <s>", "The input file", id)
@@ -63,13 +63,20 @@ if (program.file) {
     });
 }
 if (program.init) {
-    new Project_1.Project(projectPath).init().then(success => {
+    new Project_1.Project(projectPath)
+        .init()
+        .then(success => {
         if (success) {
             process.exit(0);
         }
         else {
             process.exit(1);
         }
+    })
+        .catch(e => {
+        console.log("Failed to initialize the project");
+        console.log(e);
+        process.exit(1);
     });
 }
 if (program.open) {

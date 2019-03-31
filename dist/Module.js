@@ -10,6 +10,7 @@ const stringHash = require("string-hash");
 const deflate_1 = require("./deflate/deflate");
 const createERD_1 = require("./erd/createERD");
 const createHTML_1 = require("./html/createHTML");
+const createXSD_1 = require("./xsd/createXSD");
 class Module {
     /**
      * Ceate/initialize a module.
@@ -47,10 +48,12 @@ class Module {
     }
     generateFullOutput(outPath) {
         return new Promise(resolve => {
+            // Save the plantUML code to a .puml file
             const savePlantUML = (puml) => {
                 const filePathPuml = path_1.join(outPath, this.name, this.name + ".puml");
                 fs_extra_1.outputFile(filePathPuml, puml);
             };
+            // Generate the SVG by going to the site and generating the svg
             const generateSVG = (puml) => {
                 const url = deflate_1.generateURL(puml);
                 helpers_1.fetchImage(url).then(img => {
@@ -58,14 +61,20 @@ class Module {
                     fs_extra_1.outputFile(filePathSVG, img);
                 });
             };
+            // Create the entire ERD
             const puml = createERD_1.createERD(this.ast);
             if (puml) {
                 savePlantUML(puml);
                 generateSVG(puml);
             }
+            // Generate the XSD file
+            const xsd = createXSD_1.createXSD(this.ast);
+            const filePathXSD = path_1.join(outPath, this.name, this.name + ".xsd");
+            fs_extra_1.outputFile(filePathXSD, xsd);
+            // Generate the HTML file
             const html = createHTML_1.createHTML(this.ast, puml ? this.name : undefined);
-            const filePath = path_1.join(outPath, this.name, this.name + ".html");
-            fs_extra_1.outputFile(filePath, html);
+            const filePathHTML = path_1.join(outPath, this.name, this.name + ".html");
+            fs_extra_1.outputFile(filePathHTML, html);
             resolve(puml);
             console.log("Compiled: ", this.name);
         });

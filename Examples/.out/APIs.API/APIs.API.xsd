@@ -1,0 +1,132 @@
+
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:self="something.com">
+<xsd:element name="Meta_Code">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:integer">
+            
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+<xsd:element name="Meta_Message">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+            
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+
+    <xsd:complexType name="Meta">
+        <xsd:sequence>
+        <xsd:element ref="self:Meta_Code" />
+<xsd:element ref="self:Meta_Message" />
+        </xsd:sequence>
+    </xsd:complexType>
+<xsd:element name="Error404_Code">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:integer">
+            
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+<xsd:element name="Error404_Message">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+            
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+
+    <xsd:complexType name="Error404">
+        <xsd:sequence>
+        <xsd:element ref="self:Error404_Code" />
+<xsd:element ref="self:Error404_Message" />
+        </xsd:sequence>
+    </xsd:complexType>
+<xsd:element name="Error500_Code">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:integer">
+            
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+<xsd:element name="Error500_Message">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+            
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+
+    <xsd:complexType name="Error500">
+        <xsd:sequence>
+        <xsd:element ref="self:Error500_Code" />
+<xsd:element ref="self:Error500_Message" />
+        </xsd:sequence>
+    </xsd:complexType>
+<xsd:element name="Envelope_Request">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+            
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+<xsd:element name="Envelope_Response">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+            
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+<xsd:element name="Envelope_Code">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:integer">
+            
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+<xsd:element name="Envelope_Message">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+            
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+
+    <xsd:complexType name="Envelope">
+        <xsd:sequence>
+        <xsd:element ref="self:Envelope_Request" />
+<xsd:element ref="self:Envelope_Response" />
+<xsd:element ref="self:Envelope_Code" />
+<xsd:element ref="self:Envelope_Message" />
+        </xsd:sequence>
+    </xsd:complexType>
+<xsd:element name="MyAPIRequest_Something">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+            
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+
+    <xsd:complexType name="MyAPIRequest">
+        <xsd:sequence>
+        <xsd:element ref="self:MyAPIRequest_Something" />
+        </xsd:sequence>
+    </xsd:complexType>
+<xsd:element name="MyAPIResponse_AccountId">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+            
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+
+    <xsd:complexType name="MyAPIResponse">
+        <xsd:sequence>
+        <xsd:element ref="self:MyAPIResponse_AccountId" />
+        </xsd:sequence>
+    </xsd:complexType>
+</xsd:schema>
+  
+  

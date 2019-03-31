@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const tslib_1 = require("tslib");
 const fs_1 = require("fs");
 const path_1 = require("path");
 const fs_extra_1 = require("fs-extra");
@@ -36,19 +35,18 @@ class Project {
         });
     }
     init() {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const defaultConfig = {
-                name: "Unknown",
-                description: "No description",
-                version: 0,
-                xsd: {
-                    namespace: "http://example.com/"
-                },
-                json: {
-                    namespace: "https://example.com"
-                }
-            };
-            const prelude = `
+        const defaultConfig = {
+            name: "Unknown",
+            description: "No description",
+            version: 0,
+            xsd: {
+                namespace: "http://example.com/"
+            },
+            json: {
+                namespace: "https://example.com"
+            }
+        };
+        const prelude = `
 # Prelude
 
 The prelude is a simple set of types you can use to build 
@@ -64,21 +62,32 @@ data Maybe a =
 
 
         `.trim();
-            return new Promise((resolve, reject) => tslib_1.__awaiter(this, void 0, void 0, function* () {
-                fs_1.exists(this.configPath, (e) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+        return new Promise((resolve, reject) => {
+            console.log("Check existance");
+            fs_1.exists(this.configPath, e => {
+                console.log("Existance: " + e);
+                fs_extra_1.remove(this.configPath, e2 => {
+                    console.log("Tried to remove " + e2);
                     try {
-                        if (e) {
-                            let isRemoved = yield fs_extra_1.remove(this.configPath);
-                        }
-                        fs_extra_1.outputFile(this.configPath, JSON.stringify(defaultConfig, null, 4));
-                        fs_extra_1.outputFile(this.preludePath, prelude);
-                        resolve(true);
+                        console.log(this.configPath);
+                        console.log(this.preludePath);
+                        let promises = [
+                            fs_extra_1.outputFile(this.configPath, JSON.stringify(defaultConfig, null, 4)),
+                            fs_extra_1.outputFile(this.preludePath, prelude, err3 => {
+                                console.log(err3);
+                            })
+                        ];
+                        Promise.all(promises).then(results => {
+                            console.log("Results: ", results);
+                            resolve(true);
+                        });
                     }
                     catch (err) {
+                        console.log(err);
                         reject(err);
                     }
-                }));
-            }));
+                });
+            });
         });
     }
     compile() {

@@ -1,0 +1,139 @@
+
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:self="something.com">
+<xsd:element name="Address_Street">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+            
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+<xsd:element name="Address_PostalCode">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+            
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+<xsd:element name="Address_HouseNumber">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:integer">
+            
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+<xsd:element name="Address_HouseNumberExtension">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+            
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+<xsd:element name="Address_City">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+            
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+<xsd:element name="Address_CountryCode">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+            <xsd:length value="2" />
+<xsd:pattern value="/[A-Z]{2}/" />
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+<xsd:element name="Address_Country">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+            
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+
+    <xsd:complexType name="Address">
+        <xsd:sequence>
+        <xsd:element ref="self:Address_Street" />
+<xsd:element ref="self:Address_PostalCode" />
+<xsd:element ref="self:Address_HouseNumber" />
+<xsd:element ref="self:Address_HouseNumberExtension" />
+<xsd:element ref="self:Address_City" />
+<xsd:element ref="self:Address_CountryCode" />
+<xsd:element ref="self:Address_Country" />
+        </xsd:sequence>
+    </xsd:complexType>
+<xsd:element name="Person_FirstName">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+            
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+<xsd:element name="Person_LastName">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+            
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+<xsd:element name="Person_Address">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+            
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+<xsd:element name="Person_CustomerId">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+            
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+
+    <xsd:complexType name="Person">
+        <xsd:sequence>
+        <xsd:element ref="self:Person_FirstName" />
+<xsd:element ref="self:Person_LastName" />
+<xsd:element ref="self:Person_Address" />
+<xsd:element ref="self:Person_CustomerId" />
+        </xsd:sequence>
+    </xsd:complexType>
+<xsd:element name="Company_OrganisationName">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+            
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+<xsd:element name="Company_CustomerId">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+            
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+
+    <xsd:complexType name="Company">
+        <xsd:sequence>
+        <xsd:element ref="self:Company_OrganisationName" />
+<xsd:element ref="self:Company_CustomerId" />
+        </xsd:sequence>
+    </xsd:complexType>
+<xsd:element name="Customer_CustomerId">
+        <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+            
+        </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+
+    <xsd:complexType name="Customer">
+        <xsd:sequence>
+        <xsd:element ref="self:Customer_CustomerId" />
+        </xsd:sequence>
+    </xsd:complexType>
+</xsd:schema>
+  
+  
