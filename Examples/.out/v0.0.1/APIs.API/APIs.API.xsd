@@ -1,0 +1,149 @@
+
+
+<xsd:schema 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+  
+  xmlns:self="http://example.con/"
+  targetNamespace="http://example.con/">
+  <!-- VERSION: 0.0.1 -->
+  <xsd:element name="Meta_Code" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:integer">
+        <xsd:minInclusive value="1" />
+        <xsd:maxInclusive value="9999" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Meta_Message" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:complexType name="Meta">
+    <xsd:sequence>
+      <xsd:element ref="self:Meta_Code" minOccurs="1"/>
+      <xsd:element ref="self:Meta_Message" minOccurs="1"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="Error404_Code" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:integer">
+        <xsd:minInclusive value="1" />
+        <xsd:maxInclusive value="9999" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Error404_Message" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:complexType name="Error404">
+    <xsd:sequence>
+      <xsd:element ref="self:Error404_Code" minOccurs="1"/>
+      <xsd:element ref="self:Error404_Message" minOccurs="1"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="Error500_Code" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:integer">
+        <xsd:minInclusive value="1" />
+        <xsd:maxInclusive value="9999" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Error500_Message" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:complexType name="Error500">
+    <xsd:sequence>
+      <xsd:element ref="self:Error500_Code" minOccurs="1"/>
+      <xsd:element ref="self:Error500_Message" minOccurs="1"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="Envelope_Request" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string"></xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Envelope_Response" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string"></xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Envelope_Code" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:integer">
+        <xsd:minInclusive value="1" />
+        <xsd:maxInclusive value="9999" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Envelope_Message" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:complexType name="Envelope">
+    <xsd:sequence>
+      <xsd:element ref="self:Envelope_Request" minOccurs="1"/>
+      <xsd:element ref="self:Envelope_Response" minOccurs="1"/>
+      <xsd:element ref="self:Envelope_Code" minOccurs="1"/>
+      <xsd:element ref="self:Envelope_Message" minOccurs="1"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="MyAPIRequest_Something" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:complexType name="MyAPIRequest">
+    <xsd:sequence>
+      <xsd:element ref="self:MyAPIRequest_Something" minOccurs="1"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="MyAPIResponse_AccountId" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:complexType name="MyAPIResponse">
+    <xsd:sequence>
+      <xsd:element ref="self:MyAPIResponse_AccountId" minOccurs="1"/>
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>
+  
+  

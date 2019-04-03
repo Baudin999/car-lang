@@ -1,0 +1,144 @@
+<html>
+  <head>
+    <title></title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+      <link rel="stylesheet" href="./../style.css">
+      </head>
+      <body>
+        <div class="page">
+          <h1>Links</h1>
+          <a href="Financial.xsd">XSD</a>
+          <a href="Financial.json">JSON schema</a>
+          <h1> Financial Models</h1>
+          <h1>ERD</h1>
+          <div class="image-container">
+            <img src="Financial.svg" />
+          </div>
+          <h1>Appendix: Entities</h1>
+          <table>
+            <thead>
+              <tr>
+                <th colSpan="4">
+                  <h2>Currency</h2>
+                </th>
+              </tr>
+              <tr>
+                <th colSpan="4">
+        No description
+      </th>
+              </tr>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Restrictions</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Sign</td>
+                <td>String </td>
+                <td>
+                  <div>
+                    <b>min</b>: 1
+                  </div>
+                  <div>
+                    <b>max</b>: 25
+                  </div>
+                </td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Value</td>
+                <td>Number </td>
+                <td>
+                  <div>
+                    <b>min</b>: 1
+                  </div>
+                  <div>
+                    <b>max</b>: 9999
+                  </div>
+                </td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+          <table>
+            <thead>
+              <tr>
+                <th colSpan="4">
+                  <h2>CreditCard</h2>
+                </th>
+              </tr>
+              <tr>
+                <th colSpan="4">
+        No description
+      </th>
+              </tr>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Restrictions</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Number</td>
+                <td>String </td>
+                <td>
+                  <div>
+                    <b>min</b>: 1
+                  </div>
+                  <div>
+                    <b>max</b>: 100
+                  </div>
+                </td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>ExpirationDate</td>
+                <td>Date </td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+          <table>
+            <thead>
+              <tr>
+                <th colSpan="4">
+                  <h2>DirectDebit</h2>
+                </th>
+              </tr>
+              <tr>
+                <th colSpan="4">
+        Pay from a debit account
+      </th>
+              </tr>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Restrictions</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>BankAccountNumber</td>
+                <td>String </td>
+                <td>
+                  <div>
+                    <b>min</b>: 1
+                  </div>
+                  <div>
+                    <b>max</b>: 100
+                  </div>
+                </td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </body>
+    </html>

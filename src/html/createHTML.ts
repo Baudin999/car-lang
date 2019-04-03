@@ -14,6 +14,7 @@ import { createTableTYPE } from "./tableTYPE";
 // @ts-ignore
 import { generateURL } from "./../deflate/deflate";
 import { createView } from "../erd/createERD";
+import { pd } from "pretty-data";
 
 const types = [NodeType.TYPE, NodeType.ALIAS, NodeType.DATA, NodeType.CHOICE];
 
@@ -46,7 +47,9 @@ export const createHTML = (ast: IExpression[], moduleName?: string) => {
             return null;
         });
 
-    return `
+    return pd
+        .xml(
+            `
 <html>
   <head>
     <title></title>
@@ -55,18 +58,24 @@ export const createHTML = (ast: IExpression[], moduleName?: string) => {
   </head>
   <body>
 
-  <h1>Links</h1>
-  <a href="${moduleName}.xsd">XSD</a>
-  <a href="${moduleName}.json">JSON schema</a>
+  <div class="page">
 
-  ${purge(transformedNodes).join("\n")}
-  <h1>ERD</h1>
-  ${moduleName ? `<div class="image-container"><img src="${moduleName}.svg" /></div>` : ""}
-  <h1>Appendix: Entities</h1>
-  ${purge(tables).join("\n")}
+    <h1>Links</h1>
+    <a href="${moduleName}.xsd">XSD</a>
+    <a href="${moduleName}.json">JSON schema</a>
+
+    ${purge(transformedNodes).join("\n")}
+    <h1>ERD</h1>
+    ${moduleName ? `<div class="image-container"><img src="${moduleName}.svg" /></div>` : ""}
+    <h1>Appendix: Entities</h1>
+    ${purge(tables).join("\n")}
+
+  </div>
   </body>
 </html>
-  `.trim();
+  `
+        )
+        .trim();
 };
 
 export interface ILookup {

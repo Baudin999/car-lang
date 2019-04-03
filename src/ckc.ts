@@ -49,12 +49,28 @@ program
 
 if (program.project && program.watch && !program.open) {
     // we'll watch the file system on save...
-    new Project(projectPath).watch();
+    new Project(projectPath)
+        .verify()
+        .then(project => {
+            project.watch();
+        })
+        .catch(error => {
+            console.log(error);
+            process.exit(1);
+        });
 } else if (program.project && !program.open) {
     // if we look at a project we'll want to the parse every file, then
     // include all the imports and do the rest...
     //runProgram(program.project);
-    new Project(projectPath).compile();
+    new Project(projectPath)
+        .verify()
+        .then(project => {
+            project.compile();
+        })
+        .catch(error => {
+            console.log(error);
+            process.exit(1);
+        });
 }
 
 if (program.file) {
@@ -93,10 +109,22 @@ if (program.init) {
 }
 
 if (program.open) {
-    if (!moduleName) throw "Module Name not set";
-    const htmlPath = join(projectPath, ".out", moduleName, moduleName + ".html");
-    console.log("Opening: file://" + htmlPath);
-    opn("file://" + htmlPath);
+    if (moduleName === null) throw "Module Name not set";
+    readFile(join(projectPath, "carconfig.json"), "utf8", (err, data) => {
+        if (err) {
+            console.log(err);
+            process.exit(1);
+        }
+        const config = JSON.parse(data);
+        let version = config.version;
+        if (!version.startsWith("v")) {
+            version = "v" + version;
+        }
+        let versionPath = join(projectPath, ".out", version);
+        const htmlPath = join(versionPath, moduleName as string, moduleName + ".html");
+        console.log("Opening: file://" + htmlPath);
+        opn("file://" + htmlPath);
+    });
 }
 
 export const maybeRaiseError = error => {

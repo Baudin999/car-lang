@@ -1,24 +1,22 @@
-import { IExpression, IType, NodeType, ITypeField } from "../outline";
+import { IExpression, IType, NodeType, ITypeField, IRestriction } from "../outline";
 import { purge, baseTypeToXSDType, mapRestrictionToXSD } from "../helpers";
-
-
-
 
 export class XsdClass {
     private node: IType;
     constructor(node: IType) {
-        if (!node) throw "There shoulde be a node"
+        if (!node) throw "There shoulde be a node";
         this.node = node;
     }
 
     complexType() {
-
-        const fields = purge(this.node.fields.map(field => {
-            if (field.type !== NodeType.TYPE_FIELD) return;
-            let tf = field as ITypeField;
-            return `<xsd:element ref="self:${this.node.id}_${tf.id}" />`
-
-        })).join("\n");
+        const fields = purge(
+            this.node.fields.map(field => {
+                if (field.type !== NodeType.TYPE_FIELD) return;
+                let tf = field as ITypeField;
+                let optional = tf.ofType === "Maybe" ? ` minOccurs="0"` : ` minOccurs="1"`;
+                return `<xsd:element ref="self:${this.node.id}_${tf.id}"${optional}/>`;
+            })
+        ).join("\n");
 
         return `
     <xsd:complexType name="${this.node.id}">
@@ -30,21 +28,55 @@ export class XsdClass {
     }
 
     simpleTypes() {
-        return purge(this.node.fields.map(field => {
-            if (field.type !== NodeType.TYPE_FIELD) return;
-            let tf = field as ITypeField;
-            let restrictions = tf.restrictions.map(r => mapRestrictionToXSD(tf.ofType, r)).join("\n")
-            
-            return `
-    <xsd:element name="${this.node.id}_${tf.id}">
+        const mapRestrictions = (field: ITypeField, fieldType: string): string => {
+            let $min = field.restrictions.find(r => r.key === "min");
+            let $max = field.restrictions.find(r => r.key === "max");
+            let $length = field.restrictions.find(r => r.key === "length");
+            let $restrictions = field.restrictions;
+            if (fieldType === "String") {
+                if (!$min && !$length) $restrictions.push({ key: "min", value: 1 });
+                if (!$max && !$length) $restrictions.push({ key: "max", value: 100 });
+            } else if (fieldType === "Number") {
+                if (!$min && !$length) $restrictions.push({ key: "min", value: 1 });
+                if (!$max && !$length) $restrictions.push({ key: "max", value: 9999 });
+            }
+            return $restrictions.map(r => mapRestrictionToXSD(fieldType, r)).join("\n");
+        };
+
+        return purge(
+            this.node.fields.map(field => {
+                if (field.type !== NodeType.TYPE_FIELD) return;
+                if ((field as any).id === "Country") console.log(field);
+                let tf = field as ITypeField;
+                let fieldType =
+                    tf.ofType === "Maybe" || tf.ofType === "List" ? tf.ofType_params[0] : tf.ofType;
+                let isMaybe = tf.ofType === "Maybe";
+                let isList = tf.ofType === "List";
+                let restrictions = mapRestrictions(tf, fieldType);
+                let annotations = tf.annotations
+                    .map(a => {
+                        if (a.key === "description") {
+                            return `<xsd:documentation>${a.value}</xsd:documentation>`;
+                        } else {
+                            return `<xsd:appinfo><key>${a.key}</key><value>${
+                                a.value
+                            }</value></xsd:appinfo>`;
+                        }
+                    })
+                    .join("\n");
+
+                return `
+    <xsd:element name="${this.node.id}_${tf.id}" nillable="${!!isMaybe}">
+        <xsd:annotation>${annotations}</xsd:annotation>
         <xsd:simpleType>
-        <xsd:restriction base="${baseTypeToXSDType(tf.ofType)}">
+        <xsd:restriction base="${baseTypeToXSDType(fieldType)}">
             ${restrictions}
         </xsd:restriction>
         </xsd:simpleType>
     </xsd:element>
             `.trim();
-        })).join("\n");
+            })
+        ).join("\n");
     }
 
     toString() {
@@ -54,4 +86,3 @@ ${this.complexType()}
         `.trim();
     }
 }
-

@@ -1,0 +1,167 @@
+
+
+<xsd:schema 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+  
+  xmlns:self="http://example.con/"
+  targetNamespace="http://example.con/">
+  <!-- VERSION: 0.0.1 -->
+  <xsd:element name="Address_Street" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Address_PostalCode" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Address_HouseNumber" nillable="false">
+    <xsd:annotation>
+      <xsd:documentation>Yes, a real number</xsd:documentation>
+      <xsd:appinfo>
+        <key>type</key>
+        <value>Number</value>
+      </xsd:appinfo>
+      <xsd:appinfo>
+        <key>note</key>
+        <value>This is a simple note on a field</value>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:integer">
+        <xsd:minInclusive value="1" />
+        <xsd:maxInclusive value="9999" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Address_HouseNumberExtension" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Address_City" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Address_CountryCode" nillable="false">
+    <xsd:annotation>
+      <xsd:documentation>The country code is a two letter code all in capital letters.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:length value="2" />
+        <xsd:pattern value="/[A-Z]{2}/" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Address_Country" nillable="true">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:complexType name="Address">
+    <xsd:sequence>
+      <xsd:element ref="self:Address_Street" minOccurs="1"/>
+      <xsd:element ref="self:Address_PostalCode" minOccurs="1"/>
+      <xsd:element ref="self:Address_HouseNumber" minOccurs="1"/>
+      <xsd:element ref="self:Address_HouseNumberExtension" minOccurs="1"/>
+      <xsd:element ref="self:Address_City" minOccurs="1"/>
+      <xsd:element ref="self:Address_CountryCode" minOccurs="1"/>
+      <xsd:element ref="self:Address_Country" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="Person_FirstName" nillable="true">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Person_LastName" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Person_Address" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string"></xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Person_CustomerId" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string"></xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:complexType name="Person">
+    <xsd:sequence>
+      <xsd:element ref="self:Person_FirstName" minOccurs="0"/>
+      <xsd:element ref="self:Person_LastName" minOccurs="1"/>
+      <xsd:element ref="self:Person_Address" minOccurs="1"/>
+      <xsd:element ref="self:Person_CustomerId" minOccurs="1"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="Company_OrganisationName" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Company_CustomerId" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string"></xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:complexType name="Company">
+    <xsd:sequence>
+      <xsd:element ref="self:Company_OrganisationName" minOccurs="1"/>
+      <xsd:element ref="self:Company_CustomerId" minOccurs="1"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="Customer_CustomerId" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string"></xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:complexType name="Customer">
+    <xsd:sequence>
+      <xsd:element ref="self:Customer_CustomerId" minOccurs="1"/>
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>
+  
+  

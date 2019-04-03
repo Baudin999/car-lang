@@ -1,8 +1,0 @@
-class "Currency sign value" as Currency << (T,orchid) >> {
-	Sign: String 
-	Value: Number 
---
-  <b>Currency is expressen like</b>:
- $12,00
-    
-}

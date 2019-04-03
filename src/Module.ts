@@ -1,5 +1,5 @@
 import { IError, IExpression } from "./outline";
-import { IModule, fetchImage } from "./helpers";
+import { IModule, fetchImage, IConfiguration } from "./helpers";
 import { readFile } from "fs";
 import { outputFile } from "fs-extra";
 import { normalize, join } from "path";
@@ -20,6 +20,7 @@ export class Module implements IModule {
     tokens: IToken[];
     errors: IError[];
     timestamp: Date;
+    config?: IConfiguration;
 
     // other fields
     projectDirectory: string;
@@ -29,9 +30,10 @@ export class Module implements IModule {
      *
      * @param {string} projectDirectory The project directory from which we will manage this module.
      */
-    constructor(projectDirectory: string) {
+    constructor(projectDirectory: string, configuration?: IConfiguration) {
         // simple constructor
         this.projectDirectory = projectDirectory;
+        this.config = configuration;
     }
 
     /**
@@ -86,7 +88,7 @@ export class Module implements IModule {
             }
 
             // Generate the XSD file
-            const xsd = createXSD(this.ast);
+            const xsd = createXSD(this.ast, this.config);
             const filePathXSD = join(outPath, this.name, this.name + ".xsd");
             outputFile(filePathXSD, xsd);
 
@@ -100,54 +102,3 @@ export class Module implements IModule {
         });
     }
 }
-
-/*
-
-export const generateUML = (module: IModule, outPath: string): string => {
-    const savePlantUML = (module: IModule, outPath: string, puml: string) => {
-        const filePathPuml = join(outPath, module.name, module.name + ".puml");
-        outputFile(filePathPuml, puml);
-    };
-
-    const generateSVG = (module: IModule, outPath: string, puml: string) => {
-        const url = generateURL(puml);
-        fetchImage(url).then(img => {
-            const filePathSVG = join(outPath, module.name, module.name + ".svg");
-            outputFile(filePathSVG, img);
-        });
-    };
-
-    const puml = createERD(module.ast);
-    if (puml) {
-        savePlantUML(module, outPath, puml);
-        generateSVG(module, outPath, puml);
-    }
-
-    return puml;
-};
-
-export const generateAST = (module: IModule, outPath: string): IExpression[] => {
-    const astFilePath = join(outPath, module.name, module.name + ".json");
-    outputFile(astFilePath, JSON.stringify(module.ast, null, 4));
-
-    return module.ast;
-};
-
-export const generateXSD = (module: IModule, outPath: string): string => {
-    const xsd = createXSD(module.ast);
-    const xsdFilePath = join(outPath, module.name, module.name + ".xsd");
-    outputFile(xsdFilePath, xsd);
-
-    return xsd;
-};
-
-export const generateHTML = (module: IModule, puml: string, outPath: string): string => {
-    const html = createHTML(module.ast, puml ? module.name : undefined);
-    const filePath = join(outPath, module.name, module.name + ".html");
-    outputFile(filePath, html);
-
-    return html;
-};
-
-
-*/

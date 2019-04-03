@@ -203,3 +203,14 @@ export const mapRestrictionToXSD = (baseType: string, restriction: IRestriction)
             return "";
     }
 };
+
+export interface IConfiguration {
+    name: string;
+    version: string;
+    xsd: {
+        namespace: string;
+    };
+    json: {
+        namespace: string;
+    };
+}

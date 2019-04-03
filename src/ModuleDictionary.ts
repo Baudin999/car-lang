@@ -1,13 +1,15 @@
-import { IModule } from "./helpers";
+import { IModule, IConfiguration } from "./helpers";
 import { Module } from "./Module";
 import { compile } from "./transpiler";
 import { outputFile } from "fs-extra";
 
 export class ModuleDictionary {
     private $: Record<string, Module>;
+    private config?: IConfiguration;
 
-    constructor() {
+    constructor(config?: IConfiguration) {
         this.$ = {};
+        this.config = config;
     }
 
     //modules = this.$;

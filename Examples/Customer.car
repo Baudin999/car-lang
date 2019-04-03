@@ -9,7 +9,7 @@ open Prelude importing (Maybe)
 
 This document will show the way we're going to work with
 People in the application. People have an Address where
-they live.
+they live. CHanged
 
 
 These are the fields which are important for Person:
@@ -34,6 +34,9 @@ choice Gender =
 type Address =
     Street: String
     PostalCode: String
+    @ Yes, a real number
+    @ type: Number
+    @ note: This is a simple note on a field
     HouseNumber: Number
     HouseNumberExtension: String
     City: String
@@ -42,7 +45,7 @@ type Address =
     CountryCode: String
         | length 2
         | pattern /[A-Z]{2}/
-    Country: String
+    Country: Maybe String
 
 
 type Person extends Customer =

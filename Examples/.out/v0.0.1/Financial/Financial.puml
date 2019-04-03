@@ -1,0 +1,25 @@
+class "Currency sign value" as Currency << (T,orchid) >> {
+	Sign: String 
+	Value: Number 
+--
+  <b>Currency is expressen like</b>:
+ $12,00
+    
+}
+class "CreditCard" as CreditCard  {
+	Number: String 
+	ExpirationDate: Date 
+}
+class "DirectDebit" as DirectDebit  {
+	BankAccountNumber: String 
+--
+  <b>description</b>: Pay from a debit
+ account
+    
+}
+abstract "PaymentMethod" as PaymentMethod {
+	CreditCard 
+	DirectDebit 
+}
+CreditCard --> PaymentMethod : CreditCard
+DirectDebit --> PaymentMethod : DirectDebit
