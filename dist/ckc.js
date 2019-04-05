@@ -25,7 +25,7 @@ function setProject(p) {
     console.log(`Opening project at: ${projectPath}`);
 }
 program
-    .version("1.2.0", "-v, --version")
+    .version("1.3.0", "-v, --version")
     .option("-a", "Output the AST, default is true")
     .option("-c", "Output the CST, default is false")
     .option("-f, --file <s>", "The input file", id)
@@ -38,13 +38,35 @@ program
     .parse(process.argv);
 if (program.project && program.watch && !program.open) {
     // we'll watch the file system on save...
-    new Project_1.Project(projectPath).watch();
+    new Project_1.Project(projectPath)
+        .verify()
+        .then(project => {
+        project.watch();
+        setTimeout(() => {
+            opn(project.indexPath);
+        }, 100);
+    })
+        .catch(error => {
+        console.log(error);
+        process.exit(1);
+    });
 }
 else if (program.project && !program.open) {
     // if we look at a project we'll want to the parse every file, then
     // include all the imports and do the rest...
     //runProgram(program.project);
-    new Project_1.Project(projectPath).compile();
+    new Project_1.Project(projectPath)
+        .verify()
+        .then(project => {
+        project.compile();
+        setTimeout(() => {
+            opn(project.indexPath);
+        }, 100);
+    })
+        .catch(error => {
+        console.log(error);
+        process.exit(1);
+    });
 }
 if (program.file) {
     fs_1.readFile(program.file, "utf8", (err, sourceCode) => {
@@ -67,6 +89,7 @@ if (program.init) {
         .init()
         .then(success => {
         if (success) {
+            console.log("");
             process.exit(0);
         }
         else {
@@ -80,11 +103,23 @@ if (program.init) {
     });
 }
 if (program.open) {
-    if (!moduleName)
+    if (moduleName === null)
         throw "Module Name not set";
-    const htmlPath = path_1.join(projectPath, ".out", moduleName, moduleName + ".html");
-    console.log("Opening: file://" + htmlPath);
-    opn("file://" + htmlPath);
+    fs_1.readFile(path_1.join(projectPath, "carconfig.json"), "utf8", (err, data) => {
+        if (err) {
+            console.log(err);
+            process.exit(1);
+        }
+        const config = JSON.parse(data);
+        let version = config.version;
+        if (!version.startsWith("v")) {
+            version = "v" + version;
+        }
+        let versionPath = path_1.join(projectPath, ".out", version);
+        const htmlPath = path_1.join(versionPath, moduleName, moduleName + ".html");
+        console.log("Opening: file://" + htmlPath);
+        opn(htmlPath);
+    });
 }
 exports.maybeRaiseError = error => {
     if (error) {

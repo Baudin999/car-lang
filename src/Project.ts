@@ -18,6 +18,7 @@ export class Project {
     outPath: string;
     versionPath: string;
     preludePath: string;
+    indexPath: string;
     config: IConfiguration;
 
     constructor(projectDirectory: string) {
@@ -54,6 +55,7 @@ export class Project {
                         }
                         this.versionPath = join(this.outPath, version);
                         this.preludePath = join(this.versionPath, "Prelude.car");
+                        this.indexPath = join(this.versionPath, "index.html");
 
                         resolve(this);
                     }
@@ -123,7 +125,7 @@ data Maybe a =
             remove(this.versionPath, () => {
                 outputFile(join(this.versionPath, "style.css"), styleCSS);
                 // This function will compile the entire project
-                const moduleDictionary = new ModuleDictionary();
+                const moduleDictionary = new ModuleDictionary(this.config);
                 let promises: Promise<Module>[] = [];
                 exists(this.configPath, (e: boolean) => {
                     if (!e)
@@ -164,7 +166,7 @@ data Maybe a =
         remove(this.versionPath, () => {
             outputFile(join(this.versionPath, "style.css"), styleCSS);
             // This function will compile the entire project
-            const moduleDictionary = new ModuleDictionary();
+            const moduleDictionary = new ModuleDictionary(this.config);
             let promises: Promise<Module>[] = [];
             exists(this.configPath, (e: boolean) => {
                 if (!e) {

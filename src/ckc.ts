@@ -53,6 +53,10 @@ if (program.project && program.watch && !program.open) {
         .verify()
         .then(project => {
             project.watch();
+
+            setTimeout(() => {
+                opn(project.indexPath);
+            }, 100);
         })
         .catch(error => {
             console.log(error);
@@ -66,6 +70,10 @@ if (program.project && program.watch && !program.open) {
         .verify()
         .then(project => {
             project.compile();
+
+            setTimeout(() => {
+                opn(project.indexPath);
+            }, 100);
         })
         .catch(error => {
             console.log(error);
@@ -123,7 +131,7 @@ if (program.open) {
         let versionPath = join(projectPath, ".out", version);
         const htmlPath = join(versionPath, moduleName as string, moduleName + ".html");
         console.log("Opening: file://" + htmlPath);
-        opn("file://" + htmlPath);
+        opn(htmlPath);
     });
 }
 

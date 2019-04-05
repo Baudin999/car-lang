@@ -23,9 +23,11 @@ class "Person " as Person  {
 	FirstName: Maybe String
 	LastName: String 
 	Address: Address 
+	Gender: Gender 
 	CustomerId: Id  <i>from Customer</i>
 }
 Address --> Person : Address
+Gender --> Person : Gender
 Customer --|> Person
 class "Company " as Company  {
 	OrganisationName: String 

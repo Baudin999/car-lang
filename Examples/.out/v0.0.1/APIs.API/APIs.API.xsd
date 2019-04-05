@@ -78,17 +78,11 @@
       <xsd:element ref="self:Error500_Message" minOccurs="1"/>
     </xsd:sequence>
   </xsd:complexType>
-  <xsd:element name="Envelope_Request" nillable="false">
+  <xsd:element name="Envelope_Request" type="self:req" nillable="false">
     <xsd:annotation></xsd:annotation>
-    <xsd:simpleType>
-      <xsd:restriction base="xsd:string"></xsd:restriction>
-    </xsd:simpleType>
   </xsd:element>
-  <xsd:element name="Envelope_Response" nillable="false">
+  <xsd:element name="Envelope_Response" type="self:res" nillable="false">
     <xsd:annotation></xsd:annotation>
-    <xsd:simpleType>
-      <xsd:restriction base="xsd:string"></xsd:restriction>
-    </xsd:simpleType>
   </xsd:element>
   <xsd:element name="Envelope_Code" nillable="false">
     <xsd:annotation></xsd:annotation>
@@ -144,6 +138,9 @@
       <xsd:element ref="self:MyAPIResponse_AccountId" minOccurs="1"/>
     </xsd:sequence>
   </xsd:complexType>
+  <xsd:simpleType name="MyAPI">
+    <xsd:restriction base="self:Envelope"></xsd:restriction>
+  </xsd:simpleType>
 </xsd:schema>
   
   

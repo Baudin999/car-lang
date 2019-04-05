@@ -1,2 +1,3 @@
 import { IExpression } from "./../outline";
-export declare const createXSD: (ast: IExpression[]) => string;
+import { IConfiguration } from "../helpers";
+export declare const createXSD: (ast: IExpression[], config?: IConfiguration) => any;

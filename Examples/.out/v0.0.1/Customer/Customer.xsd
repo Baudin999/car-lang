@@ -6,6 +6,20 @@
   xmlns:self="http://example.con/"
   targetNamespace="http://example.con/">
   <!-- VERSION: 0.0.1 -->
+  <xsd:simpleType name="Id">
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="2" />
+      <xsd:maxLength value="2" />
+      <xsd:pattern value="/[A-Z]{2}/" />
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:complexType name="Gender">
+    <xsd:choice>
+      <xsd:element name="Male"/>
+      <xsd:element name="Female"/>
+      <xsd:element name="Other"/>
+    </xsd:choice>
+  </xsd:complexType>
   <xsd:element name="Address_Street" nillable="false">
     <xsd:annotation></xsd:annotation>
     <xsd:simpleType>
@@ -72,7 +86,7 @@
       </xsd:restriction>
     </xsd:simpleType>
   </xsd:element>
-  <xsd:element name="Address_Country" nillable="true">
+  <xsd:element name="Address_Country" nillable="false">
     <xsd:annotation></xsd:annotation>
     <xsd:simpleType>
       <xsd:restriction base="xsd:string">
@@ -92,7 +106,7 @@
       <xsd:element ref="self:Address_Country" minOccurs="0"/>
     </xsd:sequence>
   </xsd:complexType>
-  <xsd:element name="Person_FirstName" nillable="true">
+  <xsd:element name="Person_FirstName" nillable="false">
     <xsd:annotation></xsd:annotation>
     <xsd:simpleType>
       <xsd:restriction base="xsd:string">
@@ -110,23 +124,21 @@
       </xsd:restriction>
     </xsd:simpleType>
   </xsd:element>
-  <xsd:element name="Person_Address" nillable="false">
+  <xsd:element name="Person_Address" type="self:Address" nillable="false">
     <xsd:annotation></xsd:annotation>
-    <xsd:simpleType>
-      <xsd:restriction base="xsd:string"></xsd:restriction>
-    </xsd:simpleType>
   </xsd:element>
-  <xsd:element name="Person_CustomerId" nillable="false">
+  <xsd:element name="Person_Gender" type="self:Gender" nillable="false">
     <xsd:annotation></xsd:annotation>
-    <xsd:simpleType>
-      <xsd:restriction base="xsd:string"></xsd:restriction>
-    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Person_CustomerId" type="self:Id" nillable="false">
+    <xsd:annotation></xsd:annotation>
   </xsd:element>
   <xsd:complexType name="Person">
     <xsd:sequence>
       <xsd:element ref="self:Person_FirstName" minOccurs="0"/>
       <xsd:element ref="self:Person_LastName" minOccurs="1"/>
       <xsd:element ref="self:Person_Address" minOccurs="1"/>
+      <xsd:element ref="self:Person_Gender" minOccurs="1"/>
       <xsd:element ref="self:Person_CustomerId" minOccurs="1"/>
     </xsd:sequence>
   </xsd:complexType>
@@ -139,11 +151,8 @@
       </xsd:restriction>
     </xsd:simpleType>
   </xsd:element>
-  <xsd:element name="Company_CustomerId" nillable="false">
+  <xsd:element name="Company_CustomerId" type="self:Id" nillable="false">
     <xsd:annotation></xsd:annotation>
-    <xsd:simpleType>
-      <xsd:restriction base="xsd:string"></xsd:restriction>
-    </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Company">
     <xsd:sequence>
@@ -151,11 +160,8 @@
       <xsd:element ref="self:Company_CustomerId" minOccurs="1"/>
     </xsd:sequence>
   </xsd:complexType>
-  <xsd:element name="Customer_CustomerId" nillable="false">
+  <xsd:element name="Customer_CustomerId" type="self:Id" nillable="false">
     <xsd:annotation></xsd:annotation>
-    <xsd:simpleType>
-      <xsd:restriction base="xsd:string"></xsd:restriction>
-    </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Customer">
     <xsd:sequence>

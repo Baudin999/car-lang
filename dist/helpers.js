@@ -101,7 +101,7 @@ exports.baseTypeToXSDType = (b) => {
         case "Time":
             return "xsd:time";
         default:
-            return "xsd:string";
+            return `self:${b}`;
     }
 };
 exports.mapRestrictionToXSD = (baseType, restriction) => {

@@ -14,22 +14,38 @@ const transpiler_1 = require("./transpiler");
 class Project {
     constructor(projectDirectory) {
         this.projectDirectory = projectDirectory;
-        this.configPath = path_1.join(projectDirectory, "carconfig.json");
-        this.outPath = path_1.join(projectDirectory, ".out");
-        this.preludePath = path_1.join(projectDirectory, "Prelude.car");
     }
     /**
      * Verify the directory and inspect if the directory is ready to
      * be used for the models.
      */
     verify() {
+        this.configPath = path_1.join(this.projectDirectory, "carconfig.json");
+        this.outPath = path_1.join(this.projectDirectory, ".out");
         // we'll need to verify if:
         //   1) the projectDirectory exists
         //   2) there is a carconfig.json file
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
+            const message = "Project does not exists. Please run -i --init to initialize the Project.";
             fs_1.exists(this.projectDirectory, e => {
-                fs_1.exists(this.configPath, e2 => {
-                    resolve(e && e2);
+                if (!e) {
+                    reject(message);
+                }
+                fs_extra_1.readFile(this.configPath, (err, config) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    else {
+                        this.config = JSON.parse(config);
+                        let version = this.config.version;
+                        if (!version.startsWith("v")) {
+                            version = "v" + version;
+                        }
+                        this.versionPath = path_1.join(this.outPath, version);
+                        this.preludePath = path_1.join(this.versionPath, "Prelude.car");
+                        this.indexPath = path_1.join(this.versionPath, "index.html");
+                        resolve(this);
+                    }
                 });
             });
         });
@@ -38,7 +54,7 @@ class Project {
         const defaultConfig = {
             name: "Unknown",
             description: "No description",
-            version: 0,
+            version: "0.0.0",
             xsd: {
                 namespace: "http://example.com/"
             },
@@ -65,12 +81,8 @@ data Maybe a =
         return new Promise((resolve, reject) => {
             console.log("Check existance");
             fs_1.exists(this.configPath, e => {
-                console.log("Existance: " + e);
                 fs_extra_1.remove(this.configPath, e2 => {
-                    console.log("Tried to remove " + e2);
                     try {
-                        console.log(this.configPath);
-                        console.log(this.preludePath);
                         let promises = [
                             fs_extra_1.outputFile(this.configPath, JSON.stringify(defaultConfig, null, 4)),
                             fs_extra_1.outputFile(this.preludePath, prelude, err3 => {
@@ -78,7 +90,6 @@ data Maybe a =
                             })
                         ];
                         Promise.all(promises).then(results => {
-                            console.log("Results: ", results);
                             resolve(true);
                         });
                     }
@@ -94,10 +105,10 @@ data Maybe a =
         // compile stuff
         return new Promise((resolve, reject) => {
             // clear the out path
-            fs_extra_1.remove(this.outPath, () => {
-                fs_extra_1.outputFile(path_1.join(this.outPath, "style.css"), exports.styleCSS);
+            fs_extra_1.remove(this.versionPath, () => {
+                fs_extra_1.outputFile(path_1.join(this.versionPath, "style.css"), exports.styleCSS);
                 // This function will compile the entire project
-                const moduleDictionary = new ModuleDictionary_1.ModuleDictionary();
+                const moduleDictionary = new ModuleDictionary_1.ModuleDictionary(this.config);
                 let promises = [];
                 fs_1.exists(this.configPath, (e) => {
                     if (!e)
@@ -111,7 +122,7 @@ data Maybe a =
                         const watcher = chokidar_1.watch(this.projectDirectory, chokidarConfig)
                             .on("all", (event, fullPath) => {
                             if (fullPath.endsWith(".car")) {
-                                promises.push(new Module_1.Module(this.projectDirectory).parse(fullPath));
+                                promises.push(new Module_1.Module(this.projectDirectory, config).parse(fullPath));
                             }
                         })
                             .on("ready", () => {
@@ -119,7 +130,7 @@ data Maybe a =
                             Promise.all(promises).then(modules => {
                                 modules.forEach(module => moduleDictionary.addModule(module));
                                 transpiler_1.compile(moduleDictionary);
-                                moduleDictionary.writeFiles(this.outPath);
+                                moduleDictionary.writeFiles(this.versionPath);
                                 resolve(moduleDictionary);
                             });
                         });
@@ -129,10 +140,10 @@ data Maybe a =
         });
     }
     watch() {
-        fs_extra_1.remove(this.outPath, () => {
-            fs_extra_1.outputFile(path_1.join(this.outPath, "style.css"), exports.styleCSS);
+        fs_extra_1.remove(this.versionPath, () => {
+            fs_extra_1.outputFile(path_1.join(this.versionPath, "style.css"), exports.styleCSS);
             // This function will compile the entire project
-            const moduleDictionary = new ModuleDictionary_1.ModuleDictionary();
+            const moduleDictionary = new ModuleDictionary_1.ModuleDictionary(this.config);
             let promises = [];
             fs_1.exists(this.configPath, (e) => {
                 if (!e) {
@@ -154,7 +165,7 @@ data Maybe a =
                                 new Module_1.Module(this.projectDirectory)
                                     .parse(fullPath)
                                     .then(module => {
-                                    moduleDictionary.changeAndWrite(module, this.outPath);
+                                    moduleDictionary.changeAndWrite(module, this.versionPath);
                                 });
                             }
                         }
@@ -163,7 +174,7 @@ data Maybe a =
                         Promise.all(promises).then(modules => {
                             modules.forEach(module => moduleDictionary.addModule(module));
                             transpiler_1.compile(moduleDictionary);
-                            moduleDictionary.writeFiles(this.outPath);
+                            moduleDictionary.writeFiles(this.versionPath);
                         });
                     });
                 });
@@ -175,42 +186,138 @@ exports.Project = Project;
 exports.styleCSS = `
 /* RESET */
 
-*, *:before, *:after {
+*,
+*:before,
+*:after {
     box-sizing: border-box;
 }
 
-html, body {
-  font-family: 'Roboto', 'Verdana', sans-serif;
-  margin: 0;
-  padding: 0;
-}
-
-
-table, table tr, table tr td, tr table th {
-    border: none;
-    border-width: 0px;
-    border-image-width: 0px;
-    padding: 0;
+html,
+body {
+    font-family: "Roboto", "Verdana", sans-serif;
     margin: 0;
-    outline: none;
-    border-collapse: collapse;
+    padding: 0;
+    position: relative;
+    height: 100%;
+    width: 100%;
 }
 
-/* TABEL STYLES */
+body {
+    overflow: auto;
+    background: rgb(240, 240, 240);
+}
+
+.page {
+    width: 21cm;
+    min-height: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    padding: 1rem;
+    position: absolute;
+    border: 1px solid lightgray;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+table a:link {
+    color: #666;
+    font-weight: bold;
+    text-decoration: none;
+}
+table a:visited {
+    color: #999999;
+    font-weight: bold;
+    text-decoration: none;
+}
+table a:active,
+table a:hover {
+    color: #bd5a35;
+    text-decoration: underline;
+}
 table {
     width: 100%;
-    border: 1px solid lightgray;
-    margin-bottom: 1rem;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #666;
+    font-size: 12px;
+    text-shadow: 1px 1px 0px #fff;
+    background: #eaebec;
+    border: #ccc 1px solid;
+
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+
+    -moz-box-shadow: 0 1px 2px #d1d1d1;
+    -webkit-box-shadow: 0 1px 2px #d1d1d1;
+    box-shadow: 0 1px 2px #d1d1d1;
+    margin-bottom: 2rem;
 }
-
-table tr:nth-child(even){background-color: #f2f2f2;}
-
-table tr:hover {background-color: #ddd;}
-
 table th {
-    text-align: left;
-    background-color: maroon;
-    color: white;
+    text-align: center;
+    padding: 3px;
+    border-top: 1px solid #fafafa;
+    border-bottom: 1px solid #e0e0e0;
+
+    background: #ededed;
+    background: -webkit-gradient(linear, left top, left bottom, from(#ededed), to(#ebebeb));
+    background: -moz-linear-gradient(top, #ededed, #ebebeb);
 }
+table th:first-child {
+    text-align: left;
+    padding-left: 20px;
+}
+table tr:first-child th:first-child {
+    -moz-border-radius-topleft: 3px;
+    -webkit-border-top-left-radius: 3px;
+    border-top-left-radius: 3px;
+}
+table tr:first-child th:last-child {
+    -moz-border-radius-topright: 3px;
+    -webkit-border-top-right-radius: 3px;
+    border-top-right-radius: 3px;
+}
+table tr {
+    text-align: left;
+    padding-left: 20px;
+}
+table td:first-child {
+    text-align: left;
+    padding-left: 20px;
+    border-left: 0;
+}
+table td {
+    border-top: 1px solid #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+    border-left: 1px solid #e0e0e0;
+
+    background: #fafafa;
+    background: -webkit-gradient(linear, left top, left bottom, from(#fbfbfb), to(#fafafa));
+    background: -moz-linear-gradient(top, #fbfbfb, #fafafa);
+    padding: 3px 15px;
+}
+table tr.even td {
+    background: #f6f6f6;
+    background: -webkit-gradient(linear, left top, left bottom, from(#f8f8f8), to(#f6f6f6));
+    background: -moz-linear-gradient(top, #f8f8f8, #f6f6f6);
+}
+table tr:last-child td {
+    border-bottom: 0;
+}
+table tr:last-child td:first-child {
+    -moz-border-radius-bottomleft: 3px;
+    -webkit-border-bottom-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+table tr:last-child td:last-child {
+    -moz-border-radius-bottomright: 3px;
+    -webkit-border-bottom-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+table tr:hover td {
+    background: #f2f2f2;
+    background: -webkit-gradient(linear, left top, left bottom, from(#f2f2f2), to(#f0f0f0));
+    background: -moz-linear-gradient(top, #f2f2f2, #f0f0f0);
+}
+
 `;
 //# sourceMappingURL=Project.js.map

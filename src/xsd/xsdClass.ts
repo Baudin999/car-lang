@@ -46,7 +46,6 @@ export class XsdClass {
         return purge(
             this.node.fields.map(field => {
                 if (field.type !== NodeType.TYPE_FIELD) return;
-                if ((field as any).id === "Country") console.log(field);
                 let tf = field as ITypeField;
                 let fieldType =
                     tf.ofType === "Maybe" || tf.ofType === "List" ? tf.ofType_params[0] : tf.ofType;
@@ -64,17 +63,28 @@ export class XsdClass {
                         }
                     })
                     .join("\n");
+                let xsdType = baseTypeToXSDType(fieldType);
 
-                return `
-    <xsd:element name="${this.node.id}_${tf.id}" nillable="${!!isMaybe}">
+                if (xsdType.startsWith("xsd:")) {
+                    return `
+    <xsd:element name="${this.node.id}_${tf.id}" nillable="false">
         <xsd:annotation>${annotations}</xsd:annotation>
         <xsd:simpleType>
-        <xsd:restriction base="${baseTypeToXSDType(fieldType)}">
+        <xsd:restriction base="${xsdType}">
             ${restrictions}
         </xsd:restriction>
         </xsd:simpleType>
     </xsd:element>
             `.trim();
+                } else if (xsdType.startsWith("self")) {
+                    return `
+    <xsd:element name="${this.node.id}_${tf.id}" type="${xsdType}" nillable="false">
+        <xsd:annotation>${annotations}</xsd:annotation>
+    </xsd:element>
+            `.trim();
+                } else {
+                    return "";
+                }
             })
         ).join("\n");
     }

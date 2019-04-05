@@ -2,6 +2,8 @@ import { IExpression, NodeType, IType, IChoice, IView, IDirective } from "./../o
 import { purge, IConfiguration } from "../helpers";
 import { ILookup } from "../erd/createERD";
 import { XsdClass } from "./xsdClass";
+import { XsdChoice } from "./xsdChoice";
+import { XsdAlias } from "./xsdAlias";
 import { pd } from "pretty-data";
 
 const types = [NodeType.TYPE, NodeType.ALIAS, NodeType.DATA, NodeType.CHOICE];
@@ -40,7 +42,9 @@ export const createXSD = (ast: IExpression[], config: IConfiguration = defaultCo
             if (node.type && node.type === NodeType.TYPE) {
                 return new XsdClass(node as IType).toString();
             } else if (node.type && node.type === NodeType.CHOICE) {
-                //return new PlantEnum(node as any).toString();
+                return new XsdChoice(node as any).toString();
+            } else if (node.type && node.type === NodeType.ALIAS) {
+                return new XsdAlias(node as any).toString();
             } else if (node.type && node.type === NodeType.DATA) {
                 //return new PlantData(node as any, lookup).toString();
             }

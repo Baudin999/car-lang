@@ -52,6 +52,7 @@ type Person extends Customer =
     FirstName: Maybe String
     LastName: String
     Address: Address
+    Gender: Gender
 
 ## Customer Models
 

@@ -1,7 +1,7 @@
-import { IModule, IConfiguration } from "./helpers";
+import { IConfiguration } from "./helpers";
 import { Module } from "./Module";
-import { compile } from "./transpiler";
 import { outputFile } from "fs-extra";
+import { join } from "path";
 
 export class ModuleDictionary {
     private $: Record<string, Module>;
@@ -54,6 +54,7 @@ export class ModuleDictionary {
             module.generateFullOutput(outPath);
             return module;
         });
+        this.writeOverviewPage(outPath);
     }
 
     public changeAndWrite(module: Module, outPath: string) {
@@ -61,7 +62,35 @@ export class ModuleDictionary {
             module.generateFullOutput(outPath).then(s => {
                 this.addModule(module);
             });
+            this.writeOverviewPage(outPath);
         }
+    }
+
+    public writeOverviewPage(outPath: string) {
+        const pages: string[] = [];
+        for (var name in this.$) {
+            let pagePath = join(outPath, name, name + ".html");
+            pages.push(`<li><a href="${pagePath}">${name}</a></li>`);
+        }
+        pages.sort();
+
+        // write the overview page
+        const html = `
+<html>
+  <head>
+    <title></title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link rel="stylesheet" href="./../style.css">
+  </head>
+  <body>
+    <ul>
+        ${pages.join("\n")}
+    </ul>
+  </body>
+</html>        
+        `;
+        const indexPath = join(outPath, "index.html");
+        outputFile(indexPath, html);
     }
 
     public map(handler: HandlerType) {

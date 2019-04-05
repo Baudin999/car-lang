@@ -1,8 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const fs_extra_1 = require("fs-extra");
+const path_1 = require("path");
 class ModuleDictionary {
-    constructor() {
+    constructor(config) {
         this.$ = {};
+        this.config = config;
     }
     //modules = this.$;
     /**
@@ -42,13 +45,40 @@ class ModuleDictionary {
             module.generateFullOutput(outPath);
             return module;
         });
+        this.writeOverviewPage(outPath);
     }
     changeAndWrite(module, outPath) {
         if (this.isChanged(module)) {
             module.generateFullOutput(outPath).then(s => {
                 this.addModule(module);
             });
+            this.writeOverviewPage(outPath);
         }
+    }
+    writeOverviewPage(outPath) {
+        const pages = [];
+        for (var name in this.$) {
+            let pagePath = path_1.join(outPath, name, name + ".html");
+            pages.push(`<li><a href="${pagePath}">${name}</a></li>`);
+        }
+        pages.sort();
+        // write the overview page
+        const html = `
+<html>
+  <head>
+    <title></title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link rel="stylesheet" href="./../style.css">
+  </head>
+  <body>
+    <ul>
+        ${pages.join("\n")}
+    </ul>
+  </body>
+</html>        
+        `;
+        const indexPath = path_1.join(outPath, "index.html");
+        fs_extra_1.outputFile(indexPath, html);
     }
     map(handler) {
         let newModuleDictionary = new ModuleDictionary();

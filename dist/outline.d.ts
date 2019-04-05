@@ -93,6 +93,7 @@ export interface IAlias {
     ofType_params: string[];
     ofType_params_start: ITokenStart[];
     annotations: IAnnotation[];
+    restrictions: IRestriction[];
     source?: string;
 }
 export interface IComment {

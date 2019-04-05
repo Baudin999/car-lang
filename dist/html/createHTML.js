@@ -6,6 +6,7 @@ const tableTYPE_1 = require("./tableTYPE");
 // @ts-ignore
 const deflate_1 = require("./../deflate/deflate");
 const createERD_1 = require("../erd/createERD");
+const pretty_data_1 = require("pretty-data");
 const types = [outline_1.NodeType.TYPE, outline_1.NodeType.ALIAS, outline_1.NodeType.DATA, outline_1.NodeType.CHOICE];
 exports.createHTML = (ast, moduleName) => {
     const tables = [];
@@ -39,7 +40,8 @@ exports.createHTML = (ast, moduleName) => {
         }
         return null;
     });
-    return `
+    return pretty_data_1.pd
+        .xml(`
 <html>
   <head>
     <title></title>
@@ -48,17 +50,22 @@ exports.createHTML = (ast, moduleName) => {
   </head>
   <body>
 
-  <h1>Links</h1>
-  <a href="${moduleName}.xsd">XSD</a>
-  <a href="${moduleName}.json">JSON schema</a>
+  <div class="page">
 
-  ${helpers_1.purge(transformedNodes).join("\n")}
-  <h1>ERD</h1>
-  ${moduleName ? `<div class="image-container"><img src="${moduleName}.svg" /></div>` : ""}
-  <h1>Appendix: Entities</h1>
-  ${helpers_1.purge(tables).join("\n")}
+    <h1>Links</h1>
+    <a href="${moduleName}.xsd">XSD</a>
+    <a href="${moduleName}.json">JSON schema</a>
+
+    ${helpers_1.purge(transformedNodes).join("\n")}
+    <h1>ERD</h1>
+    ${moduleName ? `<div class="image-container"><img src="${moduleName}.svg" /></div>` : ""}
+    <h1>Appendix: Entities</h1>
+    ${helpers_1.purge(tables).join("\n")}
+
+  </div>
   </body>
 </html>
-  `.trim();
+  `)
+        .trim();
 };
 //# sourceMappingURL=createHTML.js.map

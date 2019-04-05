@@ -164,7 +164,7 @@ export const baseTypeToXSDType = (b: string) => {
         case "Time":
             return "xsd:time";
         default:
-            return "xsd:string";
+            return `self:${b}`;
     }
 };
 

@@ -1,5 +1,5 @@
 import { IError, IExpression } from "./outline";
-import { IModule } from "./helpers";
+import { IModule, IConfiguration } from "./helpers";
 import { IToken } from "chevrotain";
 export declare class Module implements IModule {
     name: string;
@@ -9,13 +9,14 @@ export declare class Module implements IModule {
     tokens: IToken[];
     errors: IError[];
     timestamp: Date;
+    config?: IConfiguration;
     projectDirectory: string;
     /**
      * Ceate/initialize a module.
      *
      * @param {string} projectDirectory The project directory from which we will manage this module.
      */
-    constructor(projectDirectory: string);
+    constructor(projectDirectory: string, configuration?: IConfiguration);
     /**
      * Parse the module by passing in the full path
      * @param {string} fullPath The full path the file

@@ -65,5 +65,15 @@ export declare const clone: (source: any, template?: any) => any;
 export declare function foldText(s: string, split?: string, n?: number, useSpaces?: boolean, a?: string[]): string;
 export declare const fetchImage: (url: any) => Promise<{}>;
 export declare const baseTypes: string[];
-export declare const baseTypeToXSDType: (b: string) => "xsd:string" | "xsd:integer" | "xsd:boolean" | "xsd:date" | "xsd:dateTime" | "xsd:time";
+export declare const baseTypeToXSDType: (b: string) => string;
 export declare const mapRestrictionToXSD: (baseType: string, restriction: IRestriction) => string;
+export interface IConfiguration {
+    name: string;
+    version: string;
+    xsd: {
+        namespace: string;
+    };
+    json: {
+        namespace: string;
+    };
+}

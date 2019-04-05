@@ -6,6 +6,13 @@
   xmlns:self="http://example.con/"
   targetNamespace="http://example.con/">
   <!-- VERSION: 0.0.1 -->
+  <xsd:simpleType name="Author">
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="/[A-Z][a-z]* [[A-Z][a-z]*]/" />
+      <xsd:minLength value="1" />
+      <xsd:maxLength value="100" />
+    </xsd:restriction>
+  </xsd:simpleType>
   <xsd:element name="FileInfo_Size" nillable="false">
     <xsd:annotation></xsd:annotation>
     <xsd:simpleType>
@@ -33,17 +40,11 @@
       </xsd:restriction>
     </xsd:simpleType>
   </xsd:element>
-  <xsd:element name="FileInfo_CreatedBy" nillable="false">
+  <xsd:element name="FileInfo_CreatedBy" type="self:Author" nillable="false">
     <xsd:annotation></xsd:annotation>
-    <xsd:simpleType>
-      <xsd:restriction base="xsd:string"></xsd:restriction>
-    </xsd:simpleType>
   </xsd:element>
-  <xsd:element name="FileInfo_ModifiedBy" nillable="false">
+  <xsd:element name="FileInfo_ModifiedBy" type="self:Author" nillable="false">
     <xsd:annotation></xsd:annotation>
-    <xsd:simpleType>
-      <xsd:restriction base="xsd:string"></xsd:restriction>
-    </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="FileInfo">
     <xsd:sequence>
@@ -54,11 +55,8 @@
       <xsd:element ref="self:FileInfo_ModifiedBy" minOccurs="1"/>
     </xsd:sequence>
   </xsd:complexType>
-  <xsd:element name="DirectoryInfo_Children" nillable="false">
+  <xsd:element name="DirectoryInfo_Children" type="self:FileSystemInfo" nillable="false">
     <xsd:annotation></xsd:annotation>
-    <xsd:simpleType>
-      <xsd:restriction base="xsd:string"></xsd:restriction>
-    </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="DirectoryInfo">
     <xsd:sequence>

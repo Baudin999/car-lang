@@ -17,9 +17,10 @@ class Module {
      *
      * @param {string} projectDirectory The project directory from which we will manage this module.
      */
-    constructor(projectDirectory) {
+    constructor(projectDirectory, configuration) {
         // simple constructor
         this.projectDirectory = projectDirectory;
+        this.config = configuration;
     }
     /**
      * Parse the module by passing in the full path
@@ -68,7 +69,7 @@ class Module {
                 generateSVG(puml);
             }
             // Generate the XSD file
-            const xsd = createXSD_1.createXSD(this.ast);
+            const xsd = createXSD_1.createXSD(this.ast, this.config);
             const filePathXSD = path_1.join(outPath, this.name, this.name + ".xsd");
             fs_extra_1.outputFile(filePathXSD, xsd);
             // Generate the HTML file
@@ -81,54 +82,4 @@ class Module {
     }
 }
 exports.Module = Module;
-/*
-
-export const generateUML = (module: IModule, outPath: string): string => {
-    const savePlantUML = (module: IModule, outPath: string, puml: string) => {
-        const filePathPuml = join(outPath, module.name, module.name + ".puml");
-        outputFile(filePathPuml, puml);
-    };
-
-    const generateSVG = (module: IModule, outPath: string, puml: string) => {
-        const url = generateURL(puml);
-        fetchImage(url).then(img => {
-            const filePathSVG = join(outPath, module.name, module.name + ".svg");
-            outputFile(filePathSVG, img);
-        });
-    };
-
-    const puml = createERD(module.ast);
-    if (puml) {
-        savePlantUML(module, outPath, puml);
-        generateSVG(module, outPath, puml);
-    }
-
-    return puml;
-};
-
-export const generateAST = (module: IModule, outPath: string): IExpression[] => {
-    const astFilePath = join(outPath, module.name, module.name + ".json");
-    outputFile(astFilePath, JSON.stringify(module.ast, null, 4));
-
-    return module.ast;
-};
-
-export const generateXSD = (module: IModule, outPath: string): string => {
-    const xsd = createXSD(module.ast);
-    const xsdFilePath = join(outPath, module.name, module.name + ".xsd");
-    outputFile(xsdFilePath, xsd);
-
-    return xsd;
-};
-
-export const generateHTML = (module: IModule, puml: string, outPath: string): string => {
-    const html = createHTML(module.ast, puml ? module.name : undefined);
-    const filePath = join(outPath, module.name, module.name + ".html");
-    outputFile(filePath, html);
-
-    return html;
-};
-
-
-*/
 //# sourceMappingURL=Module.js.map
