@@ -5,16 +5,16 @@ const lexer_let_1 = require("./lexer.let");
 exports.EndBlock = chevrotain_1.createToken({
     name: "EndBlock",
     pattern: /\n(\s*\n)+(?!\s)/,
-    push_mode: "root",
-    group: chevrotain_1.Lexer.SKIPPED
+    push_mode: "root" //,
+    //group: Lexer.SKIPPED
 });
 const CommentBlock = chevrotain_1.createToken({
     name: "CommentBlock",
     pattern: /({\*)[^*}]*(\*})(?= *\n)/
 });
-const KW_Type = chevrotain_1.createToken({
+const KW_type = chevrotain_1.createToken({
     pattern: /type/,
-    name: "KW_Type",
+    name: "KW_type",
     push_mode: "type_definition"
 });
 const KW_open = chevrotain_1.createToken({
@@ -50,9 +50,19 @@ const KW_choice = chevrotain_1.createToken({
     name: "KW_choice",
     push_mode: "choice_definition"
 });
+const KW_aggregate = chevrotain_1.createToken({
+    pattern: /aggregate/,
+    name: "KW_aggregate",
+    push_mode: "aggregate_definition"
+});
 const KW_as = chevrotain_1.createToken({
     pattern: /as/,
     name: "KW_as"
+});
+const KW_flow = chevrotain_1.createToken({
+    pattern: /flow/,
+    name: "KW_flow",
+    push_mode: "flow_definition"
 });
 const KW_pluck = chevrotain_1.createToken({
     pattern: /pluck/,
@@ -114,6 +124,18 @@ const SIGN_collectionClose = chevrotain_1.createToken({
     pattern: /\)/,
     push_mode: "root"
 });
+const SIGN_wrapOpen = chevrotain_1.createToken({
+    name: "SIGN_wrapOpen",
+    pattern: /\(/
+});
+const SIGN_wrapClose = chevrotain_1.createToken({
+    name: "SIGN_wrapClose",
+    pattern: /\)/
+});
+const SIGN_arrow = chevrotain_1.createToken({
+    name: "SIGN_arrow",
+    pattern: /->/
+});
 const Identifier = chevrotain_1.createToken({
     name: "Identifier",
     pattern: /[A-Z][a-zA-Z0-9_]*/
@@ -122,8 +144,8 @@ const ViewIdentifier = chevrotain_1.createToken({
     name: "ViewIdentifier",
     pattern: /[A-Z][a-zA-Z0-9_]*(?= *{)/
 });
-const ValiableIdentifier = chevrotain_1.createToken({
-    name: "ValiableIdentifier",
+const VariableIdentifier = chevrotain_1.createToken({
+    name: "VariableIdentifier",
     pattern: /[a-z][a-zA-Z0-9_]*/
 });
 const RestrictionIdentifier = chevrotain_1.createToken({
@@ -175,15 +197,15 @@ const BooleanLiteral = chevrotain_1.createToken({
 });
 const DirectiveLiteral = chevrotain_1.createToken({
     name: "DirectiveLiteral",
-    pattern: /(%{2})([^%]*)(%{2})|%.*\n/
+    pattern: /[ \n\t]*%.*\n/
 });
 const PragmaLiteral = chevrotain_1.createToken({
     name: "PragmaLiteral",
-    pattern: /(#{2})([^#]*)(#{2})|#.*\n/
+    pattern: /[ \n\t]*#.*\n/
 });
 const AnnotationLiteral = chevrotain_1.createToken({
     name: "AnnotationLiteral",
-    pattern: /(@{2})([^@]*)(@{2})|@.*\n/
+    pattern: / *@.*\n/
 });
 const Operator = chevrotain_1.createToken({
     name: "Operator",
@@ -215,7 +237,7 @@ const MarkdownParagraphLiteral = chevrotain_1.createToken({
 const multiModeLexerDefinition = {
     modes: {
         root: [
-            KW_Type,
+            KW_type,
             KW_alias,
             KW_data,
             KW_choice,
@@ -223,6 +245,9 @@ const multiModeLexerDefinition = {
             KW_pluck,
             KW_open,
             lexer_let_1.KW_let,
+            KW_aggregate,
+            KW_flow,
+            SIGN_close,
             AnnotationLiteral,
             exports.EndBlock,
             CommentBlock,
@@ -234,6 +259,7 @@ const multiModeLexerDefinition = {
         ],
         type_definition: [
             KW_extends,
+            AnnotationLiteral,
             SIGN_EqualsType,
             GenericParameter,
             GenericIdentifier,
@@ -244,8 +270,8 @@ const multiModeLexerDefinition = {
         ],
         type_field_definition: [
             exports.EndBlock,
-            Indent,
             AnnotationLiteral,
+            Indent,
             FieldName,
             SIGN_TypeDefStart,
             SIGN_Restriction,
@@ -337,13 +363,49 @@ const multiModeLexerDefinition = {
             SIGN_collectionSeparator,
             SIGN_collectionClose
         ],
-        let_definition: lexer_let_1.let_definition
+        let_definition: lexer_let_1.let_definition,
+        aggregate_definition: [
+            KW_type,
+            KW_alias,
+            KW_data,
+            KW_choice,
+            KW_pluck,
+            StringLiteral,
+            KW_as,
+            SIGN_open,
+            SIGN_close,
+            DirectiveLiteral,
+            ViewIdentifier,
+            Identifier,
+            NewLine,
+            Indent,
+            WhiteSpace,
+            CommentBlock
+        ],
+        flow_definition: [
+            ViewIdentifier,
+            SIGN_open,
+            SIGN_close,
+            SIGN_arrow,
+            SIGN_TypeDefStart,
+            SIGN_wrapOpen,
+            SIGN_wrapClose,
+            AnnotationLiteral,
+            DirectiveLiteral,
+            GenericIdentifier,
+            GenericParameter,
+            Identifier,
+            NewLine,
+            Indent,
+            WhiteSpace,
+            CommentBlock
+        ]
     },
     defaultMode: "root"
 };
 exports.tokenLookup = {
     // keywords
-    KW_Type,
+    KW_type,
     KW_alias,
     KW_data,
     KW_extends,
@@ -352,6 +414,8 @@ exports.tokenLookup = {
     KW_pluck,
     KW_open,
     KW_importing,
+    KW_aggregate,
+    KW_flow,
     SIGN_Equals,
     SIGN_EqualsType,
     SIGN_EqualsData,
@@ -364,16 +428,19 @@ exports.tokenLookup = {
     SIGN_collectionClose,
     SIGN_collectionOpen,
     SIGN_collectionSeparator,
+    SIGN_arrow,
+    SIGN_TypeDefStart,
+    SIGN_wrapOpen,
+    SIGN_wrapClose,
     Operator,
     AnnotationLiteral,
     Identifier,
     ViewIdentifier,
-    ValiableIdentifier,
+    VariableIdentifier,
     GenericIdentifier,
     GenericParameter,
     RestrictionIdentifier,
     FieldName,
-    SIGN_TypeDefStart,
     CommentBlock,
     DirectiveLiteral,
     PragmaLiteral,

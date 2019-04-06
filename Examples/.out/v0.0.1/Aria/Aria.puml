@@ -1,4 +1,4 @@
-enum BoughtFrom {
+enum undefined {
 	Racial Package
 	Professional Package
 	XP
@@ -25,7 +25,6 @@ class "Buyable" as Buyable  {
 	Professional: Boolean 
 	Master: Boolean 
 }
-BoughtFrom --> Buyable : Source
 Stat --> Buyable : Stat
 class "Skill " as Skill  {
 	Name: String  <i>from Namable</i>
@@ -41,7 +40,6 @@ class "Skill " as Skill  {
  something a character can do
     
 }
-BoughtFrom --> Skill : Source
 Stat --> Skill : Stat
 Namable --|> Skill
 Buyable --|> Skill
@@ -55,7 +53,6 @@ class "Resistance " as Resistance  {
 	Professional: Boolean  <i>from Buyable</i>
 	Master: Boolean  <i>from Buyable</i>
 }
-BoughtFrom --> Resistance : Source
 Stat --> Resistance : Stat
 Namable --|> Resistance
 Buyable --|> Resistance
@@ -69,7 +66,6 @@ class "Special " as Special  {
 	Professional: Boolean  <i>from Buyable</i>
 	Master: Boolean  <i>from Buyable</i>
 }
-BoughtFrom --> Special : Source
 Stat --> Special : Stat
 Namable --|> Special
 Buyable --|> Special

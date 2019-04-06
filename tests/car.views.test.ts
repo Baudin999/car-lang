@@ -1,11 +1,11 @@
 import { transpile } from "../src/transpiler";
 
 const log = source => {
-  console.log(JSON.stringify(source, null, 4));
+    console.log(JSON.stringify(source, null, 4));
 };
 
 describe("Define a simple view", () => {
-  const source = `
+    const source = `
 
 data Maybe a =
     | Just a
@@ -28,25 +28,38 @@ type Address =
 
 
 view PersonView {
+    
     % title: Person View
-    %%
-     This is the personview, a view is always for an audience.
-     As you can see, this is the easiest way to add multiline
-     comments and descriptions to a view.
-    %%
+    % depth: 0
 
     Person
 }
 
 `;
 
-  const { tokens, errors, ast } = transpile(source);
-  //log(tokens);
-  //log(cst);
-  //log(ast);
-  //log(errors);
+    const { tokens, errors, ast } = transpile(source);
 
-  it("AST should be defined", () => {
-    expect(ast).toBeDefined();
-  });
+    it("AST should be defined", () => {
+        expect(ast).toBeDefined();
+    });
+});
+
+describe("The View should only have nodes which are known", () => {
+    const source = `
+
+view PersonView {
+    Person
+    Address
+    Contracts
+}
+
+type Address 
+
+`;
+
+    const { tokens, errors, ast } = transpile(source);
+
+    it("Errors should be of length 2", () => {
+        expect(errors.length).toEqual(2);
+    });
 });

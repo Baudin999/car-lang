@@ -13,6 +13,12 @@ export declare class OutlineVisitor extends BaseCstVisitorWithDefaults {
     DATA_OPTION(ctx: any): IDataOption;
     ALIAS(ctx: any): IAlias;
     VIEW(ctx: any): IView;
+    AGGREGATE(ctx: any): IAggregate;
+    FLOW(ctx: any): IFlow;
+    OPERATION(ctx: any): IOperation;
+    OPERATION_PARAMETER(ctx: any): IOperationParameter;
+    OPERATION_PARAMETER_TYPE(ctx: any): any;
+    OPERATION_PARAMETER_FIELD_TYPE(ctx: any): any;
     CHOICE(ctx: any): IChoice;
     CHOICE_OPTION(ctx: any): any;
     IDENTIFIER(ctx: any): IIdentity;
@@ -65,6 +71,29 @@ export interface IPluckedField {
     parts: string[];
     parts_start: ITokenStart[];
 }
+export interface IFlow {
+    type: NodeType;
+    directives: IDirective[];
+    operations: IOperation[];
+}
+export interface IOperation {
+    type: NodeType;
+    id: string;
+    id_start: ITokenStart;
+    result: string;
+    result_start: ITokenStart;
+    params: IOperationParameter[];
+    annotations: IAnnotation[];
+}
+export interface IOperationParameter {
+    type: NodeType;
+    id?: string;
+    id_start?: ITokenStart;
+    ofType: string;
+    ofType_start: ITokenStart;
+    ofType_params: string[];
+    ofType_params_start: ITokenStart[];
+}
 export interface IData {
     type: NodeType;
     id: string;
@@ -83,6 +112,15 @@ export interface IView {
     type: NodeType;
     id?: string;
     nodes: string[];
+    nodes_start: ITokenStart[];
+    directives: IDirective[];
+}
+export interface IAggregate {
+    type: NodeType;
+    root: string;
+    root_start: ITokenStart;
+    valueObjects: string[];
+    valueObjects_start: ITokenStart[];
     directives: IDirective[];
 }
 export interface IAlias {
@@ -154,7 +192,7 @@ export interface IMarkdownList {
     type: NodeType;
     items: string[];
 }
-export declare type IExpression = IType | IAlias | IData | IComment | IMarkdownChapter | IMarkdownCode | IMarkdownImage | IMarkdownList | IMarkdownParagraph;
+export declare type IExpression = IType | IAlias | IData | IComment | IAggregate | IFlow | IView | IMarkdownChapter | IMarkdownCode | IMarkdownImage | IMarkdownList | IMarkdownParagraph;
 export declare enum NodeType {
     TYPE = "TYPE",
     TYPE_FIELD = "TYPE_FIELD",
@@ -166,6 +204,7 @@ export declare enum NodeType {
     CHAPTER = "CHAPTER",
     IMAGE = "IMAGE",
     VIEW = "VIEW",
+    AGGREGATE = "AGGREGATE",
     PARAGRAPH = "PARAGRAPH",
     MARKDOWN_CODE = "MARKDOWN_CODE",
     MARKDOWN_PARAGRAPH = "MARKDOWN_PARAGRAPH",
@@ -174,7 +213,10 @@ export declare enum NodeType {
     MARKDOWN_LIST = "MARKDOWN_LIST",
     CHOICE = "CHOICE",
     PLUCKED_FIELD = "PLUCKED_FIELD",
-    OPEN = "OPEN"
+    OPEN = "OPEN",
+    FLOW = "FLOW",
+    OPERATION = "OPERATION",
+    OPERATION_PARAMETER = "OPERATION_PARAMETER"
 }
 export interface IError {
     message: string;

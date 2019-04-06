@@ -67,6 +67,7 @@ export declare const fetchImage: (url: any) => Promise<{}>;
 export declare const baseTypes: string[];
 export declare const baseTypeToXSDType: (b: string) => string;
 export declare const mapRestrictionToXSD: (baseType: string, restriction: IRestriction) => string;
+export declare const baseTypeToJSONType: (b: string) => string | null;
 export interface IConfiguration {
     name: string;
     version: string;

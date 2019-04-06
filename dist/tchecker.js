@@ -21,9 +21,7 @@ const getNodeById = (ast, params = [], id) => {
 };
 exports.typeChecker = (ast = []) => {
     let errors = [];
-    ast
-        .filter(node => node.type === outline_1.NodeType.TYPE && !node.imported)
-        .forEach((node) => {
+    ast.filter(node => node.type === outline_1.NodeType.TYPE && !node.imported).forEach((node) => {
         // check the normal fields for errors
         node.fields
             .filter(field => field.type == outline_1.NodeType.TYPE_FIELD)
@@ -60,9 +58,38 @@ exports.typeChecker = (ast = []) => {
             if (ref.type !== outline_1.NodeType.TYPE) {
                 errors.push(Object.assign({ message: `Can only pluck from a type` }, field.parts_start[0]));
             }
-            let refField = ref.fields.find(f => f.type === outline_1.NodeType.TYPE_FIELD && f.id === field.parts[1]);
+            let refField = ref.fields.find(f => f.type === outline_1.NodeType.TYPE_FIELD &&
+                f.id === field.parts[1]);
             if (!refField) {
                 errors.push(Object.assign({ message: `Cannot find field "${field.parts[1]}" of type "${typeId}" to pluck` }, field.parts_start[1]));
+            }
+        });
+    });
+    /**
+     * Type Check the AGGREGATES
+     */
+    ast.filter(node => node.type === outline_1.NodeType.AGGREGATE).forEach((aggregate) => {
+        // test if the root exists
+        let root = getNodeById(ast, [], aggregate.root);
+        if (!root) {
+            errors.push(Object.assign({ message: `Cannot find the aggregate root "${aggregate.root}"` }, aggregate.root_start));
+        }
+        aggregate.valueObjects.forEach((v, i) => {
+            let valueObject = getNodeById(ast, [], v);
+            if (!valueObject) {
+                errors.push(Object.assign({ message: `Cannot find the Value Object "${v}" on Aggregate "${aggregate.root}"` }, aggregate.valueObjects_start[i]));
+            }
+        });
+    });
+    /**
+     * Type Check the VIEWS
+     */
+    ast.filter(node => node.type === outline_1.NodeType.VIEW).forEach((view) => {
+        view.nodes.forEach((v, i) => {
+            let valueObject = getNodeById(ast, [], v);
+            if (!valueObject) {
+                errors.push(Object.assign({ message: `Cannot find the Node "${v}" on View "${view.id ||
+                        "Unnamed view"}"` }, view.nodes_start[i]));
             }
         });
     });

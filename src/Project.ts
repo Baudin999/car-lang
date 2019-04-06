@@ -23,6 +23,8 @@ export class Project {
 
     constructor(projectDirectory: string) {
         this.projectDirectory = projectDirectory;
+        this.configPath = join(this.projectDirectory, "carconfig.json");
+        this.outPath = join(this.projectDirectory, ".out");
     }
 
     /**
@@ -30,9 +32,6 @@ export class Project {
      * be used for the models.
      */
     verify(): Promise<Project> {
-        this.configPath = join(this.projectDirectory, "carconfig.json");
-        this.outPath = join(this.projectDirectory, ".out");
-
         // we'll need to verify if:
         //   1) the projectDirectory exists
         //   2) there is a carconfig.json file
@@ -100,10 +99,7 @@ data Maybe a =
                 remove(this.configPath, e2 => {
                     try {
                         let promises = [
-                            outputFile(this.configPath, JSON.stringify(defaultConfig, null, 4)),
-                            outputFile(this.preludePath, prelude, err3 => {
-                                console.log(err3);
-                            })
+                            outputFile(this.configPath, JSON.stringify(defaultConfig, null, 4))
                         ];
 
                         Promise.all(promises).then(results => {

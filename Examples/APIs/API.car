@@ -1,31 +1,23 @@
+open Customer importing ( Person )
+
 {*
-  We define APIs with a Request and a Response, this pattern
-  I'll be describing in the following sections will not work
-  for push notifications.
+An API has a Request and a Response, we will need to provide both.
 *}
 
-type Meta =
-    Code: Number
-    Message: String
-
-@ code: 404
-@ message: Not Found
-type Error404 extends Meta
-
-@ code: 500
-@ message: Internal Server Error
-type Error500 extends Meta
 
 
-type Envelope req res extends Meta =
-    Request: req
-    Response: res
-
-type MyAPIRequest =
-    Something: String
 
 
-type MyAPIResponse =
-    AccountId: String
+@ api: /myapi
+type MyAPI =
+    pluck Person.FirstName
+    pluck Person.LastName
 
-alias MyAPI = Envelope MyAPIRequest MyAPIResponse
+
+type Base = 
+    Bar: Number
+
+@ api: /something
+type Response =
+    Foo: String
+    Bar: Base

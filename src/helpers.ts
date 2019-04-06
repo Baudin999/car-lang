@@ -204,6 +204,25 @@ export const mapRestrictionToXSD = (baseType: string, restriction: IRestriction)
     }
 };
 
+export const baseTypeToJSONType = (b: string): string | null => {
+    switch (b) {
+        case "String":
+            return "string";
+        case "Number":
+            return "number";
+        case "Boolean":
+            return "boolean";
+        case "Date":
+            return "date";
+        case "DateTime":
+            return "dateTime";
+        case "Time":
+            return "time";
+        default:
+            return null;
+    }
+};
+
 export interface IConfiguration {
     name: string;
     version: string;

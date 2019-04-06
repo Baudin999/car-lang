@@ -11,6 +11,7 @@ import { generateURL } from "./deflate/deflate";
 import { createERD } from "./erd/createERD";
 import { createHTML } from "./html/createHTML";
 import { createXSD } from "./xsd/createXSD";
+import { createJsonSchema } from "./jsonSchema/createJsonSchema";
 
 export class Module implements IModule {
     name: string;
@@ -96,6 +97,16 @@ export class Module implements IModule {
             const html = createHTML(this.ast, puml ? this.name : undefined);
             const filePathHTML = join(outPath, this.name, this.name + ".html");
             outputFile(filePathHTML, html);
+
+            const schemas = createJsonSchema(this.ast);
+            schemas.map(schema => {
+                const schemaPath = join(
+                    outPath,
+                    this.name,
+                    this.name + "_" + schema.name + ".json"
+                );
+                outputFile(schemaPath, JSON.stringify(schema.schema, null, 4));
+            });
 
             resolve(puml);
             console.log("Compiled: ", this.name);

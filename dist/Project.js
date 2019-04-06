@@ -14,14 +14,14 @@ const transpiler_1 = require("./transpiler");
 class Project {
     constructor(projectDirectory) {
         this.projectDirectory = projectDirectory;
+        this.configPath = path_1.join(this.projectDirectory, "carconfig.json");
+        this.outPath = path_1.join(this.projectDirectory, ".out");
     }
     /**
      * Verify the directory and inspect if the directory is ready to
      * be used for the models.
      */
     verify() {
-        this.configPath = path_1.join(this.projectDirectory, "carconfig.json");
-        this.outPath = path_1.join(this.projectDirectory, ".out");
         // we'll need to verify if:
         //   1) the projectDirectory exists
         //   2) there is a carconfig.json file
@@ -84,10 +84,7 @@ data Maybe a =
                 fs_extra_1.remove(this.configPath, e2 => {
                     try {
                         let promises = [
-                            fs_extra_1.outputFile(this.configPath, JSON.stringify(defaultConfig, null, 4)),
-                            fs_extra_1.outputFile(this.preludePath, prelude, err3 => {
-                                console.log(err3);
-                            })
+                            fs_extra_1.outputFile(this.configPath, JSON.stringify(defaultConfig, null, 4))
                         ];
                         Promise.all(promises).then(results => {
                             resolve(true);

@@ -1,35 +1,24 @@
-class "Meta" as Meta  {
-	Code: Number 
-	Message: String 
+class "Person " as Person  {
+	FirstName: Maybe String
+	LastName: String 
+	Address: Address 
+	Gender: Gender 
 }
-class "Error404 " as Error404  {
-	Code: Number  <i>from Meta</i>
-	Message: String  <i>from Meta</i>
+class "MyAPI" as MyAPI  {
+	FirstName: Maybe String
+	LastName: String 
 --
-  <b>code</b>: 404
-<b>message</b>: Not Found
+  <b>api</b>: /myapi
     
 }
-Meta --|> Error404
-class "Error500 " as Error500  {
-	Code: Number  <i>from Meta</i>
-	Message: String  <i>from Meta</i>
+class "Base" as Base  {
+	Bar: Number 
+}
+class "Response" as Response  {
+	Foo: String 
+	Bar: Base 
 --
-  <b>code</b>: 500
-<b>message</b>: Internal Server Error
+  <b>api</b>: /something
     
 }
-Meta --|> Error500
-class "Envelope req res" as Envelope << (T,orchid) >> {
-	Request: req 
-	Response: res 
-	Code: Number  <i>from Meta</i>
-	Message: String  <i>from Meta</i>
-}
-Meta --|> Envelope
-class "MyAPIRequest" as MyAPIRequest  {
-	Something: String 
-}
-class "MyAPIResponse" as MyAPIResponse  {
-	AccountId: String 
-}
+Base --> Response : Bar

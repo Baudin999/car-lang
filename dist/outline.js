@@ -15,7 +15,7 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
         return expressions;
     }
     EXPRESSION(ctx) {
-        const annotations = helpers_1.purge(ctx.ROOT_ANNOTATIONS.map(a => this.visit(a)));
+        const annotations = helpers_1.purge(ctx.ANNOTATIONS.map(a => this.visit(a)));
         const ignoreAttribute = annotations.find((a) => a.key === "ignore");
         const ignore = ignoreAttribute ? ignoreAttribute.value === "true" : false;
         if (ctx.TYPE) {
@@ -42,6 +42,12 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
                 comment: ctx.CommentBlock[0].image
             };
         }
+        else if (ctx.AGGREGATE) {
+            return Object.assign({ annotations }, this.visit(ctx.AGGREGATE[0]));
+        }
+        else if (ctx.FLOW) {
+            return Object.assign({ annotations }, this.visit(ctx.FLOW[0]));
+        }
         else if (ctx.MARKDOWN_CHAPTER) {
             return this.visit(ctx.MARKDOWN_CHAPTER[0]);
         }
@@ -57,7 +63,7 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
         else if (ctx.MARKDOWN_LIST) {
             return this.visit(ctx.MARKDOWN_LIST);
         }
-        else if (ctx.ROOT_ANNOTATIONS) {
+        else if (ctx.EndBlock) {
             // do nothing, already parsed at the top...
             return null;
         }
@@ -102,45 +108,63 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
         return Object.assign({ type: NodeType.ALIAS }, this.visit(ctx.IDENTIFIER[0]), this.visit(ctx.TYPE_IDENTIFIER[0]), { restrictions: (ctx.RESTRICTION || []).map(r => this.visit(r)) });
     }
     VIEW(ctx) {
-        // Parse the Directives in the code.
-        const pattern = /( *)(%)(.*)(:)(.*)(\n)/;
-        let directives = (ctx.DirectiveLiteral || []).map(d => {
-            const segments = pattern.exec(d.image);
-            if (segments) {
-                return {
-                    key: segments[3].trim(),
-                    value: segments[5].trim()
-                };
-            }
-            else {
-                return {
-                    key: "description",
-                    value: d.image
-                        .replace(/%%/g, "")
-                        .split(/\n +/)
-                        .join(" ")
-                        .trim()
-                };
-            }
-        });
         return {
             type: NodeType.VIEW,
             id: ctx.ViewIdentifier ? ctx.ViewIdentifier[0].image : "",
             nodes: (ctx.Identifier || []).map(i => i.image),
-            directives
+            nodes_start: (ctx.Identifier || []).map(i => helpers_1.getStartToken(i)),
+            directives: parseDirectives(ctx)
         };
     }
-    CHOICE(ctx) {
+    AGGREGATE(ctx) {
         return {
-            type: NodeType.CHOICE,
-            id: ctx.Identifier[0].image,
-            id_start: helpers_1.getStartToken(ctx.Identifier[0]),
-            options: ctx.CHOICE_OPTION.map(o => this.visit(o)),
-            options_start: ctx.CHOICE_OPTION.map(o => {
+            type: NodeType.AGGREGATE,
+            root: ctx.ViewIdentifier ? ctx.ViewIdentifier[0].image : "",
+            root_start: helpers_1.getStartToken(ctx.ViewIdentifier[0]),
+            valueObjects: (ctx.Identifier || []).map(i => i.image),
+            valueObjects_start: (ctx.Identifier || []).map(i => helpers_1.getStartToken(i)),
+            directives: parseDirectives(ctx)
+        };
+    }
+    FLOW(ctx) {
+        return {
+            type: NodeType.FLOW,
+            operations: (ctx.OPERATION || []).map(o => this.visit(o)),
+            directives: parseDirectives(ctx)
+        };
+    }
+    OPERATION(ctx) {
+        return {
+            annotations: this.ROOT_ANNOTATIONS(ctx),
+            type: NodeType.OPERATION,
+            id: ctx.GenericParameter[0].image,
+            id_start: helpers_1.getStartToken(ctx.GenericParameter[0]),
+            result: ctx.OPERATION_RESULT[0].image,
+            result_start: helpers_1.getStartToken(ctx.OPERATION_RESULT[0]),
+            params: (ctx.OPERATION_PARAMETER || []).map(p => this.visit(p))
+        };
+    }
+    OPERATION_PARAMETER(ctx) {
+        let paramDetails;
+        if (ctx.OPERATION_PARAMETER_FIELD_TYPE) {
+            paramDetails = this.visit(ctx.OPERATION_PARAMETER_FIELD_TYPE[0]);
+        }
+        else if (ctx.OPERATION_PARAMETER_TYPE) {
+            paramDetails = this.visit(ctx.OPERATION_PARAMETER_TYPE[0]);
+        }
+        return Object.assign({ type: NodeType.OPERATION_PARAMETER }, paramDetails);
+    }
+    OPERATION_PARAMETER_TYPE(ctx) {
+        return Object.assign({}, this.visit(ctx.TYPE_IDENTIFIER[0]));
+    }
+    OPERATION_PARAMETER_FIELD_TYPE(ctx) {
+        return Object.assign({ id: ctx.GenericParameter[0].image, id_start: helpers_1.getStartToken(ctx.GenericParameter[0]) }, this.visit(ctx.TYPE_IDENTIFIER[0]));
+    }
+    CHOICE(ctx) {
+        return Object.assign({ type: NodeType.CHOICE }, this.visit(ctx.TYPE_IDENTIFIER[0]), { options: ctx.CHOICE_OPTION.map(o => this.visit(o)), options_start: ctx.CHOICE_OPTION.map(o => {
                 const literal = o.children.StringLiteral || o.children.NumberLiteral;
                 return helpers_1.getStartToken(literal[0]);
-            })
-        };
+            }) });
     }
     CHOICE_OPTION(ctx) {
         return ctx.StringLiteral
@@ -310,6 +334,30 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
     }
 }
 exports.OutlineVisitor = OutlineVisitor;
+const parseDirectives = (ctx) => {
+    // Parse the Directives in the code.
+    const pattern = /( *)(%)(.*)(:)(.*)(\n)/;
+    let directives = (ctx.DirectiveLiteral || []).map(d => {
+        const segments = pattern.exec(d.image);
+        if (segments) {
+            return {
+                key: segments[3].trim(),
+                value: segments[5].trim()
+            };
+        }
+        else {
+            return {
+                key: "description",
+                value: d.image
+                    .replace(/%%/g, "")
+                    .split(/\n +/)
+                    .join(" ")
+                    .trim()
+            };
+        }
+    });
+    return directives;
+};
 var NodeType;
 (function (NodeType) {
     NodeType["TYPE"] = "TYPE";
@@ -322,6 +370,7 @@ var NodeType;
     NodeType["CHAPTER"] = "CHAPTER";
     NodeType["IMAGE"] = "IMAGE";
     NodeType["VIEW"] = "VIEW";
+    NodeType["AGGREGATE"] = "AGGREGATE";
     NodeType["PARAGRAPH"] = "PARAGRAPH";
     NodeType["MARKDOWN_CODE"] = "MARKDOWN_CODE";
     NodeType["MARKDOWN_PARAGRAPH"] = "MARKDOWN_PARAGRAPH";
@@ -331,6 +380,9 @@ var NodeType;
     NodeType["CHOICE"] = "CHOICE";
     NodeType["PLUCKED_FIELD"] = "PLUCKED_FIELD";
     NodeType["OPEN"] = "OPEN";
+    NodeType["FLOW"] = "FLOW";
+    NodeType["OPERATION"] = "OPERATION";
+    NodeType["OPERATION_PARAMETER"] = "OPERATION_PARAMETER";
 })(NodeType = exports.NodeType || (exports.NodeType = {}));
 const defaultStart = {
     startLineNumber: 0,

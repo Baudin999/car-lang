@@ -19,9 +19,15 @@ declare class DomainParser extends Parser {
     FUNCTION_APPLICATION: any;
     OPEN: any;
     IMPORTING: any;
+    AGGREGATE: any;
+    FLOW: any;
+    OPERATION: any;
+    OPERATION_RESULT: any;
+    OPERATION_PARAMETER: any;
+    OPERATION_PARAMETER_TYPE: any;
+    OPERATION_PARAMETER_FIELD_TYPE: any;
     IDENTIFIER: any;
     TYPE_IDENTIFIER: any;
-    ROOT_ANNOTATIONS: any;
     ANNOTATIONS: any;
     ANNOTATION: any;
     MARKDOWN_CHAPTER: any;

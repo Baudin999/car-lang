@@ -1,4 +1,4 @@
-enum Gender {
+enum undefined {
 	Male
 	Female
 	Other
@@ -27,7 +27,6 @@ class "Person " as Person  {
 	CustomerId: Id  <i>from Customer</i>
 }
 Address --> Person : Address
-Gender --> Person : Gender
 Customer --|> Person
 class "Company " as Company  {
 	OrganisationName: String 

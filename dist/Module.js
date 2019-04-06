@@ -11,6 +11,7 @@ const deflate_1 = require("./deflate/deflate");
 const createERD_1 = require("./erd/createERD");
 const createHTML_1 = require("./html/createHTML");
 const createXSD_1 = require("./xsd/createXSD");
+const createJsonSchema_1 = require("./jsonSchema/createJsonSchema");
 class Module {
     /**
      * Ceate/initialize a module.
@@ -76,6 +77,11 @@ class Module {
             const html = createHTML_1.createHTML(this.ast, puml ? this.name : undefined);
             const filePathHTML = path_1.join(outPath, this.name, this.name + ".html");
             fs_extra_1.outputFile(filePathHTML, html);
+            const schemas = createJsonSchema_1.createJsonSchema(this.ast);
+            schemas.map(schema => {
+                const schemaPath = path_1.join(outPath, this.name, this.name + "_" + schema.name + ".json");
+                fs_extra_1.outputFile(schemaPath, JSON.stringify(schema.schema, null, 4));
+            });
             resolve(puml);
             console.log("Compiled: ", this.name);
         });

@@ -68,11 +68,15 @@ programming is the true future of programming. This is why I've taken a good har
 current state of functional programming and tried to grab the best parts of the languages which I
 admire. Here's a small list of potential features which will probably be in the `car` language:
 
-- Type Classes (like Haskell)
-- Simple Module System (like OCaml)
-- Simple Error messages (like Elm)
+-   Type Classes (like Haskell)
+-   Simple Module System (like OCaml)
+-   Simple Error messages (like Elm)
 
 The first thing I'll implement is the [type system](./documentation/types.md).
+
+## Domain Driven Design
+
+A quick introduction on how to do DDD in the car-lang can be found [this](./documentation/ddd.md) page.
 
 ## Railroad Diagram
 

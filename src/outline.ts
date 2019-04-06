@@ -21,7 +21,7 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
     }
 
     EXPRESSION(ctx: any): IExpression | null {
-        const annotations = purge(ctx.ROOT_ANNOTATIONS.map(a => this.visit(a)));
+        const annotations = purge(ctx.ANNOTATIONS.map(a => this.visit(a)));
         const ignoreAttribute: any = annotations.find((a: IAnnotation) => a.key === "ignore");
         const ignore = ignoreAttribute ? ignoreAttribute.value === "true" : false;
 
@@ -59,6 +59,16 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
                 type: NodeType.COMMENT,
                 comment: ctx.CommentBlock[0].image
             };
+        } else if (ctx.AGGREGATE) {
+            return {
+                annotations,
+                ...this.visit(ctx.AGGREGATE[0])
+            };
+        } else if (ctx.FLOW) {
+            return {
+                annotations,
+                ...this.visit(ctx.FLOW[0])
+            };
         } else if (ctx.MARKDOWN_CHAPTER) {
             return this.visit(ctx.MARKDOWN_CHAPTER[0]);
         } else if (ctx.MARKDOWN_IMAGE) {
@@ -69,7 +79,7 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
             return this.visit(ctx.MARKDOWN_CODE[0]);
         } else if (ctx.MARKDOWN_LIST) {
             return this.visit(ctx.MARKDOWN_LIST);
-        } else if (ctx.ROOT_ANNOTATIONS) {
+        } else if (ctx.EndBlock) {
             // do nothing, already parsed at the top...
             return null;
         } else {
@@ -144,40 +154,75 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
     }
 
     VIEW(ctx: any): IView {
-        // Parse the Directives in the code.
-        const pattern = /( *)(%)(.*)(:)(.*)(\n)/;
-        let directives: IDirective[] = (ctx.DirectiveLiteral || []).map(d => {
-            const segments = pattern.exec(d.image);
-            if (segments) {
-                return {
-                    key: segments[3].trim(),
-                    value: segments[5].trim()
-                };
-            } else {
-                return {
-                    key: "description",
-                    value: d.image
-                        .replace(/%%/g, "")
-                        .split(/\n +/)
-                        .join(" ")
-                        .trim()
-                };
-            }
-        });
-
         return {
             type: NodeType.VIEW,
             id: ctx.ViewIdentifier ? ctx.ViewIdentifier[0].image : "",
             nodes: (ctx.Identifier || []).map(i => i.image),
-            directives
+            nodes_start: (ctx.Identifier || []).map(i => getStartToken(i)),
+            directives: parseDirectives(ctx)
+        };
+    }
+
+    AGGREGATE(ctx: any): IAggregate {
+        return {
+            type: NodeType.AGGREGATE,
+            root: ctx.ViewIdentifier ? ctx.ViewIdentifier[0].image : "",
+            root_start: getStartToken(ctx.ViewIdentifier[0]),
+            valueObjects: (ctx.Identifier || []).map(i => i.image),
+            valueObjects_start: (ctx.Identifier || []).map(i => getStartToken(i)),
+            directives: parseDirectives(ctx)
+        };
+    }
+
+    FLOW(ctx: any): IFlow {
+        return {
+            type: NodeType.FLOW,
+            operations: (ctx.OPERATION || []).map(o => this.visit(o)),
+            directives: parseDirectives(ctx)
+        };
+    }
+
+    OPERATION(ctx: any): IOperation {
+        return {
+            annotations: this.ROOT_ANNOTATIONS(ctx),
+            type: NodeType.OPERATION,
+            id: ctx.GenericParameter[0].image,
+            id_start: getStartToken(ctx.GenericParameter[0]),
+            result: ctx.OPERATION_RESULT[0].image,
+            result_start: getStartToken(ctx.OPERATION_RESULT[0]),
+            params: (ctx.OPERATION_PARAMETER || []).map(p => this.visit(p))
+        };
+    }
+
+    OPERATION_PARAMETER(ctx: any): IOperationParameter {
+        let paramDetails;
+        if (ctx.OPERATION_PARAMETER_FIELD_TYPE) {
+            paramDetails = this.visit(ctx.OPERATION_PARAMETER_FIELD_TYPE[0]);
+        } else if (ctx.OPERATION_PARAMETER_TYPE) {
+            paramDetails = this.visit(ctx.OPERATION_PARAMETER_TYPE[0]);
+        }
+        return {
+            type: NodeType.OPERATION_PARAMETER,
+            ...paramDetails
+        };
+    }
+    OPERATION_PARAMETER_TYPE(ctx: any) {
+        return {
+            ...this.visit(ctx.TYPE_IDENTIFIER[0])
+        };
+    }
+    OPERATION_PARAMETER_FIELD_TYPE(ctx: any) {
+        return {
+            id: ctx.GenericParameter[0].image,
+            id_start: getStartToken(ctx.GenericParameter[0]),
+            ...this.visit(ctx.TYPE_IDENTIFIER[0])
         };
     }
 
     CHOICE(ctx: any): IChoice {
         return {
             type: NodeType.CHOICE,
-            id: ctx.Identifier[0].image,
-            id_start: getStartToken(ctx.Identifier[0]),
+            ...this.visit(ctx.TYPE_IDENTIFIER[0]),
             options: ctx.CHOICE_OPTION.map(o => this.visit(o)),
             options_start: ctx.CHOICE_OPTION.map(o => {
                 const literal = o.children.StringLiteral || o.children.NumberLiteral;
@@ -369,6 +414,30 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
     }
 }
 
+const parseDirectives = (ctx: any): IDirective[] => {
+    // Parse the Directives in the code.
+    const pattern = /( *)(%)(.*)(:)(.*)(\n)/;
+    let directives: IDirective[] = (ctx.DirectiveLiteral || []).map(d => {
+        const segments = pattern.exec(d.image);
+        if (segments) {
+            return {
+                key: segments[3].trim(),
+                value: segments[5].trim()
+            };
+        } else {
+            return {
+                key: "description",
+                value: d.image
+                    .replace(/%%/g, "")
+                    .split(/\n +/)
+                    .join(" ")
+                    .trim()
+            };
+        }
+    });
+    return directives;
+};
+
 export interface IOpen {
     type: NodeType;
     module: string;
@@ -406,6 +475,32 @@ export interface IPluckedField {
     parts_start: ITokenStart[];
 }
 
+export interface IFlow {
+    type: NodeType;
+    directives: IDirective[];
+    operations: IOperation[];
+}
+
+export interface IOperation {
+    type: NodeType;
+    id: string;
+    id_start: ITokenStart;
+    result: string;
+    result_start: ITokenStart;
+    params: IOperationParameter[];
+    annotations: IAnnotation[];
+}
+
+export interface IOperationParameter {
+    type: NodeType;
+    id?: string;
+    id_start?: ITokenStart;
+    ofType: string;
+    ofType_start: ITokenStart;
+    ofType_params: string[];
+    ofType_params_start: ITokenStart[];
+}
+
 export interface IData {
     type: NodeType;
     id: string;
@@ -426,6 +521,16 @@ export interface IView {
     type: NodeType;
     id?: string;
     nodes: string[];
+    nodes_start: ITokenStart[];
+    directives: IDirective[];
+}
+
+export interface IAggregate {
+    type: NodeType;
+    root: string;
+    root_start: ITokenStart;
+    valueObjects: string[];
+    valueObjects_start: ITokenStart[];
     directives: IDirective[];
 }
 
@@ -516,6 +621,9 @@ export type IExpression =
     | IAlias
     | IData
     | IComment
+    | IAggregate
+    | IFlow
+    | IView
     | IMarkdownChapter
     | IMarkdownCode
     | IMarkdownImage
@@ -533,6 +641,7 @@ export enum NodeType {
     CHAPTER = "CHAPTER",
     IMAGE = "IMAGE",
     VIEW = "VIEW",
+    AGGREGATE = "AGGREGATE",
     PARAGRAPH = "PARAGRAPH",
     MARKDOWN_CODE = "MARKDOWN_CODE",
     MARKDOWN_PARAGRAPH = "MARKDOWN_PARAGRAPH",
@@ -541,7 +650,10 @@ export enum NodeType {
     MARKDOWN_LIST = "MARKDOWN_LIST",
     CHOICE = "CHOICE",
     PLUCKED_FIELD = "PLUCKED_FIELD",
-    OPEN = "OPEN"
+    OPEN = "OPEN",
+    FLOW = "FLOW",
+    OPERATION = "OPERATION",
+    OPERATION_PARAMETER = "OPERATION_PARAMETER"
 }
 
 const defaultStart: ITokenStart = {

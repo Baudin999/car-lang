@@ -1,7 +1,7 @@
 import { Lexer } from "chevrotain";
 export declare const EndBlock: import("chevrotain").TokenType;
 export declare const tokenLookup: {
-    KW_Type: import("chevrotain").TokenType;
+    KW_type: import("chevrotain").TokenType;
     KW_alias: import("chevrotain").TokenType;
     KW_data: import("chevrotain").TokenType;
     KW_extends: import("chevrotain").TokenType;
@@ -10,6 +10,8 @@ export declare const tokenLookup: {
     KW_pluck: import("chevrotain").TokenType;
     KW_open: import("chevrotain").TokenType;
     KW_importing: import("chevrotain").TokenType;
+    KW_aggregate: import("chevrotain").TokenType;
+    KW_flow: import("chevrotain").TokenType;
     SIGN_Equals: import("chevrotain").TokenType;
     SIGN_EqualsType: import("chevrotain").TokenType;
     SIGN_EqualsData: import("chevrotain").TokenType;
@@ -22,16 +24,19 @@ export declare const tokenLookup: {
     SIGN_collectionClose: import("chevrotain").TokenType;
     SIGN_collectionOpen: import("chevrotain").TokenType;
     SIGN_collectionSeparator: import("chevrotain").TokenType;
+    SIGN_arrow: import("chevrotain").TokenType;
+    SIGN_TypeDefStart: import("chevrotain").TokenType;
+    SIGN_wrapOpen: import("chevrotain").TokenType;
+    SIGN_wrapClose: import("chevrotain").TokenType;
     Operator: import("chevrotain").TokenType;
     AnnotationLiteral: import("chevrotain").TokenType;
     Identifier: import("chevrotain").TokenType;
     ViewIdentifier: import("chevrotain").TokenType;
-    ValiableIdentifier: import("chevrotain").TokenType;
+    VariableIdentifier: import("chevrotain").TokenType;
     GenericIdentifier: import("chevrotain").TokenType;
     GenericParameter: import("chevrotain").TokenType;
     RestrictionIdentifier: import("chevrotain").TokenType;
     FieldName: import("chevrotain").TokenType;
-    SIGN_TypeDefStart: import("chevrotain").TokenType;
     CommentBlock: import("chevrotain").TokenType;
     DirectiveLiteral: import("chevrotain").TokenType;
     PragmaLiteral: import("chevrotain").TokenType;

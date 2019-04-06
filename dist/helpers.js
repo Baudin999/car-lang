@@ -139,4 +139,22 @@ exports.mapRestrictionToXSD = (baseType, restriction) => {
             return "";
     }
 };
+exports.baseTypeToJSONType = (b) => {
+    switch (b) {
+        case "String":
+            return "string";
+        case "Number":
+            return "number";
+        case "Boolean":
+            return "boolean";
+        case "Date":
+            return "date";
+        case "DateTime":
+            return "dateTime";
+        case "Time":
+            return "time";
+        default:
+            return null;
+    }
+};
 //# sourceMappingURL=helpers.js.map

@@ -11,27 +11,28 @@ class DomainParser extends chevrotain_1.Parser {
         //errorMessageProvider: carErrorProvider
         });
         const $ = this;
-        lexer_let_1.Modify($, lexer_1.tokenLookup);
+        //ModifyLet($, tokenLookup);
         $.RULE("START", () => {
             $.MANY(() => $.SUBRULE($.EXPRESSION));
         });
         $.RULE("EXPRESSION", () => {
-            $.SUBRULE($.ROOT_ANNOTATIONS);
+            $.SUBRULE($.ANNOTATIONS);
             $.OR([
+                { ALT: () => $.CONSUME(lexer_1.tokenLookup.CommentBlock) },
                 { ALT: () => $.SUBRULE($.TYPE) },
                 { ALT: () => $.SUBRULE($.ALIAS) },
                 { ALT: () => $.SUBRULE($.DATA) },
                 { ALT: () => $.SUBRULE($.VIEW) },
                 { ALT: () => $.SUBRULE($.CHOICE) },
                 { ALT: () => $.SUBRULE($.OPEN) },
-                // @ts-ignore
-                { ALT: () => $.SUBRULE($.LET) },
+                { ALT: () => $.SUBRULE($.AGGREGATE) },
+                { ALT: () => $.SUBRULE($.FLOW) },
                 { ALT: () => $.SUBRULE($.MARKDOWN_CHAPTER) },
                 { ALT: () => $.SUBRULE($.MARKDOWN_PARAGRAPH) },
                 { ALT: () => $.SUBRULE($.MARKDOWN_IMAGE) },
                 { ALT: () => $.SUBRULE($.MARKDOWN_CODE) },
                 { ALT: () => $.SUBRULE($.MARKDOWN_LIST) },
-                { ALT: () => $.CONSUME(lexer_1.tokenLookup.CommentBlock) }
+                { ALT: () => $.CONSUME(lexer_1.tokenLookup.EndBlock) }
             ]);
         });
         $.RULE("OPEN", () => {
@@ -52,7 +53,7 @@ class DomainParser extends chevrotain_1.Parser {
             $.CONSUME(lexer_1.tokenLookup.SIGN_collectionClose);
         });
         $.RULE("TYPE", () => {
-            $.CONSUME(lexer_1.tokenLookup.KW_Type);
+            $.CONSUME(lexer_1.tokenLookup.KW_type);
             $.SUBRULE($.IDENTIFIER);
             $.OPTION(() => {
                 $.CONSUME(lexer_1.tokenLookup.KW_extends);
@@ -67,7 +68,7 @@ class DomainParser extends chevrotain_1.Parser {
         });
         $.RULE("TYPE_FIELD", () => {
             $.SUBRULE($.ANNOTATIONS);
-            $.CONSUME(lexer_1.tokenLookup.Indent);
+            $.AT_LEAST_ONE1(() => $.CONSUME(lexer_1.tokenLookup.Indent));
             $.OR([
                 {
                     ALT: () => {
@@ -115,7 +116,7 @@ class DomainParser extends chevrotain_1.Parser {
         });
         $.RULE("CHOICE", () => {
             $.CONSUME(lexer_1.tokenLookup.KW_choice);
-            $.CONSUME(lexer_1.tokenLookup.Identifier);
+            $.SUBRULE($.TYPE_IDENTIFIER);
             $.CONSUME(lexer_1.tokenLookup.SIGN_Equals);
             $.AT_LEAST_ONE(() => $.SUBRULE($.CHOICE_OPTION));
         });
@@ -133,14 +134,63 @@ class DomainParser extends chevrotain_1.Parser {
             $.OPTION(() => $.CONSUME(lexer_1.tokenLookup.ViewIdentifier));
             $.CONSUME(lexer_1.tokenLookup.SIGN_open);
             $.MANY(() => {
-                $.AT_LEAST_ONE(() => $.CONSUME(lexer_1.tokenLookup.Indent));
                 $.CONSUME(lexer_1.tokenLookup.DirectiveLiteral);
             });
-            $.MANY1(() => {
+            $.MANY2(() => {
                 $.AT_LEAST_ONE1(() => $.CONSUME1(lexer_1.tokenLookup.Indent));
                 $.CONSUME1(lexer_1.tokenLookup.Identifier);
             });
             $.CONSUME(lexer_1.tokenLookup.SIGN_close);
+        });
+        $.RULE("AGGREGATE", () => {
+            $.CONSUME(lexer_1.tokenLookup.KW_aggregate);
+            $.OPTION(() => $.CONSUME(lexer_1.tokenLookup.ViewIdentifier));
+            $.CONSUME(lexer_1.tokenLookup.SIGN_open);
+            $.MANY(() => {
+                $.CONSUME(lexer_1.tokenLookup.DirectiveLiteral);
+            });
+            $.MANY1(() => {
+                $.CONSUME1(lexer_1.tokenLookup.Indent);
+                $.CONSUME(lexer_1.tokenLookup.Identifier);
+            });
+            $.CONSUME(lexer_1.tokenLookup.SIGN_close);
+        });
+        $.RULE("FLOW", () => {
+            $.CONSUME(lexer_1.tokenLookup.KW_flow);
+            $.CONSUME(lexer_1.tokenLookup.SIGN_open);
+            $.MANY(() => $.CONSUME(lexer_1.tokenLookup.DirectiveLiteral));
+            $.MANY1(() => $.SUBRULE($.OPERATION));
+            $.CONSUME(lexer_1.tokenLookup.SIGN_close);
+        });
+        $.RULE("OPERATION", () => {
+            $.MANY(() => $.CONSUME(lexer_1.tokenLookup.AnnotationLiteral));
+            $.CONSUME(lexer_1.tokenLookup.Indent);
+            $.CONSUME(lexer_1.tokenLookup.GenericParameter);
+            $.CONSUME(lexer_1.tokenLookup.SIGN_TypeDefStart);
+            $.CONSUME1(lexer_1.tokenLookup.SIGN_TypeDefStart);
+            $.MANY1(() => $.SUBRULE($.OPERATION_PARAMETER));
+            $.SUBRULE($.OPERATION_RESULT);
+        });
+        $.RULE("OPERATION_PARAMETER", () => {
+            $.OR([
+                { ALT: () => $.SUBRULE($.OPERATION_PARAMETER_FIELD_TYPE) },
+                { ALT: () => $.SUBRULE($.OPERATION_PARAMETER_TYPE) }
+            ]);
+        });
+        $.RULE("OPERATION_PARAMETER_FIELD_TYPE", () => {
+            $.CONSUME(lexer_1.tokenLookup.SIGN_wrapOpen);
+            $.CONSUME(lexer_1.tokenLookup.GenericParameter);
+            $.CONSUME(lexer_1.tokenLookup.SIGN_TypeDefStart);
+            $.SUBRULE($.TYPE_IDENTIFIER);
+            $.CONSUME(lexer_1.tokenLookup.SIGN_wrapClose);
+            $.CONSUME(lexer_1.tokenLookup.SIGN_arrow);
+        });
+        $.RULE("OPERATION_PARAMETER_TYPE", () => {
+            $.SUBRULE($.TYPE_IDENTIFIER);
+            $.CONSUME(lexer_1.tokenLookup.SIGN_arrow);
+        });
+        $.RULE("OPERATION_RESULT", () => {
+            $.SUBRULE($.TYPE_IDENTIFIER);
         });
         $.RULE("RESTRICTION", () => {
             $.AT_LEAST_ONE(() => {
@@ -209,16 +259,13 @@ class DomainParser extends chevrotain_1.Parser {
         });
         $.RULE("ANNOTATIONS", () => {
             $.MANY({
-                GATE: this.isAnnotation,
-                DEF: () => {
-                    $.CONSUME(lexer_1.tokenLookup.Indent);
-                    $.CONSUME(lexer_1.tokenLookup.AnnotationLiteral);
-                }
+                GATE: $.isAnnotation,
+                DEF: () => $.CONSUME(lexer_1.tokenLookup.AnnotationLiteral)
             });
         });
-        $.RULE("ROOT_ANNOTATIONS", () => {
-            $.MANY(() => $.CONSUME(lexer_1.tokenLookup.AnnotationLiteral));
-        });
+        // $.RULE("ROOT_ANNOTATIONS", () => {
+        //     $.MANY(() => $.CONSUME(tokenLookup.AnnotationLiteral));
+        // });
         /* MARKDOWN RULES */
         $.RULE("MARKDOWN_CHAPTER", () => {
             $.CONSUME(lexer_1.tokenLookup.MarkdownChapterLiteral);
