@@ -121,8 +121,7 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
             ...this.visit(ctx.IDENTIFIER[0]),
             extends: (ctx.Identifier || []).map(i => i.image),
             extends_start: (ctx.Identifier || []).map(getStartToken),
-            fields: ctx.SIGN_EqualsType ? ctx.TYPE_FIELD.map(f => this.visit(f)) : [],
-            annotations: purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
+            fields: ctx.SIGN_EqualsType ? ctx.TYPE_FIELD.map(f => this.visit(f)) : []
         };
     }
 
@@ -150,8 +149,7 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
         return {
             type: NodeType.DATA,
             ...this.visit(ctx.IDENTIFIER[0]),
-            options,
-            annotations: purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
+            options
         };
     }
 
@@ -168,8 +166,7 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
             type: NodeType.ALIAS,
             ...this.visit(ctx.IDENTIFIER[0]),
             ...this.visit(ctx.TYPE_IDENTIFIER[0]),
-            restrictions: (ctx.RESTRICTION || []).map(r => this.visit(r)),
-            annotations: purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
+            restrictions: (ctx.RESTRICTION || []).map(r => this.visit(r))
         };
     }
 
@@ -180,7 +177,7 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
             nodes: (ctx.Identifier || []).map(i => i.image),
             nodes_start: (ctx.Identifier || []).map(i => getStartToken(i)),
             directives: parseDirectives(ctx),
-            annotations: purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
+            annotations: []
         };
     }
 
@@ -192,7 +189,7 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
             valueObjects: (ctx.Identifier || []).map(i => i.image),
             valueObjects_start: (ctx.Identifier || []).map(i => getStartToken(i)),
             directives: parseDirectives(ctx),
-            annotations: purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
+            annotations: []
         };
     }
 
@@ -240,10 +237,14 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
         };
     }
     OPERATION_RESULT(ctx: any) {
-        const { ofType, ofType_start } = this.visit(ctx.TYPE_IDENTIFIER[0]);
+        const { ofType, ofType_start, ofType_params, ofType_params_start } = this.visit(
+            ctx.TYPE_IDENTIFIER[0]
+        );
         return {
             result: ofType,
-            result_start: ofType_start
+            result_start: ofType_start,
+            result_params: ofType_params,
+            result_params_start: ofType_params_start
         };
     }
 
@@ -522,6 +523,8 @@ export interface IOperation {
     id_start: ITokenStart;
     result: string;
     result_start: ITokenStart;
+    result_params: string[];
+    result_params_start: ITokenStart[];
     params: IOperationParameter[];
     annotations: IAnnotation[];
 }

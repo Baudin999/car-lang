@@ -19,6 +19,12 @@ export declare class OutlineVisitor extends BaseCstVisitorWithDefaults {
     OPERATION_PARAMETER(ctx: any): IOperationParameter;
     OPERATION_PARAMETER_TYPE(ctx: any): any;
     OPERATION_PARAMETER_FIELD_TYPE(ctx: any): any;
+    OPERATION_RESULT(ctx: any): {
+        result: any;
+        result_start: any;
+        result_params: any;
+        result_params_start: any;
+    };
     CHOICE(ctx: any): IChoice;
     CHOICE_OPTION(ctx: any): any;
     IDENTIFIER(ctx: any): IIdentity;
@@ -54,6 +60,10 @@ export interface IType {
     annotations: IAnnotation[];
     imported?: boolean;
     ignore: boolean;
+    aggregate?: string;
+    plantUML?: {
+        id: string;
+    };
 }
 export interface ITypeField {
     type: NodeType;
@@ -82,6 +92,8 @@ export interface IOperation {
     id_start: ITokenStart;
     result: string;
     result_start: ITokenStart;
+    result_params: string[];
+    result_params_start: ITokenStart[];
     params: IOperationParameter[];
     annotations: IAnnotation[];
 }
@@ -101,6 +113,10 @@ export interface IData {
     options: IDataOption[];
     annotations: IAnnotation[];
     ignore: boolean;
+    aggregate?: string;
+    plantUML?: {
+        id: string;
+    };
 }
 export interface IDataOption {
     type: NodeType;
@@ -114,6 +130,7 @@ export interface IView {
     nodes: string[];
     nodes_start: ITokenStart[];
     directives: IDirective[];
+    annotations: IAnnotation[];
 }
 export interface IAggregate {
     type: NodeType;
@@ -122,6 +139,7 @@ export interface IAggregate {
     valueObjects: string[];
     valueObjects_start: ITokenStart[];
     directives: IDirective[];
+    annotations: IAnnotation[];
 }
 export interface IAlias {
     type: NodeType;
@@ -133,6 +151,10 @@ export interface IAlias {
     annotations: IAnnotation[];
     restrictions: IRestriction[];
     source?: string;
+    aggregate?: string;
+    plantUML?: {
+        id: string;
+    };
 }
 export interface IComment {
     type: NodeType;
@@ -162,6 +184,11 @@ export interface IChoice {
     id_start: ITokenStart;
     options: string[];
     options_start: ITokenStart[];
+    annotations: IAnnotation[];
+    aggregate?: string;
+    plantUML?: {
+        id: string;
+    };
 }
 export interface IRestriction {
     key: string;

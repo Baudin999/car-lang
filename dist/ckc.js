@@ -59,9 +59,6 @@ else if (program.project && !program.open) {
         .verify()
         .then(project => {
         project.compile();
-        setTimeout(() => {
-            opn(project.indexPath);
-        }, 100);
     })
         .catch(error => {
         console.log(error);
@@ -103,8 +100,6 @@ if (program.init) {
     });
 }
 if (program.open) {
-    if (moduleName === null)
-        throw "Module Name not set";
     fs_1.readFile(path_1.join(projectPath, "carconfig.json"), "utf8", (err, data) => {
         if (err) {
             console.log(err);
@@ -116,9 +111,15 @@ if (program.open) {
             version = "v" + version;
         }
         let versionPath = path_1.join(projectPath, ".out", version);
-        const htmlPath = path_1.join(versionPath, moduleName, moduleName + ".html");
-        console.log("Opening: file://" + htmlPath);
-        opn(htmlPath);
+        if (moduleName === null) {
+            const indexPath = path_1.join(versionPath, "index.html");
+            opn(indexPath);
+        }
+        else {
+            const htmlPath = path_1.join(versionPath, moduleName, moduleName + ".html");
+            console.log("Opening: file://" + htmlPath);
+            opn(htmlPath);
+        }
     });
 }
 exports.maybeRaiseError = error => {

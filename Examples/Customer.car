@@ -95,13 +95,23 @@ flow {
     % title: Get Customer
 
     @ from: API
+    @ to: API
+    validateAPICall :: Either Ok Error
+
+    @ from: API
     @ to: Service Layer
-    getCustomer :: CustomerId -> JWT -> Customer
+    getCustomer :: CustomerId -> JWT -> Maybe Customer
 
     @ Get a Customer from CRM by passing in the CustomerId.
     @ from: Service Layer
     @ to: CRM
-    getCustomer :: CustomerId -> Customer
+    getCustomer :: CustomerId -> AccountId -> Maybe Customer
+
+    @ Validate if the AccountId is actually the Id of the person
+    @ for whom the details are fetched.
+    @ from: CRM
+    @ to: CRM
+    validateCustomer :: CustomerId -> AccountId -> Maybe Customer
 
 
 }

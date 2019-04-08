@@ -6,6 +6,7 @@ const tableTYPE_1 = require("./tableTYPE");
 // @ts-ignore
 const deflate_1 = require("./../deflate/deflate");
 const createERD_1 = require("../erd/createERD");
+const createFlow_1 = require("../flows/createFlow");
 const pretty_data_1 = require("pretty-data");
 const types = [outline_1.NodeType.TYPE, outline_1.NodeType.ALIAS, outline_1.NodeType.DATA, outline_1.NodeType.CHOICE];
 exports.createHTML = (ast, moduleName) => {
@@ -37,6 +38,19 @@ exports.createHTML = (ast, moduleName) => {
             let plantSource = createERD_1.createView(node, ast);
             let url = deflate_1.generateURL(plantSource);
             return `<div class="image-container"><img src="${url}" /></div>`;
+        }
+        else if (node.type === outline_1.NodeType.FLOW) {
+            let result = "";
+            const { sequence, useCase } = createFlow_1.createFlow(node);
+            if (sequence) {
+                const s_url = deflate_1.generateURL(sequence);
+                result += `<div class="image-container"><img src="${s_url}" /></div>`;
+            }
+            if (useCase) {
+                const u_url = deflate_1.generateURL(useCase);
+                result += `<div class="image-container"><img src="${u_url}" /></div>`;
+            }
+            return result;
         }
         return null;
     });

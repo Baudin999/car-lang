@@ -61,6 +61,37 @@ data List a =
 
 ```
 
+## Annotations
+
+Annotations are part of a type and as such are part of the documentation. We
+should think of annotations not as comments but as descriptions. There are two
+types of annotations, the "description" kind:
+
+```
+@ This is a description in the form of an annotation
+@ it can span multiple lines.
+type Person
+```
+
+There is also a qualified annotation:
+
+```
+@ ignore: true
+@ aggregate: Person
+type person
+```
+
+There qualified annotations are used in the rest of the application to generate
+certain patterns.
+
+The following annotations are used:
+
+| Type | Key | Values | Description |
+---
+| Flow.Operation | to | string | A string which describes a vertical lane in the Sequence Diagram |
+| Flow.Operation | from | string | A string which describes a vertical lane in the Sequence Diagram from which the operation will return |
+| type, alias, data | ignore | boolean | Indicating if we should ignore that type in the output of our diagrams |
+
 ## Functional Programming
 
 The `car` language recognizes that functional programming is both hard and that functional

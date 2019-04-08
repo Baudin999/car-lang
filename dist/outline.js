@@ -16,16 +16,22 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
     }
     EXPRESSION(ctx) {
         const annotations = helpers_1.purge(ctx.ANNOTATIONS.map(a => this.visit(a)));
-        const ignoreAttribute = annotations.find((a) => a.key === "ignore");
-        const ignore = ignoreAttribute ? ignoreAttribute.value === "true" : false;
+        const ignoreAnnotation = annotations.find((a) => a.key === "ignore");
+        const ignore = ignoreAnnotation ? ignoreAnnotation.value === "true" : false;
+        const aggregateAnnotation = annotations.find(a => a.key === "aggregate");
+        const aggregate = aggregateAnnotation ? aggregateAnnotation.value : null;
+        let result;
         if (ctx.TYPE) {
-            return Object.assign({ annotations }, this.visit(ctx.TYPE[0]), { ignore });
+            result = Object.assign({ annotations,
+                aggregate }, this.visit(ctx.TYPE[0]), { ignore });
         }
         else if (ctx.DATA) {
-            return Object.assign({ annotations }, this.visit(ctx.DATA[0]), { ignore });
+            result = Object.assign({ annotations,
+                aggregate }, this.visit(ctx.DATA[0]), { ignore });
         }
         else if (ctx.ALIAS) {
-            return Object.assign({ annotations }, this.visit(ctx.ALIAS[0]));
+            result = Object.assign({ annotations,
+                aggregate }, this.visit(ctx.ALIAS[0]));
         }
         else if (ctx.VIEW) {
             return Object.assign({ annotations }, this.visit(ctx.VIEW[0]));
@@ -34,7 +40,8 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
             return this.visit(ctx.OPEN[0]);
         }
         else if (ctx.CHOICE) {
-            return Object.assign({ annotations }, this.visit(ctx.CHOICE[0]));
+            result = Object.assign({ annotations,
+                aggregate }, this.visit(ctx.CHOICE[0]));
         }
         else if (ctx.CommentBlock) {
             return {
@@ -71,6 +78,10 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
             console.log(ctx);
             return null;
         }
+        result.plantUML = {
+            id: result.aggregate ? `${result.aggregate}.${result.id}` : result.id
+        };
+        return result;
     }
     OPEN(ctx) {
         return {
@@ -83,14 +94,15 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
         return ctx.Identifier.map(i => i.image);
     }
     TYPE(ctx) {
-        return Object.assign({ type: NodeType.TYPE }, this.visit(ctx.IDENTIFIER[0]), { extends: (ctx.Identifier || []).map(i => i.image), extends_start: (ctx.Identifier || []).map(helpers_1.getStartToken), fields: ctx.SIGN_EqualsType ? ctx.TYPE_FIELD.map(f => this.visit(f)) : [] });
+        return Object.assign({ type: NodeType.TYPE }, this.visit(ctx.IDENTIFIER[0]), { extends: (ctx.Identifier || []).map(i => i.image), extends_start: (ctx.Identifier || []).map(helpers_1.getStartToken), fields: ctx.SIGN_EqualsType ? ctx.TYPE_FIELD.map(f => this.visit(f)) : [], annotations: helpers_1.purge((ctx.ANNOTATIONS || []).map(a => this.visit(a))) });
     }
     TYPE_FIELD(ctx) {
         if (ctx.KW_pluck) {
             return {
                 type: NodeType.PLUCKED_FIELD,
                 parts: ctx.Identifier.map(i => i.image),
-                parts_start: ctx.Identifier.map(helpers_1.getStartToken)
+                parts_start: ctx.Identifier.map(helpers_1.getStartToken),
+                annotations: helpers_1.purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
             };
         }
         else {
@@ -99,13 +111,13 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
     }
     DATA(ctx) {
         const options = ctx.DATA_OPTION.map(d => this.visit(d));
-        return Object.assign({ type: NodeType.DATA }, this.visit(ctx.IDENTIFIER[0]), { options });
+        return Object.assign({ type: NodeType.DATA }, this.visit(ctx.IDENTIFIER[0]), { options, annotations: helpers_1.purge((ctx.ANNOTATIONS || []).map(a => this.visit(a))) });
     }
     DATA_OPTION(ctx) {
-        return Object.assign({ type: NodeType.DATA_OPTION }, this.visit(ctx.IDENTIFIER[0]));
+        return Object.assign({ type: NodeType.DATA_OPTION }, this.visit(ctx.IDENTIFIER[0]), { annotations: helpers_1.purge((ctx.ANNOTATIONS || []).map(a => this.visit(a))) });
     }
     ALIAS(ctx) {
-        return Object.assign({ type: NodeType.ALIAS }, this.visit(ctx.IDENTIFIER[0]), this.visit(ctx.TYPE_IDENTIFIER[0]), { restrictions: (ctx.RESTRICTION || []).map(r => this.visit(r)) });
+        return Object.assign({ type: NodeType.ALIAS }, this.visit(ctx.IDENTIFIER[0]), this.visit(ctx.TYPE_IDENTIFIER[0]), { restrictions: (ctx.RESTRICTION || []).map(r => this.visit(r)), annotations: helpers_1.purge((ctx.ANNOTATIONS || []).map(a => this.visit(a))) });
     }
     VIEW(ctx) {
         return {
@@ -113,7 +125,8 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
             id: ctx.ViewIdentifier ? ctx.ViewIdentifier[0].image : "",
             nodes: (ctx.Identifier || []).map(i => i.image),
             nodes_start: (ctx.Identifier || []).map(i => helpers_1.getStartToken(i)),
-            directives: parseDirectives(ctx)
+            directives: parseDirectives(ctx),
+            annotations: helpers_1.purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
         };
     }
     AGGREGATE(ctx) {
@@ -123,7 +136,8 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
             root_start: helpers_1.getStartToken(ctx.ViewIdentifier[0]),
             valueObjects: (ctx.Identifier || []).map(i => i.image),
             valueObjects_start: (ctx.Identifier || []).map(i => helpers_1.getStartToken(i)),
-            directives: parseDirectives(ctx)
+            directives: parseDirectives(ctx),
+            annotations: helpers_1.purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
         };
     }
     FLOW(ctx) {
@@ -134,15 +148,7 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
         };
     }
     OPERATION(ctx) {
-        return {
-            annotations: this.ROOT_ANNOTATIONS(ctx),
-            type: NodeType.OPERATION,
-            id: ctx.GenericParameter[0].image,
-            id_start: helpers_1.getStartToken(ctx.GenericParameter[0]),
-            result: ctx.OPERATION_RESULT[0].image,
-            result_start: helpers_1.getStartToken(ctx.OPERATION_RESULT[0]),
-            params: (ctx.OPERATION_PARAMETER || []).map(p => this.visit(p))
-        };
+        return Object.assign({ annotations: helpers_1.purge(this.ROOT_ANNOTATIONS(ctx)), type: NodeType.OPERATION, id: ctx.GenericParameter[0].image, id_start: helpers_1.getStartToken(ctx.GenericParameter[0]) }, this.visit(ctx.OPERATION_RESULT[0]), { params: (ctx.OPERATION_PARAMETER || []).map(p => this.visit(p)) });
     }
     OPERATION_PARAMETER(ctx) {
         let paramDetails;
@@ -160,11 +166,28 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
     OPERATION_PARAMETER_FIELD_TYPE(ctx) {
         return Object.assign({ id: ctx.GenericParameter[0].image, id_start: helpers_1.getStartToken(ctx.GenericParameter[0]) }, this.visit(ctx.TYPE_IDENTIFIER[0]));
     }
+    OPERATION_RESULT(ctx) {
+        const { ofType, ofType_start, ofType_params, ofType_params_start } = this.visit(ctx.TYPE_IDENTIFIER[0]);
+        return {
+            result: ofType,
+            result_start: ofType_start,
+            result_params: ofType_params,
+            result_params_start: ofType_params_start
+        };
+    }
     CHOICE(ctx) {
-        return Object.assign({ type: NodeType.CHOICE }, this.visit(ctx.TYPE_IDENTIFIER[0]), { options: ctx.CHOICE_OPTION.map(o => this.visit(o)), options_start: ctx.CHOICE_OPTION.map(o => {
+        let type = this.visit(ctx.TYPE_IDENTIFIER[0]);
+        return {
+            type: NodeType.CHOICE,
+            id: type.ofType,
+            id_start: type.ofType_start,
+            options: ctx.CHOICE_OPTION.map(o => this.visit(o)),
+            options_start: ctx.CHOICE_OPTION.map(o => {
                 const literal = o.children.StringLiteral || o.children.NumberLiteral;
                 return helpers_1.getStartToken(literal[0]);
-            }) });
+            }),
+            annotations: helpers_1.purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
+        };
     }
     CHOICE_OPTION(ctx) {
         return ctx.StringLiteral
