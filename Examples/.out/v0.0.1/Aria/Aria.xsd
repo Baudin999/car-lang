@@ -12,7 +12,7 @@
       <xsd:maxInclusive value="9999" />
     </xsd:restriction>
   </xsd:simpleType>
-  <xsd:complexType name="undefined">
+  <xsd:complexType name="BoughtFrom">
     <xsd:choice>
       <xsd:element name="Racial Package"/>
       <xsd:element name="Professional Package"/>

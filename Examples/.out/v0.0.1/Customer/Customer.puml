@@ -1,4 +1,4 @@
-enum undefined {
+enum Gender {
 	Male
 	Female
 	Other
@@ -11,13 +11,6 @@ class "Address" as Address  {
 	City: String 
 	CountryCode: String 
 	Country: Maybe String
---
-  <b>description</b>: The address of a
- person. This is the functional
- location of where a person lives. This
- type is of course designed for the
- Dutch address system.
-    
 }
 class "Person " as Person  {
 	FirstName: Maybe String
@@ -26,13 +19,14 @@ class "Person " as Person  {
 	Gender: Gender 
 	CustomerId: Id  <i>from Customer</i>
 }
-Address --> Person : Address
-Customer --|> Person
+Address <-- Person : Address
+Gender <-- Person : Gender
+Customer <|-- Person
 class "Company " as Company  {
 	OrganisationName: String 
 	CustomerId: Id  <i>from Customer</i>
 }
-Customer --|> Company
+Customer <|-- Company
 class "Customer" as Customer  {
 	CustomerId: Id 
 }

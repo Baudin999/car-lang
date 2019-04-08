@@ -14,6 +14,7 @@ import { createTableTYPE } from "./tableTYPE";
 // @ts-ignore
 import { generateURL } from "./../deflate/deflate";
 import { createView } from "../erd/createERD";
+import { createFlow } from "../flows/createFlow";
 import { pd } from "pretty-data";
 
 const types = [NodeType.TYPE, NodeType.ALIAS, NodeType.DATA, NodeType.CHOICE];
@@ -43,6 +44,18 @@ export const createHTML = (ast: IExpression[], moduleName?: string) => {
                 let plantSource = createView(node as any, ast);
                 let url = generateURL(plantSource);
                 return `<div class="image-container"><img src="${url}" /></div>`;
+            } else if (node.type === NodeType.FLOW) {
+                let result = "";
+                const { sequence, useCase } = createFlow(node as any);
+                if (sequence) {
+                    const s_url = generateURL(sequence);
+                    result += `<div class="image-container"><img src="${s_url}" /></div>`;
+                }
+                if (useCase) {
+                    const u_url = generateURL(useCase);
+                    result += `<div class="image-container"><img src="${u_url}" /></div>`;
+                }
+                return result;
             }
             return null;
         });

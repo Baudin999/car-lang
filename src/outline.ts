@@ -21,25 +21,33 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
     }
 
     EXPRESSION(ctx: any): IExpression | null {
-        const annotations = purge(ctx.ANNOTATIONS.map(a => this.visit(a)));
-        const ignoreAttribute: any = annotations.find((a: IAnnotation) => a.key === "ignore");
-        const ignore = ignoreAttribute ? ignoreAttribute.value === "true" : false;
+        const annotations: IAnnotation[] = purge(ctx.ANNOTATIONS.map(a => this.visit(a)));
+        const ignoreAnnotation: any = annotations.find((a: IAnnotation) => a.key === "ignore");
+        const ignore = ignoreAnnotation ? ignoreAnnotation.value === "true" : false;
+
+        const aggregateAnnotation = annotations.find(a => a.key === "aggregate");
+        const aggregate = aggregateAnnotation ? aggregateAnnotation.value : null;
+
+        let result: any;
 
         if (ctx.TYPE) {
-            return {
+            result = {
                 annotations,
+                aggregate,
                 ...this.visit(ctx.TYPE[0]),
                 ignore
             };
         } else if (ctx.DATA) {
-            return {
+            result = {
                 annotations,
+                aggregate,
                 ...this.visit(ctx.DATA[0]),
                 ignore
             };
         } else if (ctx.ALIAS) {
-            return {
+            result = {
                 annotations,
+                aggregate,
                 ...this.visit(ctx.ALIAS[0])
             };
         } else if (ctx.VIEW) {
@@ -50,8 +58,9 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
         } else if (ctx.OPEN) {
             return this.visit(ctx.OPEN[0]);
         } else if (ctx.CHOICE) {
-            return {
+            result = {
                 annotations,
+                aggregate,
                 ...this.visit(ctx.CHOICE[0])
             };
         } else if (ctx.CommentBlock) {
@@ -86,6 +95,12 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
             console.log(ctx);
             return null;
         }
+
+        result.plantUML = {
+            id: result.aggregate ? `${result.aggregate}.${result.id}` : result.id
+        };
+
+        return result;
     }
 
     OPEN(ctx: any): IOpen {
@@ -106,7 +121,8 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
             ...this.visit(ctx.IDENTIFIER[0]),
             extends: (ctx.Identifier || []).map(i => i.image),
             extends_start: (ctx.Identifier || []).map(getStartToken),
-            fields: ctx.SIGN_EqualsType ? ctx.TYPE_FIELD.map(f => this.visit(f)) : []
+            fields: ctx.SIGN_EqualsType ? ctx.TYPE_FIELD.map(f => this.visit(f)) : [],
+            annotations: purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
         };
     }
 
@@ -115,7 +131,8 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
             return {
                 type: NodeType.PLUCKED_FIELD,
                 parts: ctx.Identifier.map(i => i.image),
-                parts_start: ctx.Identifier.map(getStartToken)
+                parts_start: ctx.Identifier.map(getStartToken),
+                annotations: purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
             };
         } else {
             return {
@@ -133,14 +150,16 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
         return {
             type: NodeType.DATA,
             ...this.visit(ctx.IDENTIFIER[0]),
-            options
+            options,
+            annotations: purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
         };
     }
 
     DATA_OPTION(ctx: any): IDataOption {
         return {
             type: NodeType.DATA_OPTION,
-            ...this.visit(ctx.IDENTIFIER[0])
+            ...this.visit(ctx.IDENTIFIER[0]),
+            annotations: purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
         };
     }
 
@@ -149,7 +168,8 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
             type: NodeType.ALIAS,
             ...this.visit(ctx.IDENTIFIER[0]),
             ...this.visit(ctx.TYPE_IDENTIFIER[0]),
-            restrictions: (ctx.RESTRICTION || []).map(r => this.visit(r))
+            restrictions: (ctx.RESTRICTION || []).map(r => this.visit(r)),
+            annotations: purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
         };
     }
 
@@ -159,7 +179,8 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
             id: ctx.ViewIdentifier ? ctx.ViewIdentifier[0].image : "",
             nodes: (ctx.Identifier || []).map(i => i.image),
             nodes_start: (ctx.Identifier || []).map(i => getStartToken(i)),
-            directives: parseDirectives(ctx)
+            directives: parseDirectives(ctx),
+            annotations: purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
         };
     }
 
@@ -170,7 +191,8 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
             root_start: getStartToken(ctx.ViewIdentifier[0]),
             valueObjects: (ctx.Identifier || []).map(i => i.image),
             valueObjects_start: (ctx.Identifier || []).map(i => getStartToken(i)),
-            directives: parseDirectives(ctx)
+            directives: parseDirectives(ctx),
+            annotations: purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
         };
     }
 
@@ -184,12 +206,11 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
 
     OPERATION(ctx: any): IOperation {
         return {
-            annotations: this.ROOT_ANNOTATIONS(ctx),
+            annotations: purge(this.ROOT_ANNOTATIONS(ctx)),
             type: NodeType.OPERATION,
             id: ctx.GenericParameter[0].image,
             id_start: getStartToken(ctx.GenericParameter[0]),
-            result: ctx.OPERATION_RESULT[0].image,
-            result_start: getStartToken(ctx.OPERATION_RESULT[0]),
+            ...this.visit(ctx.OPERATION_RESULT[0]),
             params: (ctx.OPERATION_PARAMETER || []).map(p => this.visit(p))
         };
     }
@@ -218,16 +239,26 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
             ...this.visit(ctx.TYPE_IDENTIFIER[0])
         };
     }
+    OPERATION_RESULT(ctx: any) {
+        const { ofType, ofType_start } = this.visit(ctx.TYPE_IDENTIFIER[0]);
+        return {
+            result: ofType,
+            result_start: ofType_start
+        };
+    }
 
     CHOICE(ctx: any): IChoice {
+        let type = this.visit(ctx.TYPE_IDENTIFIER[0]);
         return {
             type: NodeType.CHOICE,
-            ...this.visit(ctx.TYPE_IDENTIFIER[0]),
+            id: type.ofType,
+            id_start: type.ofType_start,
             options: ctx.CHOICE_OPTION.map(o => this.visit(o)),
             options_start: ctx.CHOICE_OPTION.map(o => {
                 const literal = o.children.StringLiteral || o.children.NumberLiteral;
                 return getStartToken(literal[0]);
-            })
+            }),
+            annotations: purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
         };
     }
 
@@ -455,6 +486,10 @@ export interface IType {
     annotations: IAnnotation[];
     imported?: boolean;
     ignore: boolean;
+    aggregate?: string;
+    plantUML?: {
+        id: string;
+    };
 }
 
 export interface ITypeField {
@@ -508,6 +543,10 @@ export interface IData {
     options: IDataOption[];
     annotations: IAnnotation[];
     ignore: boolean;
+    aggregate?: string;
+    plantUML?: {
+        id: string;
+    };
 }
 
 export interface IDataOption {
@@ -523,6 +562,7 @@ export interface IView {
     nodes: string[];
     nodes_start: ITokenStart[];
     directives: IDirective[];
+    annotations: IAnnotation[];
 }
 
 export interface IAggregate {
@@ -532,6 +572,7 @@ export interface IAggregate {
     valueObjects: string[];
     valueObjects_start: ITokenStart[];
     directives: IDirective[];
+    annotations: IAnnotation[];
 }
 
 export interface IAlias {
@@ -544,6 +585,10 @@ export interface IAlias {
     annotations: IAnnotation[];
     restrictions: IRestriction[];
     source?: string;
+    aggregate?: string;
+    plantUML?: {
+        id: string;
+    };
 }
 
 export interface IComment {
@@ -579,6 +624,11 @@ export interface IChoice {
     id_start: ITokenStart;
     options: string[];
     options_start: ITokenStart[];
+    annotations: IAnnotation[];
+    aggregate?: string;
+    plantUML?: {
+        id: string;
+    };
 }
 
 export interface IRestriction {

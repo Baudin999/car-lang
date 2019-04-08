@@ -13,7 +13,7 @@
       <xsd:pattern value="/[A-Z]{2}/" />
     </xsd:restriction>
   </xsd:simpleType>
-  <xsd:complexType name="undefined">
+  <xsd:complexType name="Gender">
     <xsd:choice>
       <xsd:element name="Male"/>
       <xsd:element name="Female"/>

@@ -8,38 +8,22 @@ class "Error" as Error  {
 class "Error404 " as Error404  {
 	HttpCode: Number  <i>from Error</i>
 	Message: String  <i>from Error</i>
---
-  <b>code</b>: 404
-<b>message</b>: Not Found
-    
 }
-Error --|> Error404
+Error <|-- Error404
 class "Error401 " as Error401  {
 	HttpCode: Number  <i>from Error</i>
 	Message: String  <i>from Error</i>
---
-  <b>code</b>: 401
-<b>message</b>: Unauthorised
-    
 }
-Error --|> Error401
+Error <|-- Error401
 class "Error500 " as Error500  {
 	HttpCode: Number  <i>from Error</i>
 	Message: String  <i>from Error</i>
---
-  <b>code</b>: 500
-<b>message</b>: Internal Server Error
-    
 }
-Error --|> Error500
+Error <|-- Error500
 class "Response a" as Response << (T,orchid) >> {
 	Code: Number 
 	Message: String 
 	Body: a 
---
-  <b>code</b>: 200
-<b>message</b>: OK
-    
 }
 abstract "ApiResponse a" as ApiResponse {
 	Error401 
@@ -47,7 +31,7 @@ abstract "ApiResponse a" as ApiResponse {
 	Error500 
 	Response a
 }
-Error401 --> ApiResponse : Error401
-Error404 --> ApiResponse : Error404
-Error500 --> ApiResponse : Error500
-Response --> ApiResponse : Response
+Error401 <-- ApiResponse : Error401
+Error404 <-- ApiResponse : Error404
+Error500 <-- ApiResponse : Error500
+Response <-- ApiResponse : Response

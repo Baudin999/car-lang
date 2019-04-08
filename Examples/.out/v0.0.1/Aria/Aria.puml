@@ -1,4 +1,4 @@
-enum undefined {
+enum BoughtFrom {
 	Racial Package
 	Professional Package
 	XP
@@ -25,7 +25,8 @@ class "Buyable" as Buyable  {
 	Professional: Boolean 
 	Master: Boolean 
 }
-Stat --> Buyable : Stat
+BoughtFrom <-- Buyable : Source
+Stat <-- Buyable : Stat
 class "Skill " as Skill  {
 	Name: String  <i>from Namable</i>
 	Description: String  <i>from Namable</i>
@@ -35,14 +36,11 @@ class "Skill " as Skill  {
 	Skilled: Boolean  <i>from Buyable</i>
 	Professional: Boolean  <i>from Buyable</i>
 	Master: Boolean  <i>from Buyable</i>
---
-  <b>description</b>: A skill is
- something a character can do
-    
 }
-Stat --> Skill : Stat
-Namable --|> Skill
-Buyable --|> Skill
+BoughtFrom <-- Skill : Source
+Stat <-- Skill : Stat
+Namable <|-- Skill
+Buyable <|-- Skill
 class "Resistance " as Resistance  {
 	Name: String  <i>from Namable</i>
 	Description: String  <i>from Namable</i>
@@ -53,9 +51,10 @@ class "Resistance " as Resistance  {
 	Professional: Boolean  <i>from Buyable</i>
 	Master: Boolean  <i>from Buyable</i>
 }
-Stat --> Resistance : Stat
-Namable --|> Resistance
-Buyable --|> Resistance
+BoughtFrom <-- Resistance : Source
+Stat <-- Resistance : Stat
+Namable <|-- Resistance
+Buyable <|-- Resistance
 class "Special " as Special  {
 	Name: String  <i>from Namable</i>
 	Description: String  <i>from Namable</i>
@@ -66,9 +65,10 @@ class "Special " as Special  {
 	Professional: Boolean  <i>from Buyable</i>
 	Master: Boolean  <i>from Buyable</i>
 }
-Stat --> Special : Stat
-Namable --|> Special
-Buyable --|> Special
+BoughtFrom <-- Special : Source
+Stat <-- Special : Stat
+Namable <|-- Special
+Buyable <|-- Special
 class "Feat " as Feat  {
 	Rank: Number 
 	XP: Number 
@@ -76,21 +76,15 @@ class "Feat " as Feat  {
 	Name: String  <i>from Namable</i>
 	Description: String  <i>from Namable</i>
 }
-Stat --> Feat : Stat
-Namable --|> Feat
+Stat <-- Feat : Stat
+Namable <|-- Feat
 class "Statistic" as Statistic  {
 	Stat: Stat 
 	Description: String 
 	XP: XP 
 	Value: Number 
---
-  <b>description</b>: A statistic is a
- base value for a character's potential
- Statistics serve as a base bonus for
- certain abilities.
-    
 }
-Stat --> Statistic : Stat
+Stat <-- Statistic : Stat
 class "Character" as Character  {
 	Name: String 
 	Skills: List Skill
@@ -102,11 +96,11 @@ class "Character" as Character  {
 	Perception: Statistic 
 	Charisma: Statistic 
 }
-Statistic --> Character : Strength
-Statistic --> Character : Agility
-Statistic --> Character : Intuition
-Statistic --> Character : Perception
-Statistic --> Character : Charisma
-Skill "0" --> "*" Character : List Skill
-Special "0" --> "*" Character : List Special
-Feat "0" --> "*" Character : List Feat
+Statistic <-- Character : Strength
+Statistic <-- Character : Agility
+Statistic <-- Character : Intuition
+Statistic <-- Character : Perception
+Statistic <-- Character : Charisma
+Skill "0" <-- "*" Character : List Skill
+Special "0" <-- "*" Character : List Special
+Feat "0" <-- "*" Character : List Feat
