@@ -263,6 +263,11 @@ class DomainParser extends chevrotain_1.Parser {
                 DEF: () => $.CONSUME(lexer_1.tokenLookup.AnnotationLiteral)
             });
         });
+        $.RULE("CHOICE_ANNOTATION", () => {
+            $.MANY(() => {
+                $.CONSUME(lexer_1.tokenLookup.AnnotationLiteral);
+            });
+        });
         // $.RULE("ROOT_ANNOTATIONS", () => {
         //     $.MANY(() => $.CONSUME(tokenLookup.AnnotationLiteral));
         // });

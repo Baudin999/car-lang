@@ -30,6 +30,7 @@ declare class DomainParser extends Parser {
     TYPE_IDENTIFIER: any;
     ANNOTATIONS: any;
     ANNOTATION: any;
+    CHOICE_ANNOTATION: any;
     MARKDOWN_CHAPTER: any;
     MARKDOWN_PARAGRAPH: any;
     MARKDOWN_IMAGE: any;

@@ -345,6 +345,7 @@ const multiModeLexerDefinition = {
         ],
         choice_definition: [
             exports.EndBlock,
+            AnnotationLiteral,
             SIGN_Or,
             SIGN_Equals,
             Indent,
