@@ -394,6 +394,7 @@ const multiModeLexerDefinition = {
         ],
         choice_definition: [
             EndBlock,
+            AnnotationLiteral,
             SIGN_Or,
             SIGN_Equals,
             Indent,

@@ -37,6 +37,7 @@ class DomainParser extends Parser {
     //ROOT_ANNOTATIONS: any;
     ANNOTATIONS: any;
     ANNOTATION: any;
+    CHOICE_ANNOTATION: any;
 
     MARKDOWN_CHAPTER: any;
     MARKDOWN_PARAGRAPH: any;
@@ -331,6 +332,12 @@ class DomainParser extends Parser {
             $.MANY({
                 GATE: $.isAnnotation as any,
                 DEF: () => $.CONSUME(tokenLookup.AnnotationLiteral)
+            });
+        });
+
+        $.RULE("CHOICE_ANNOTATION", () => {
+            $.MANY(() => {
+                $.CONSUME(tokenLookup.AnnotationLiteral);
             });
         });
 

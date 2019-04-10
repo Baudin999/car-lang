@@ -50,11 +50,18 @@ data Maybe a =
     @ Return nothing
     | Nothing
 
-@ An alias can also have a 
+@ An alias can also have a description
+@ But no annotations on the restrictions
 alias Name = String
     | min 2
     | max 50
     | pattern /[A-Z]\w+/
+
+choice Gender =
+    @ Male
+    | "Male"
+    @ Female
+    | "Female"
 `;
 
     const { tokens, errors, ast } = transpile(source);

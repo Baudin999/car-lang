@@ -79,10 +79,11 @@ view {
 
 This is the customer aggregate.
 
-view {
+aggregate Customer {
     % title: Customer Aggregate
 
-    Customer
+    Person
+    Company
 }
 
 ## Service Calls

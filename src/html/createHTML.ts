@@ -7,7 +7,8 @@ import {
     IMarkdownParagraph,
     IMarkdownList,
     IMarkdownCode,
-    IView
+    IView,
+    IAggregate
 } from "../outline";
 import { purge } from "../helpers";
 import { createTableTYPE } from "./tableTYPE";
@@ -15,6 +16,7 @@ import { createTableTYPE } from "./tableTYPE";
 import { generateURL } from "./../deflate/deflate";
 import { createView } from "../erd/createERD";
 import { createFlow } from "../flows/createFlow";
+import { createAggregate } from "../aggregates/createAggregate";
 import { pd } from "pretty-data";
 
 const types = [NodeType.TYPE, NodeType.ALIAS, NodeType.DATA, NodeType.CHOICE];
@@ -42,6 +44,11 @@ export const createHTML = (ast: IExpression[], moduleName?: string) => {
                 tables.push(createTableTYPE(node as IType));
             } else if (node.type === NodeType.VIEW) {
                 let plantSource = createView(node as any, ast);
+                let url = generateURL(plantSource);
+                return `<div class="image-container"><img src="${url}" /></div>`;
+            } else if (node.type === NodeType.AGGREGATE) {
+                let plantSource = createAggregate(node as IAggregate, ast);
+                console.log(plantSource);
                 let url = generateURL(plantSource);
                 return `<div class="image-container"><img src="${url}" /></div>`;
             } else if (node.type === NodeType.FLOW) {

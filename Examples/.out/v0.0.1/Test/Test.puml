@@ -11,4 +11,8 @@ class "Address" as Address  {
 class "Something a" as Something << (T,orchid) >> {
 	Body: a 
 	Header: String 
+--
+  <b>description</b>: THis is the the
+ Something type
+    
 }

@@ -94,7 +94,7 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
         return ctx.Identifier.map(i => i.image);
     }
     TYPE(ctx) {
-        return Object.assign({ type: NodeType.TYPE }, this.visit(ctx.IDENTIFIER[0]), { extends: (ctx.Identifier || []).map(i => i.image), extends_start: (ctx.Identifier || []).map(helpers_1.getStartToken), fields: ctx.SIGN_EqualsType ? ctx.TYPE_FIELD.map(f => this.visit(f)) : [], annotations: helpers_1.purge((ctx.ANNOTATIONS || []).map(a => this.visit(a))) });
+        return Object.assign({ type: NodeType.TYPE }, this.visit(ctx.IDENTIFIER[0]), { extends: (ctx.Identifier || []).map(i => i.image), extends_start: (ctx.Identifier || []).map(helpers_1.getStartToken), fields: ctx.SIGN_EqualsType ? ctx.TYPE_FIELD.map(f => this.visit(f)) : [] });
     }
     TYPE_FIELD(ctx) {
         if (ctx.KW_pluck) {
@@ -111,13 +111,13 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
     }
     DATA(ctx) {
         const options = ctx.DATA_OPTION.map(d => this.visit(d));
-        return Object.assign({ type: NodeType.DATA }, this.visit(ctx.IDENTIFIER[0]), { options, annotations: helpers_1.purge((ctx.ANNOTATIONS || []).map(a => this.visit(a))) });
+        return Object.assign({ type: NodeType.DATA }, this.visit(ctx.IDENTIFIER[0]), { options });
     }
     DATA_OPTION(ctx) {
         return Object.assign({ type: NodeType.DATA_OPTION }, this.visit(ctx.IDENTIFIER[0]), { annotations: helpers_1.purge((ctx.ANNOTATIONS || []).map(a => this.visit(a))) });
     }
     ALIAS(ctx) {
-        return Object.assign({ type: NodeType.ALIAS }, this.visit(ctx.IDENTIFIER[0]), this.visit(ctx.TYPE_IDENTIFIER[0]), { restrictions: (ctx.RESTRICTION || []).map(r => this.visit(r)), annotations: helpers_1.purge((ctx.ANNOTATIONS || []).map(a => this.visit(a))) });
+        return Object.assign({ type: NodeType.ALIAS }, this.visit(ctx.IDENTIFIER[0]), this.visit(ctx.TYPE_IDENTIFIER[0]), { restrictions: (ctx.RESTRICTION || []).map(r => this.visit(r)) });
     }
     VIEW(ctx) {
         return {
@@ -126,7 +126,7 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
             nodes: (ctx.Identifier || []).map(i => i.image),
             nodes_start: (ctx.Identifier || []).map(i => helpers_1.getStartToken(i)),
             directives: parseDirectives(ctx),
-            annotations: helpers_1.purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
+            annotations: []
         };
     }
     AGGREGATE(ctx) {
@@ -137,7 +137,7 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
             valueObjects: (ctx.Identifier || []).map(i => i.image),
             valueObjects_start: (ctx.Identifier || []).map(i => helpers_1.getStartToken(i)),
             directives: parseDirectives(ctx),
-            annotations: helpers_1.purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
+            annotations: []
         };
     }
     FLOW(ctx) {

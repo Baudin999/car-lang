@@ -7,6 +7,7 @@ const tableTYPE_1 = require("./tableTYPE");
 const deflate_1 = require("./../deflate/deflate");
 const createERD_1 = require("../erd/createERD");
 const createFlow_1 = require("../flows/createFlow");
+const createAggregate_1 = require("../aggregates/createAggregate");
 const pretty_data_1 = require("pretty-data");
 const types = [outline_1.NodeType.TYPE, outline_1.NodeType.ALIAS, outline_1.NodeType.DATA, outline_1.NodeType.CHOICE];
 exports.createHTML = (ast, moduleName) => {
@@ -36,6 +37,12 @@ exports.createHTML = (ast, moduleName) => {
         }
         else if (node.type === outline_1.NodeType.VIEW) {
             let plantSource = createERD_1.createView(node, ast);
+            let url = deflate_1.generateURL(plantSource);
+            return `<div class="image-container"><img src="${url}" /></div>`;
+        }
+        else if (node.type === outline_1.NodeType.AGGREGATE) {
+            let plantSource = createAggregate_1.createAggregate(node, ast);
+            console.log(plantSource);
             let url = deflate_1.generateURL(plantSource);
             return `<div class="image-container"><img src="${url}" /></div>`;
         }

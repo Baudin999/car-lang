@@ -1,0 +1,17 @@
+{
+    "$id": "https://schemas.com/MyAPI",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "description": "/myapi",
+    "type": "object",
+    "required": [
+        "LastName"
+    ],
+    "properties": {
+        "FirstName": {
+            "type": "string"
+        },
+        "LastName": {
+            "type": "string"
+        }
+    }
+}

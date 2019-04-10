@@ -3,10 +3,16 @@ class "Person " as Person  {
 	LastName: String 
 	Address: Address 
 	Gender: Gender 
+--
+  <b>aggregate</b>: Person
+    
 }
 class "MyAPI" as MyAPI  {
 	FirstName: Maybe String
 	LastName: String 
+--
+  <b>api</b>: /myapi
+    
 }
 class "Base" as Base  {
 	Bar: Number 
@@ -14,5 +20,8 @@ class "Base" as Base  {
 class "Response" as Response  {
 	Foo: String 
 	Bar: Base 
+--
+  <b>api</b>: /something
+    
 }
 Base <-- Response : Bar
