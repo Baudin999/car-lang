@@ -4,6 +4,7 @@ enum BoughtFrom {
 	XP
 	Gift
 	Other
+
 }
 abstract "Stat" as Stat {
 	Strength 
@@ -27,7 +28,7 @@ class "Buyable" as Buyable  {
 }
 BoughtFrom <-- Buyable : Source
 Stat <-- Buyable : Stat
-class "Skill " as Skill  {
+class "Skill " as Skill <Namable,Buyable> {
 	Name: String  <i>from Namable</i>
 	Description: String  <i>from Namable</i>
 	Source: BoughtFrom  <i>from Buyable</i>
@@ -45,7 +46,7 @@ BoughtFrom <-- Skill : Source
 Stat <-- Skill : Stat
 Namable <|-- Skill
 Buyable <|-- Skill
-class "Resistance " as Resistance  {
+class "Resistance " as Resistance <Namable,Buyable> {
 	Name: String  <i>from Namable</i>
 	Description: String  <i>from Namable</i>
 	Source: BoughtFrom  <i>from Buyable</i>
@@ -59,7 +60,7 @@ BoughtFrom <-- Resistance : Source
 Stat <-- Resistance : Stat
 Namable <|-- Resistance
 Buyable <|-- Resistance
-class "Special " as Special  {
+class "Special " as Special <Namable,Buyable> {
 	Name: String  <i>from Namable</i>
 	Description: String  <i>from Namable</i>
 	Source: BoughtFrom  <i>from Buyable</i>
@@ -73,7 +74,7 @@ BoughtFrom <-- Special : Source
 Stat <-- Special : Stat
 Namable <|-- Special
 Buyable <|-- Special
-class "Feat " as Feat  {
+class "Feat " as Feat <Namable> {
 	Rank: Number 
 	XP: Number 
 	Stat: Stat 

@@ -1,14 +1,11 @@
 class "Customer" as Customer  {
 	CustomerId: Id 
---
-  <b>aggregate</b>: Customer
-    
 }
 class "Error" as Error  {
 	HttpCode: Number 
 	Message: String 
 }
-class "Error404 " as Error404  {
+class "Error404 " as Error404 <Error> {
 	HttpCode: Number  <i>from Error</i>
 	Message: String  <i>from Error</i>
 --
@@ -17,7 +14,7 @@ class "Error404 " as Error404  {
     
 }
 Error <|-- Error404
-class "Error401 " as Error401  {
+class "Error401 " as Error401 <Error> {
 	HttpCode: Number  <i>from Error</i>
 	Message: String  <i>from Error</i>
 --
@@ -26,7 +23,7 @@ class "Error401 " as Error401  {
     
 }
 Error <|-- Error401
-class "Error500 " as Error500  {
+class "Error500 " as Error500 <Error> {
 	HttpCode: Number  <i>from Error</i>
 	Message: String  <i>from Error</i>
 --

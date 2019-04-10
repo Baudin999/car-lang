@@ -1,11 +1,8 @@
-class "Person " as Person  {
+class "Person " as Person <Customer> {
 	FirstName: Maybe String
 	LastName: String 
 	Address: Address 
 	Gender: Gender 
---
-  <b>aggregate</b>: Person
-    
 }
 class "MyAPI" as MyAPI  {
 	FirstName: Maybe String

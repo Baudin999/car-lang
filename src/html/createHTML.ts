@@ -8,16 +8,20 @@ import {
     IMarkdownList,
     IMarkdownCode,
     IView,
-    IAggregate
+    IAggregate,
+    IData
 } from "../outline";
 import { purge } from "../helpers";
 import { createTableTYPE } from "./tableTYPE";
+import { createTableDATA } from "./tableDATA";
+import { createTableCHOICE } from "./tableCHOICE";
 // @ts-ignore
 import { generateURL } from "./../deflate/deflate";
 import { createView } from "../erd/createERD";
 import { createFlow } from "../flows/createFlow";
 import { createAggregate } from "../aggregates/createAggregate";
 import { pd } from "pretty-data";
+import filter from "ramda/es/filter";
 
 const types = [NodeType.TYPE, NodeType.ALIAS, NodeType.DATA, NodeType.CHOICE];
 
@@ -25,6 +29,7 @@ export const createHTML = (ast: IExpression[], moduleName?: string) => {
     const tables: string[] = [];
 
     const transformedNodes = ast
+        .filter((node: any) => !!!node.ignore)
         .filter(node => node.type)
         .map(node => {
             if (node.type === NodeType.MARKDOWN_CHAPTER) {
@@ -42,8 +47,12 @@ export const createHTML = (ast: IExpression[], moduleName?: string) => {
                 return `<pre><code>${code.content}</code></pre>`;
             } else if (node.type === NodeType.TYPE) {
                 tables.push(createTableTYPE(node as IType));
+            } else if (node.type === NodeType.DATA) {
+                tables.push(createTableDATA(node as IData));
+            } else if (node.type === NodeType.CHOICE) {
+                tables.push(createTableCHOICE(node as IChoice));
             } else if (node.type === NodeType.VIEW) {
-                let plantSource = createView(node as any, ast);
+                let plantSource = createView(node as IView, ast);
                 let url = generateURL(plantSource);
                 return `<div class="image-container"><img src="${url}" /></div>`;
             } else if (node.type === NodeType.AGGREGATE) {

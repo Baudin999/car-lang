@@ -22,6 +22,7 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
 
     EXPRESSION(ctx: any): IExpression | null {
         const annotations: IAnnotation[] = purge(ctx.ANNOTATIONS.map(a => this.visit(a)));
+
         const ignoreAnnotation: any = annotations.find((a: IAnnotation) => a.key === "ignore");
         const ignore = ignoreAnnotation ? ignoreAnnotation.value === "true" : false;
 
@@ -48,12 +49,14 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
             result = {
                 annotations,
                 aggregate,
-                ...this.visit(ctx.ALIAS[0])
+                ...this.visit(ctx.ALIAS[0]),
+                ignore
             };
         } else if (ctx.VIEW) {
             return {
                 annotations,
-                ...this.visit(ctx.VIEW[0])
+                ...this.visit(ctx.VIEW[0]),
+                ignore
             };
         } else if (ctx.OPEN) {
             return this.visit(ctx.OPEN[0]);
@@ -61,7 +64,8 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
             result = {
                 annotations,
                 aggregate,
-                ...this.visit(ctx.CHOICE[0])
+                ...this.visit(ctx.CHOICE[0]),
+                ignore
             };
         } else if (ctx.CommentBlock) {
             return {
@@ -71,12 +75,14 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
         } else if (ctx.AGGREGATE) {
             return {
                 annotations,
-                ...this.visit(ctx.AGGREGATE[0])
+                ...this.visit(ctx.AGGREGATE[0]),
+                ignore
             };
         } else if (ctx.FLOW) {
             return {
                 annotations,
-                ...this.visit(ctx.FLOW[0])
+                ...this.visit(ctx.FLOW[0]),
+                ignore
             };
         } else if (ctx.MARKDOWN_CHAPTER) {
             return this.visit(ctx.MARKDOWN_CHAPTER[0]);
@@ -263,12 +269,18 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
         };
     }
 
-    CHOICE_OPTION(ctx: any) {
-        return ctx.StringLiteral
+    CHOICE_OPTION(ctx: any): IChoiceOption {
+        const value = ctx.StringLiteral
             ? ctx.StringLiteral[0].image.replace(/"/g, "")
             : ctx.NumberLiteral
             ? +ctx.NumberLiteral[0].image
             : "";
+
+        return {
+            type: ctx.NumberLiteral ? "number" : "string",
+            id: value,
+            annotations: purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
+        };
     }
 
     IDENTIFIER(ctx: any): IIdentity {
@@ -625,13 +637,19 @@ export interface IChoice {
     type: string;
     id: string;
     id_start: ITokenStart;
-    options: string[];
+    options: IChoiceOption[];
     options_start: ITokenStart[];
     annotations: IAnnotation[];
     aggregate?: string;
     plantUML?: {
         id: string;
     };
+}
+
+export interface IChoiceOption {
+    type: string;
+    id: string;
+    annotations: IAnnotation[];
 }
 
 export interface IRestriction {
@@ -675,6 +693,7 @@ export type IExpression =
     | IData
     | IComment
     | IAggregate
+    | IChoice
     | IFlow
     | IView
     | IMarkdownChapter

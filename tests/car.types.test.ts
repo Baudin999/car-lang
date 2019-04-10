@@ -1,11 +1,12 @@
 import { transpile } from "../src/transpiler";
+import { IType } from "../src/outline";
 
 const log = source => {
-  console.log(JSON.stringify(source, null, 4));
+    console.log(JSON.stringify(source, null, 4));
 };
 
 describe("Define and parser a simple type", () => {
-  const source = `
+    const source = `
 
 type Person =
     FirstName: String
@@ -14,15 +15,15 @@ type Person =
 
 `;
 
-  const { cst, ast, errors } = transpile(source);
+    const { cst, ast, errors } = transpile(source);
 
-  it("We should be able to tokenize", () => {
-    expect(ast).toBeDefined();
-  });
+    it("We should be able to tokenize", () => {
+        expect(ast).toBeDefined();
+    });
 });
 
 describe("Pluck fields from other types", () => {
-  const source = `
+    const source = `
 
 type Person =
     FirstName: String
@@ -36,15 +37,38 @@ type Account =
 
 `;
 
-  const { cst, ast, errors } = transpile(source);
+    const { cst, ast, errors } = transpile(source);
 
-  it("We should be able to tokenize", () => {
-    expect(ast).toBeDefined();
-  });
+    it("We should be able to tokenize", () => {
+        expect(ast).toBeDefined();
+    });
+});
+
+describe("Should be able to extend types", () => {
+    const source = `
+
+type Customer =
+    CustomerId: Number
+
+type Person extends Customer =
+    FirstName: String
+    LastName: String
+    Email: String
+
+type Company extends Customer =
+    KvK: String
+
+`;
+
+    const { cst, ast, errors } = transpile(source);
+
+    it("Person should have a 'source' and it should be 'Customer'", () => {
+        expect((ast[1] as IType).extends[0]).toEqual("Customer");
+    });
 });
 
 describe("Alias with a restriction", () => {
-  const source = `
+    const source = `
 
 alias Name = String
     | min 2
@@ -53,14 +77,14 @@ alias Name = String
 
 `;
 
-  const { cst, tokens, ast, errors } = transpile(source);
-  it("We should be able to tokenize", () => {
-    expect(ast).toBeDefined();
-  });
+    const { cst, tokens, ast, errors } = transpile(source);
+    it("We should be able to tokenize", () => {
+        expect(ast).toBeDefined();
+    });
 });
 
 describe("Define a generic type", () => {
-  const source = `
+    const source = `
 
 data Maybe a =
     | Just a
@@ -68,15 +92,15 @@ data Maybe a =
 
 `;
 
-  const { ast, errors } = transpile(source);
+    const { ast, errors } = transpile(source);
 
-  it("We should be able to tokenize", () => {
-    expect(ast).toBeDefined();
-  });
+    it("We should be able to tokenize", () => {
+        expect(ast).toBeDefined();
+    });
 });
 
 describe("Define a generic type and use it in a type", () => {
-  const source = `
+    const source = `
 
 data Maybe a =
     | Just a
@@ -88,62 +112,62 @@ type Person =
 
 `;
 
-  const { ast, errors } = transpile(source);
+    const { ast, errors } = transpile(source);
 
-  it("We should be able to tokenize", () => {
-    expect(ast).toBeDefined();
-  });
+    it("We should be able to tokenize", () => {
+        expect(ast).toBeDefined();
+    });
 });
 
 describe("Let's generate some errors", () => {
-  const source = `
+    const source = `
 
 type Person =
     FirstName: Maybe String
     LastName: Foo Bar Result String
 
 `;
-  const errorResults = [
-    {
-      message: 'Cannot find type "Maybe" of field "FirstName" of type "Person"',
-      startLineNumber: 4,
-      endLineNumber: 4,
-      startColumn: 16,
-      endColumn: 21
-    },
-    {
-      message: 'Cannot find type "Foo" of field "LastName" of type "Person"',
-      startLineNumber: 5,
-      endLineNumber: 5,
-      startColumn: 15,
-      endColumn: 18
-    },
-    {
-      message: 'Cannot find type "Bar" of field "LastName" of type "Person"',
-      startLineNumber: 5,
-      endLineNumber: 5,
-      startColumn: 19,
-      endColumn: 22
-    },
-    {
-      message: 'Cannot find type "Result" of field "LastName" of type "Person"',
-      startLineNumber: 5,
-      endLineNumber: 5,
-      startColumn: 23,
-      endColumn: 29
-    }
-  ];
+    const errorResults = [
+        {
+            message: 'Cannot find type "Maybe" of field "FirstName" of type "Person"',
+            startLineNumber: 4,
+            endLineNumber: 4,
+            startColumn: 16,
+            endColumn: 21
+        },
+        {
+            message: 'Cannot find type "Foo" of field "LastName" of type "Person"',
+            startLineNumber: 5,
+            endLineNumber: 5,
+            startColumn: 15,
+            endColumn: 18
+        },
+        {
+            message: 'Cannot find type "Bar" of field "LastName" of type "Person"',
+            startLineNumber: 5,
+            endLineNumber: 5,
+            startColumn: 19,
+            endColumn: 22
+        },
+        {
+            message: 'Cannot find type "Result" of field "LastName" of type "Person"',
+            startLineNumber: 5,
+            endLineNumber: 5,
+            startColumn: 23,
+            endColumn: 29
+        }
+    ];
 
-  const { ast, errors } = transpile(source);
+    const { ast, errors } = transpile(source);
 
-  it("We should be able to tokenize", () => {
-    expect(ast).toBeDefined();
-    expect(errors).toBeDefined();
-    expect(errors.length).toEqual(4);
-    errors.forEach((error, i) => {
-      for (var key in error) {
-        expect(errors[i][key]).toEqual(errorResults[i][key]);
-      }
+    it("We should be able to tokenize", () => {
+        expect(ast).toBeDefined();
+        expect(errors).toBeDefined();
+        expect(errors.length).toEqual(4);
+        errors.forEach((error, i) => {
+            for (var key in error) {
+                expect(errors[i][key]).toEqual(errorResults[i][key]);
+            }
+        });
     });
-  });
 });

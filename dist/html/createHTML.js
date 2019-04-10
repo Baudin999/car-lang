@@ -3,6 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const outline_1 = require("../outline");
 const helpers_1 = require("../helpers");
 const tableTYPE_1 = require("./tableTYPE");
+const tableDATA_1 = require("./tableDATA");
+const tableCHOICE_1 = require("./tableCHOICE");
 // @ts-ignore
 const deflate_1 = require("./../deflate/deflate");
 const createERD_1 = require("../erd/createERD");
@@ -13,6 +15,7 @@ const types = [outline_1.NodeType.TYPE, outline_1.NodeType.ALIAS, outline_1.Node
 exports.createHTML = (ast, moduleName) => {
     const tables = [];
     const transformedNodes = ast
+        .filter((node) => !!!node.ignore)
         .filter(node => node.type)
         .map(node => {
         if (node.type === outline_1.NodeType.MARKDOWN_CHAPTER) {
@@ -34,6 +37,12 @@ exports.createHTML = (ast, moduleName) => {
         }
         else if (node.type === outline_1.NodeType.TYPE) {
             tables.push(tableTYPE_1.createTableTYPE(node));
+        }
+        else if (node.type === outline_1.NodeType.DATA) {
+            tables.push(tableDATA_1.createTableDATA(node));
+        }
+        else if (node.type === outline_1.NodeType.CHOICE) {
+            tables.push(tableCHOICE_1.createTableCHOICE(node));
         }
         else if (node.type === outline_1.NodeType.VIEW) {
             let plantSource = createERD_1.createView(node, ast);

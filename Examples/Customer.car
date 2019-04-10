@@ -23,13 +23,13 @@ alias Id = String
     | max 2
     | pattern /[A-Z]{2}/
 
-@ aggregate: Person
+
 choice Gender =
     | "Male"
     | "Female"
     | "Other"
 
-@ aggregate: Person
+
 @ The address of a person. This is the functional 
 @ location of where a person lives. This type is 
 @ of course designed for the Dutch address system.
@@ -49,7 +49,6 @@ type Address =
         | pattern /[A-Z]{2}/
     Country: Maybe String
 
-@ aggregate: Person
 type Person extends Customer =
     FirstName: Maybe String
     LastName: String
@@ -58,11 +57,9 @@ type Person extends Customer =
 
 ## Customer Models
 
-@ aggregate: Company
 type Company extends Customer  =
     OrganisationName: String
 
-@ aggregate: Customer
 type Customer =
     CustomerId: Id
 

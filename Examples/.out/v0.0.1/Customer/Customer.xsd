@@ -15,9 +15,9 @@
   </xsd:simpleType>
   <xsd:complexType name="Gender">
     <xsd:choice>
-      <xsd:element name="Male"/>
-      <xsd:element name="Female"/>
-      <xsd:element name="Other"/>
+      <xsd:element name="[object Object]"/>
+      <xsd:element name="[object Object]"/>
+      <xsd:element name="[object Object]"/>
     </xsd:choice>
   </xsd:complexType>
   <xsd:element name="Address_Street" nillable="false">

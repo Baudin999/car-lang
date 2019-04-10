@@ -31,17 +31,17 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
         }
         else if (ctx.ALIAS) {
             result = Object.assign({ annotations,
-                aggregate }, this.visit(ctx.ALIAS[0]));
+                aggregate }, this.visit(ctx.ALIAS[0]), { ignore });
         }
         else if (ctx.VIEW) {
-            return Object.assign({ annotations }, this.visit(ctx.VIEW[0]));
+            return Object.assign({ annotations }, this.visit(ctx.VIEW[0]), { ignore });
         }
         else if (ctx.OPEN) {
             return this.visit(ctx.OPEN[0]);
         }
         else if (ctx.CHOICE) {
             result = Object.assign({ annotations,
-                aggregate }, this.visit(ctx.CHOICE[0]));
+                aggregate }, this.visit(ctx.CHOICE[0]), { ignore });
         }
         else if (ctx.CommentBlock) {
             return {
@@ -50,10 +50,10 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
             };
         }
         else if (ctx.AGGREGATE) {
-            return Object.assign({ annotations }, this.visit(ctx.AGGREGATE[0]));
+            return Object.assign({ annotations }, this.visit(ctx.AGGREGATE[0]), { ignore });
         }
         else if (ctx.FLOW) {
-            return Object.assign({ annotations }, this.visit(ctx.FLOW[0]));
+            return Object.assign({ annotations }, this.visit(ctx.FLOW[0]), { ignore });
         }
         else if (ctx.MARKDOWN_CHAPTER) {
             return this.visit(ctx.MARKDOWN_CHAPTER[0]);
@@ -190,11 +190,16 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
         };
     }
     CHOICE_OPTION(ctx) {
-        return ctx.StringLiteral
+        const value = ctx.StringLiteral
             ? ctx.StringLiteral[0].image.replace(/"/g, "")
             : ctx.NumberLiteral
                 ? +ctx.NumberLiteral[0].image
                 : "";
+        return {
+            type: ctx.NumberLiteral ? "number" : "string",
+            id: value,
+            annotations: helpers_1.purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
+        };
     }
     IDENTIFIER(ctx) {
         if (ctx.GenericIdentifier) {

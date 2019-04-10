@@ -14,11 +14,11 @@
   </xsd:simpleType>
   <xsd:complexType name="BoughtFrom">
     <xsd:choice>
-      <xsd:element name="Racial Package"/>
-      <xsd:element name="Professional Package"/>
-      <xsd:element name="XP"/>
-      <xsd:element name="Gift"/>
-      <xsd:element name="Other"/>
+      <xsd:element name="[object Object]"/>
+      <xsd:element name="[object Object]"/>
+      <xsd:element name="[object Object]"/>
+      <xsd:element name="[object Object]"/>
+      <xsd:element name="[object Object]"/>
     </xsd:choice>
   </xsd:complexType>
   <xsd:element name="Namable_Name" nillable="false">

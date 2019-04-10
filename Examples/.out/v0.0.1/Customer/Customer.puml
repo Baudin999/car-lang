@@ -2,6 +2,7 @@ enum Gender {
 	Male
 	Female
 	Other
+
 }
 class "Address" as Address  {
 	Street: String 
@@ -17,33 +18,23 @@ class "Address" as Address  {
  location of where a person lives. This
  type is of course designed for the
  Dutch address system.
-<b>aggregate</b>: Person
     
 }
-class "Person " as Person  {
+class "Person " as Person <Customer> {
 	FirstName: Maybe String
 	LastName: String 
 	Address: Address 
 	Gender: Gender 
 	CustomerId: Id  <i>from Customer</i>
---
-  <b>aggregate</b>: Person
-    
 }
 Address <-- Person : Address
 Gender <-- Person : Gender
 Customer <|-- Person
-class "Company " as Company  {
+class "Company " as Company <Customer> {
 	OrganisationName: String 
 	CustomerId: Id  <i>from Customer</i>
---
-  <b>aggregate</b>: Company
-    
 }
 Customer <|-- Company
 class "Customer" as Customer  {
 	CustomerId: Id 
---
-  <b>aggregate</b>: Customer
-    
 }

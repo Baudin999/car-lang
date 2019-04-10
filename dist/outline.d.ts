@@ -26,7 +26,7 @@ export declare class OutlineVisitor extends BaseCstVisitorWithDefaults {
         result_params_start: any;
     };
     CHOICE(ctx: any): IChoice;
-    CHOICE_OPTION(ctx: any): any;
+    CHOICE_OPTION(ctx: any): IChoiceOption;
     IDENTIFIER(ctx: any): IIdentity;
     TYPE_IDENTIFIER(ctx: any): {
         ofType: any;
@@ -182,13 +182,18 @@ export interface IChoice {
     type: string;
     id: string;
     id_start: ITokenStart;
-    options: string[];
+    options: IChoiceOption[];
     options_start: ITokenStart[];
     annotations: IAnnotation[];
     aggregate?: string;
     plantUML?: {
         id: string;
     };
+}
+export interface IChoiceOption {
+    type: string;
+    id: string;
+    annotations: IAnnotation[];
 }
 export interface IRestriction {
     key: string;
@@ -219,7 +224,7 @@ export interface IMarkdownList {
     type: NodeType;
     items: string[];
 }
-export declare type IExpression = IType | IAlias | IData | IComment | IAggregate | IFlow | IView | IMarkdownChapter | IMarkdownCode | IMarkdownImage | IMarkdownList | IMarkdownParagraph;
+export declare type IExpression = IType | IAlias | IData | IComment | IAggregate | IChoice | IFlow | IView | IMarkdownChapter | IMarkdownCode | IMarkdownImage | IMarkdownList | IMarkdownParagraph;
 export declare enum NodeType {
     TYPE = "TYPE",
     TYPE_FIELD = "TYPE_FIELD",

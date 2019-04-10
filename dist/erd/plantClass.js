@@ -6,9 +6,6 @@ class PlantClass {
     constructor(node, lookup) {
         this.node = node;
         this.lookup = lookup;
-        if (node.id === "ApiMessage") {
-            //console.log(JSON.stringify(lookup, null, 4))
-        }
     }
     fields() {
         return this.node.fields
@@ -43,7 +40,8 @@ class PlantClass {
             .join("\n");
     }
     source() {
-        return this.node.source ? `<${this.node.source}>` : "";
+        return this.node.extends.length > 0 ? `<${this.node.extends.join(",")}>` : "";
+        //return this.node.source ? `<${this.node.source}>` : "";
     }
     annotations() {
         if (this.node.annotations.length === 0)
