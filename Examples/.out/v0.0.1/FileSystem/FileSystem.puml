@@ -8,10 +8,10 @@ class "FileInfo" as FileInfo  {
 class "DirectoryInfo" as DirectoryInfo  {
 	Children: List FileSystemInfo
 }
-FileSystemInfo "0" <-- "*" DirectoryInfo : List FileSystemInfo
+FileSystemInfo "0" --> "*" DirectoryInfo : List FileSystemInfo
 abstract "FileSystemInfo" as FileSystemInfo {
 	FileInfo 
 	DirectoryInfo 
 }
-FileInfo <-- FileSystemInfo : FileInfo
-DirectoryInfo <-- FileSystemInfo : DirectoryInfo
+FileInfo --> FileSystemInfo : FileInfo
+DirectoryInfo --> FileSystemInfo : DirectoryInfo

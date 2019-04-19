@@ -8,7 +8,11 @@ export class PlantEnum {
     }
 
     fields() {
-        return this.node.options.map(o => `\t${o.id}`).join("\n");
+        return this.node.options
+            .map(o => {
+                return `\t${o.id}`;
+            })
+            .join("\n");
     }
 
     annotations() {

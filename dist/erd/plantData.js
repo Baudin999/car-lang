@@ -17,7 +17,7 @@ class PlantData {
     associations() {
         return this.node.options
             .filter(field => this.lookupValues.indexOf(field.id) > -1)
-            .map((field) => `${field.id} <-- ${this.node.id} : ${field.id}`)
+            .map((field) => `${field.id} --> ${this.node.id} : ${field.id}`)
             .join("\n");
     }
     annotations() {
@@ -36,7 +36,7 @@ class PlantData {
             return (option.params || [])
                 .filter(p => /[A-Z].*/.test(p))
                 .map(param => {
-                return `${param} <|.. ${this.node.id} : ${option.id} <i>${param}</i>`;
+                return `${param} ..|> ${this.node.id} : ${option.id} <i>${param}</i>`;
             });
         });
         return helpers_1.purge(fieldParams).join("\n");

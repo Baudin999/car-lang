@@ -192,7 +192,7 @@ export interface IChoice {
 }
 export interface IChoiceOption {
     type: string;
-    id: string;
+    id: string | number;
     annotations: IAnnotation[];
 }
 export interface IRestriction {

@@ -26,8 +26,8 @@ class "Buyable" as Buyable  {
 	Professional: Boolean 
 	Master: Boolean 
 }
-BoughtFrom <-- Buyable : Source
-Stat <-- Buyable : Stat
+BoughtFrom --> Buyable : Source
+Stat --> Buyable : Stat
 class "Skill " as Skill <Namable,Buyable> {
 	Name: String  <i>from Namable</i>
 	Description: String  <i>from Namable</i>
@@ -42,10 +42,10 @@ class "Skill " as Skill <Namable,Buyable> {
  something a character can do
     
 }
-BoughtFrom <-- Skill : Source
-Stat <-- Skill : Stat
-Namable <|-- Skill
-Buyable <|-- Skill
+BoughtFrom --> Skill : Source
+Stat --> Skill : Stat
+Namable --|> Skill
+Buyable --|> Skill
 class "Resistance " as Resistance <Namable,Buyable> {
 	Name: String  <i>from Namable</i>
 	Description: String  <i>from Namable</i>
@@ -56,10 +56,10 @@ class "Resistance " as Resistance <Namable,Buyable> {
 	Professional: Boolean  <i>from Buyable</i>
 	Master: Boolean  <i>from Buyable</i>
 }
-BoughtFrom <-- Resistance : Source
-Stat <-- Resistance : Stat
-Namable <|-- Resistance
-Buyable <|-- Resistance
+BoughtFrom --> Resistance : Source
+Stat --> Resistance : Stat
+Namable --|> Resistance
+Buyable --|> Resistance
 class "Special " as Special <Namable,Buyable> {
 	Name: String  <i>from Namable</i>
 	Description: String  <i>from Namable</i>
@@ -70,10 +70,10 @@ class "Special " as Special <Namable,Buyable> {
 	Professional: Boolean  <i>from Buyable</i>
 	Master: Boolean  <i>from Buyable</i>
 }
-BoughtFrom <-- Special : Source
-Stat <-- Special : Stat
-Namable <|-- Special
-Buyable <|-- Special
+BoughtFrom --> Special : Source
+Stat --> Special : Stat
+Namable --|> Special
+Buyable --|> Special
 class "Feat " as Feat <Namable> {
 	Rank: Number 
 	XP: Number 
@@ -81,8 +81,8 @@ class "Feat " as Feat <Namable> {
 	Name: String  <i>from Namable</i>
 	Description: String  <i>from Namable</i>
 }
-Stat <-- Feat : Stat
-Namable <|-- Feat
+Stat --> Feat : Stat
+Namable --|> Feat
 class "Statistic" as Statistic  {
 	Stat: Stat 
 	Description: String 
@@ -95,7 +95,7 @@ class "Statistic" as Statistic  {
  certain abilities.
     
 }
-Stat <-- Statistic : Stat
+Stat --> Statistic : Stat
 class "Character" as Character  {
 	Name: String 
 	Skills: List Skill
@@ -107,11 +107,11 @@ class "Character" as Character  {
 	Perception: Statistic 
 	Charisma: Statistic 
 }
-Statistic <-- Character : Strength
-Statistic <-- Character : Agility
-Statistic <-- Character : Intuition
-Statistic <-- Character : Perception
-Statistic <-- Character : Charisma
-Skill "0" <-- "*" Character : List Skill
-Special "0" <-- "*" Character : List Special
-Feat "0" <-- "*" Character : List Feat
+Statistic --> Character : Strength
+Statistic --> Character : Agility
+Statistic --> Character : Intuition
+Statistic --> Character : Perception
+Statistic --> Character : Charisma
+Skill "0" --> "*" Character : List Skill
+Special "0" --> "*" Character : List Special
+Feat "0" --> "*" Character : List Feat

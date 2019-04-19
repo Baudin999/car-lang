@@ -62,8 +62,49 @@ type Company extends Customer =
 
     const { cst, ast, errors } = transpile(source);
 
-    it("Person should have a 'source' and it should be 'Customer'", () => {
+    it("Person should have a 'extensions' and it should be 'Customer'", () => {
         expect((ast[1] as IType).extends[0]).toEqual("Customer");
+    });
+    it("Person should have 4 fields", () => {
+        expect((ast[1] as IType).fields.length).toEqual(4);
+    });
+});
+
+describe("Should be able to extend types", () => {
+    const source = `
+
+alias Email = String
+
+type Address =
+    Street: String
+    Postcode: String
+    HouseNumber: String
+    HouseNumberExtension: String
+
+type CorrespondenceAddress extends Address, Correspondence =
+    Active: Boolean
+    @ The name to put on the letter.
+    CareOfFullName: String
+    PoBox: String
+
+type EmailCorrespondence extends Correspondence =
+    Email: String
+
+type PhoneCorrespondence extends Correspondence =
+    Phone: String
+
+@ How to contact the Customer.
+type Correspondence =
+    From: Date
+    To: Maybe Date
+
+
+`;
+
+    const { cst, ast, errors } = transpile(source);
+
+    it("'CorrespondenceAddress' should have 9 fields", () => {
+        expect((ast[2] as IType).fields.length).toEqual(9);
     });
 });
 

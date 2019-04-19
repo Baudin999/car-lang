@@ -3,8 +3,8 @@
 <xsd:schema 
   xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
   
-  xmlns:self="http://example.con/"
-  targetNamespace="http://example.con/">
+  xmlns:self="http://foo.bar/"
+  targetNamespace="http://foo.bar/">
   <!-- VERSION: 0.0.1 -->
   <xsd:element name="Person_FirstName" nillable="false">
     <xsd:annotation></xsd:annotation>
@@ -31,12 +31,12 @@
     <xsd:annotation></xsd:annotation>
   </xsd:element>
   <xsd:complexType name="Person">
-    <xsd:sequence>
+    <xsd:all>
       <xsd:element ref="self:Person_FirstName" minOccurs="0"/>
       <xsd:element ref="self:Person_LastName" minOccurs="1"/>
       <xsd:element ref="self:Person_Address" minOccurs="1"/>
       <xsd:element ref="self:Person_Gender" minOccurs="1"/>
-    </xsd:sequence>
+    </xsd:all>
   </xsd:complexType>
   <xsd:element name="MyAPI_FirstName" nillable="false">
     <xsd:annotation></xsd:annotation>
@@ -57,10 +57,10 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="MyAPI">
-    <xsd:sequence>
+    <xsd:all>
       <xsd:element ref="self:MyAPI_FirstName" minOccurs="0"/>
       <xsd:element ref="self:MyAPI_LastName" minOccurs="1"/>
-    </xsd:sequence>
+    </xsd:all>
   </xsd:complexType>
   <xsd:element name="Base_Bar" nillable="false">
     <xsd:annotation></xsd:annotation>
@@ -72,9 +72,9 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Base">
-    <xsd:sequence>
+    <xsd:all>
       <xsd:element ref="self:Base_Bar" minOccurs="1"/>
-    </xsd:sequence>
+    </xsd:all>
   </xsd:complexType>
   <xsd:element name="Response_Foo" nillable="false">
     <xsd:annotation></xsd:annotation>
@@ -89,10 +89,10 @@
     <xsd:annotation></xsd:annotation>
   </xsd:element>
   <xsd:complexType name="Response">
-    <xsd:sequence>
+    <xsd:all>
       <xsd:element ref="self:Response_Foo" minOccurs="1"/>
       <xsd:element ref="self:Response_Bar" minOccurs="1"/>
-    </xsd:sequence>
+    </xsd:all>
   </xsd:complexType>
 </xsd:schema>
   

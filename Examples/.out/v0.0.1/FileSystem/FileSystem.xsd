@@ -3,8 +3,8 @@
 <xsd:schema 
   xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
   
-  xmlns:self="http://example.con/"
-  targetNamespace="http://example.con/">
+  xmlns:self="http://foo.bar/"
+  targetNamespace="http://foo.bar/">
   <!-- VERSION: 0.0.1 -->
   <xsd:simpleType name="Author">
     <xsd:restriction base="xsd:string">
@@ -47,21 +47,26 @@
     <xsd:annotation></xsd:annotation>
   </xsd:element>
   <xsd:complexType name="FileInfo">
-    <xsd:sequence>
+    <xsd:all>
       <xsd:element ref="self:FileInfo_Size" minOccurs="1"/>
       <xsd:element ref="self:FileInfo_LastModified" minOccurs="1"/>
       <xsd:element ref="self:FileInfo_FullPath" minOccurs="1"/>
       <xsd:element ref="self:FileInfo_CreatedBy" minOccurs="1"/>
       <xsd:element ref="self:FileInfo_ModifiedBy" minOccurs="1"/>
-    </xsd:sequence>
+    </xsd:all>
   </xsd:complexType>
-  <xsd:element name="DirectoryInfo_Children" type="self:FileSystemInfo" nillable="false">
+  <xsd:element name="DirectoryInfo_Children" nillable="false">
     <xsd:annotation></xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="self:FileSystemInfo" minOccurs="0" maxOccurs="unbound" />
+      </xsd:sequence>
+    </xsd:complexType>
   </xsd:element>
   <xsd:complexType name="DirectoryInfo">
-    <xsd:sequence>
+    <xsd:all>
       <xsd:element ref="self:DirectoryInfo_Children" minOccurs="1"/>
-    </xsd:sequence>
+    </xsd:all>
   </xsd:complexType>
 </xsd:schema>
   

@@ -6,7 +6,11 @@ class PlantEnum {
         this.node = node;
     }
     fields() {
-        return this.node.options.map(o => `\t${o.id}`).join("\n");
+        return this.node.options
+            .map(o => {
+            return `\t${o.id}`;
+        })
+            .join("\n");
     }
     annotations() {
         if (this.node.annotations.length === 0)

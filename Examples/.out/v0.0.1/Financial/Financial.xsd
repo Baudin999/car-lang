@@ -3,8 +3,8 @@
 <xsd:schema 
   xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
   
-  xmlns:self="http://example.con/"
-  targetNamespace="http://example.con/">
+  xmlns:self="http://foo.bar/"
+  targetNamespace="http://foo.bar/">
   <!-- VERSION: 0.0.1 -->
   <xsd:element name="Currency_Sign" nillable="false">
     <xsd:annotation></xsd:annotation>
@@ -25,10 +25,10 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Currency">
-    <xsd:sequence>
+    <xsd:all>
       <xsd:element ref="self:Currency_Sign" minOccurs="1"/>
       <xsd:element ref="self:Currency_Value" minOccurs="1"/>
-    </xsd:sequence>
+    </xsd:all>
   </xsd:complexType>
   <xsd:element name="CreditCard_Number" nillable="false">
     <xsd:annotation></xsd:annotation>
@@ -46,10 +46,10 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="CreditCard">
-    <xsd:sequence>
+    <xsd:all>
       <xsd:element ref="self:CreditCard_Number" minOccurs="1"/>
       <xsd:element ref="self:CreditCard_ExpirationDate" minOccurs="1"/>
-    </xsd:sequence>
+    </xsd:all>
   </xsd:complexType>
   <xsd:element name="DirectDebit_BankAccountNumber" nillable="false">
     <xsd:annotation></xsd:annotation>
@@ -61,9 +61,9 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="DirectDebit">
-    <xsd:sequence>
+    <xsd:all>
       <xsd:element ref="self:DirectDebit_BankAccountNumber" minOccurs="1"/>
-    </xsd:sequence>
+    </xsd:all>
   </xsd:complexType>
 </xsd:schema>
   

@@ -190,11 +190,13 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
         };
     }
     CHOICE_OPTION(ctx) {
-        const value = ctx.StringLiteral
-            ? ctx.StringLiteral[0].image.replace(/"/g, "")
-            : ctx.NumberLiteral
-                ? +ctx.NumberLiteral[0].image
-                : "";
+        let value = "";
+        if (ctx.StringLiteral) {
+            value = ctx.StringLiteral[0].image.replace(/"/g, "");
+        }
+        if (ctx.NumberLiteral) {
+            value = +ctx.NumberLiteral[0].image;
+        }
         return {
             type: ctx.NumberLiteral ? "number" : "string",
             id: value,

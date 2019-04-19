@@ -1,3 +1,7 @@
+class "CreditCard" as CreditCard  {
+	Number: String 
+	ExpirationDate: Date 
+}
 enum Gender {
 	Male
 	Female
@@ -27,14 +31,20 @@ class "Person " as Person <Customer> {
 	Gender: Gender 
 	CustomerId: Id  <i>from Customer</i>
 }
-Address <-- Person : Address
-Gender <-- Person : Gender
-Customer <|-- Person
+Address --> Person : Address
+Gender --> Person : Gender
+Customer --|> Person
+class "PaymentMethod" as PaymentMethod  {
+	Customer: Customer 
+	CreditCard: CreditCard 
+}
+Customer --> PaymentMethod : Customer
+CreditCard --> PaymentMethod : CreditCard
 class "Company " as Company <Customer> {
 	OrganisationName: String 
 	CustomerId: Id  <i>from Customer</i>
 }
-Customer <|-- Company
+Customer --|> Company
 class "Customer" as Customer  {
 	CustomerId: Id 
 }

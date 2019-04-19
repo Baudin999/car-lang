@@ -21,4 +21,4 @@ class "Response" as Response  {
   <b>api</b>: /something
     
 }
-Base <-- Response : Bar
+Base --> Response : Bar

@@ -3,8 +3,8 @@
 <xsd:schema 
   xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
   
-  xmlns:self="http://example.con/"
-  targetNamespace="http://example.con/">
+  xmlns:self="http://foo.bar/"
+  targetNamespace="http://foo.bar/">
   <!-- VERSION: 0.0.1 -->
   <xsd:simpleType name="XP">
     <xsd:restriction base="xsd:integer">
@@ -14,11 +14,11 @@
   </xsd:simpleType>
   <xsd:complexType name="BoughtFrom">
     <xsd:choice>
-      <xsd:element name="[object Object]"/>
-      <xsd:element name="[object Object]"/>
-      <xsd:element name="[object Object]"/>
-      <xsd:element name="[object Object]"/>
-      <xsd:element name="[object Object]"/>
+      <xsd:element name="Racial Package"/>
+      <xsd:element name="Professional Package"/>
+      <xsd:element name="XP"/>
+      <xsd:element name="Gift"/>
+      <xsd:element name="Other"/>
     </xsd:choice>
   </xsd:complexType>
   <xsd:element name="Namable_Name" nillable="false">
@@ -40,10 +40,10 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Namable">
-    <xsd:sequence>
+    <xsd:all>
       <xsd:element ref="self:Namable_Name" minOccurs="1"/>
       <xsd:element ref="self:Namable_Description" minOccurs="1"/>
-    </xsd:sequence>
+    </xsd:all>
   </xsd:complexType>
   <xsd:element name="Buyable_Source" type="self:BoughtFrom" nillable="false">
     <xsd:annotation></xsd:annotation>
@@ -76,14 +76,14 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Buyable">
-    <xsd:sequence>
+    <xsd:all>
       <xsd:element ref="self:Buyable_Source" minOccurs="1"/>
       <xsd:element ref="self:Buyable_Stat" minOccurs="1"/>
       <xsd:element ref="self:Buyable_Bought" minOccurs="1"/>
       <xsd:element ref="self:Buyable_Skilled" minOccurs="1"/>
       <xsd:element ref="self:Buyable_Professional" minOccurs="1"/>
       <xsd:element ref="self:Buyable_Master" minOccurs="1"/>
-    </xsd:sequence>
+    </xsd:all>
   </xsd:complexType>
   <xsd:element name="Skill_Name" nillable="false">
     <xsd:annotation></xsd:annotation>
@@ -134,7 +134,7 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Skill">
-    <xsd:sequence>
+    <xsd:all>
       <xsd:element ref="self:Skill_Name" minOccurs="1"/>
       <xsd:element ref="self:Skill_Description" minOccurs="1"/>
       <xsd:element ref="self:Skill_Source" minOccurs="1"/>
@@ -143,7 +143,7 @@
       <xsd:element ref="self:Skill_Skilled" minOccurs="1"/>
       <xsd:element ref="self:Skill_Professional" minOccurs="1"/>
       <xsd:element ref="self:Skill_Master" minOccurs="1"/>
-    </xsd:sequence>
+    </xsd:all>
   </xsd:complexType>
   <xsd:element name="Resistance_Name" nillable="false">
     <xsd:annotation></xsd:annotation>
@@ -194,7 +194,7 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Resistance">
-    <xsd:sequence>
+    <xsd:all>
       <xsd:element ref="self:Resistance_Name" minOccurs="1"/>
       <xsd:element ref="self:Resistance_Description" minOccurs="1"/>
       <xsd:element ref="self:Resistance_Source" minOccurs="1"/>
@@ -203,7 +203,7 @@
       <xsd:element ref="self:Resistance_Skilled" minOccurs="1"/>
       <xsd:element ref="self:Resistance_Professional" minOccurs="1"/>
       <xsd:element ref="self:Resistance_Master" minOccurs="1"/>
-    </xsd:sequence>
+    </xsd:all>
   </xsd:complexType>
   <xsd:element name="Special_Name" nillable="false">
     <xsd:annotation></xsd:annotation>
@@ -254,7 +254,7 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Special">
-    <xsd:sequence>
+    <xsd:all>
       <xsd:element ref="self:Special_Name" minOccurs="1"/>
       <xsd:element ref="self:Special_Description" minOccurs="1"/>
       <xsd:element ref="self:Special_Source" minOccurs="1"/>
@@ -263,7 +263,7 @@
       <xsd:element ref="self:Special_Skilled" minOccurs="1"/>
       <xsd:element ref="self:Special_Professional" minOccurs="1"/>
       <xsd:element ref="self:Special_Master" minOccurs="1"/>
-    </xsd:sequence>
+    </xsd:all>
   </xsd:complexType>
   <xsd:element name="Feat_Rank" nillable="false">
     <xsd:annotation></xsd:annotation>
@@ -305,13 +305,13 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Feat">
-    <xsd:sequence>
+    <xsd:all>
       <xsd:element ref="self:Feat_Rank" minOccurs="1"/>
       <xsd:element ref="self:Feat_XP" minOccurs="1"/>
       <xsd:element ref="self:Feat_Stat" minOccurs="1"/>
       <xsd:element ref="self:Feat_Name" minOccurs="1"/>
       <xsd:element ref="self:Feat_Description" minOccurs="1"/>
-    </xsd:sequence>
+    </xsd:all>
   </xsd:complexType>
   <xsd:element name="Statistic_Stat" type="self:Stat" nillable="false">
     <xsd:annotation></xsd:annotation>
@@ -340,12 +340,12 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Statistic">
-    <xsd:sequence>
+    <xsd:all>
       <xsd:element ref="self:Statistic_Stat" minOccurs="1"/>
       <xsd:element ref="self:Statistic_Description" minOccurs="1"/>
       <xsd:element ref="self:Statistic_XP" minOccurs="1"/>
       <xsd:element ref="self:Statistic_Value" minOccurs="1"/>
-    </xsd:sequence>
+    </xsd:all>
   </xsd:complexType>
   <xsd:element name="Character_Name" nillable="false">
     <xsd:annotation></xsd:annotation>
@@ -356,14 +356,29 @@
       </xsd:restriction>
     </xsd:simpleType>
   </xsd:element>
-  <xsd:element name="Character_Skills" type="self:Skill" nillable="false">
+  <xsd:element name="Character_Skills" nillable="false">
     <xsd:annotation></xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="self:Skill" minOccurs="0" maxOccurs="unbound" />
+      </xsd:sequence>
+    </xsd:complexType>
   </xsd:element>
-  <xsd:element name="Character_Specials" type="self:Special" nillable="false">
+  <xsd:element name="Character_Specials" nillable="false">
     <xsd:annotation></xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="self:Special" minOccurs="0" maxOccurs="unbound" />
+      </xsd:sequence>
+    </xsd:complexType>
   </xsd:element>
-  <xsd:element name="Character_Feats" type="self:Feat" nillable="false">
+  <xsd:element name="Character_Feats" nillable="false">
     <xsd:annotation></xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="self:Feat" minOccurs="0" maxOccurs="unbound" />
+      </xsd:sequence>
+    </xsd:complexType>
   </xsd:element>
   <xsd:element name="Character_Strength" type="self:Statistic" nillable="false">
     <xsd:annotation></xsd:annotation>
@@ -381,7 +396,7 @@
     <xsd:annotation></xsd:annotation>
   </xsd:element>
   <xsd:complexType name="Character">
-    <xsd:sequence>
+    <xsd:all>
       <xsd:element ref="self:Character_Name" minOccurs="1"/>
       <xsd:element ref="self:Character_Skills" minOccurs="1"/>
       <xsd:element ref="self:Character_Specials" minOccurs="1"/>
@@ -391,7 +406,7 @@
       <xsd:element ref="self:Character_Intuition" minOccurs="1"/>
       <xsd:element ref="self:Character_Perception" minOccurs="1"/>
       <xsd:element ref="self:Character_Charisma" minOccurs="1"/>
-    </xsd:sequence>
+    </xsd:all>
   </xsd:complexType>
 </xsd:schema>
   

@@ -23,7 +23,7 @@ export class PlantData {
     associations() {
         return this.node.options
             .filter(field => this.lookupValues.indexOf(field.id) > -1)
-            .map((field: any) => `${field.id} <-- ${this.node.id} : ${field.id}`)
+            .map((field: any) => `${field.id} --> ${this.node.id} : ${field.id}`)
             .join("\n");
     }
 
@@ -43,7 +43,7 @@ export class PlantData {
             return (option.params || [])
                 .filter(p => /[A-Z].*/.test(p))
                 .map(param => {
-                    return `${param} <|.. ${this.node.id} : ${option.id} <i>${param}</i>`;
+                    return `${param} ..|> ${this.node.id} : ${option.id} <i>${param}</i>`;
                 });
         });
         return purge(fieldParams).join("\n");

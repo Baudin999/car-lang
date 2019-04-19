@@ -3,8 +3,8 @@
 <xsd:schema 
   xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
   
-  xmlns:self="http://example.con/"
-  targetNamespace="http://example.con/">
+  xmlns:self="http://foo.bar/"
+  targetNamespace="http://foo.bar/">
   <!-- VERSION: 0.0.1 -->
 </xsd:schema>
   

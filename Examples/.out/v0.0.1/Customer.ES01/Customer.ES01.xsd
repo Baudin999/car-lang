@@ -3,8 +3,8 @@
 <xsd:schema 
   xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
   
-  xmlns:self="http://example.con/"
-  targetNamespace="http://example.con/">
+  xmlns:self="http://foo.bar/"
+  targetNamespace="http://foo.bar/">
   <!-- VERSION: 0.0.1 -->
   <xsd:element name="Foo_Bar" nillable="false">
     <xsd:annotation></xsd:annotation>
@@ -16,9 +16,9 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Foo">
-    <xsd:sequence>
+    <xsd:all>
       <xsd:element ref="self:Foo_Bar" minOccurs="1"/>
-    </xsd:sequence>
+    </xsd:all>
   </xsd:complexType>
 </xsd:schema>
   

@@ -29,24 +29,23 @@ export class PlantClass {
                     this.lookup.data.indexOf(field.ofType) > -1 ||
                     this.lookup.enums.indexOf(field.ofType) > -1
             )
-            .map((field: any) => `${field.ofType} <-- ${this.node.id} : ${field.id}`);
+            .map((field: any) => `${field.ofType} --> ${this.node.id} : ${field.id}`);
 
         const maybeFields = this.node.fields
             .filter((f: any) => f.ofType && f.ofType === "Maybe")
             .filter((field: any) => baseTypes.indexOf(field.ofType_params[0]) === -1)
-            .map(
-                (field: any) =>
-                    `${field.ofType_params[0]} "0" <-- "1" ${this.node.id} : Maybe ${
-                        field.ofType_params[0]
-                    }`
-            );
+            .map((field: any) => {
+                return `${field.ofType_params[0]} "0" --> "1" ${this.node.id} : Maybe ${
+                    field.ofType_params[0]
+                }`;
+            });
 
         const listFields = this.node.fields
             .filter((f: any) => f.ofType && f.ofType === "List")
             .filter((field: any) => baseTypes.indexOf(field.ofType_params[0]) === -1)
             .map(
                 (field: any) =>
-                    `${field.ofType_params[0]} "0" <-- "*" ${this.node.id} : List ${
+                    `${field.ofType_params[0]} "0" --> "*" ${this.node.id} : List ${
                         field.ofType_params[0]
                     }`
             );
@@ -57,7 +56,7 @@ export class PlantClass {
     extensions() {
         return this.node.extends
             .filter((extension: any) => this.lookup.types.indexOf(extension) > -1)
-            .map((extension: any) => `${extension} <|-- ${this.node.id}`)
+            .map((extension: any) => `${extension} --|> ${this.node.id}`)
             .join("\n");
     }
 

@@ -1,18 +1,18 @@
+open Prelude importing (List, Maybe)
+
+% domain: Carlos
+
 # Chapter
 
-type List a
+@ Een item is iets wat we kunnen gebruiken
+@ name: Item
+@ value: Niet nodig
+type Item =
+    Key: String
+    Value: String
 
+@ api: Dit is ook een API
 type Person =
-    FirstName: String
-    Address: List Address
-
-type Address =
-    Street: String 
-
-@ THis is the the Something type
-type Something a =
-    Body: a
-    Header: String
-
-
-A little change
+    Name: String
+    Something: Item
+    Items: List Item

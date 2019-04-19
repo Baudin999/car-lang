@@ -20,9 +20,9 @@ export class XsdClass {
 
         return `
     <xsd:complexType name="${this.node.id}">
-        <xsd:sequence>
+        <xsd:all>
         ${fields}
-        </xsd:sequence>
+        </xsd:all>
     </xsd:complexType>
         `;
     }
@@ -65,7 +65,18 @@ export class XsdClass {
                     .join("\n");
                 let xsdType = baseTypeToXSDType(fieldType);
 
-                if (xsdType.startsWith("xsd:")) {
+                if (isList) {
+                    return `
+    <xsd:element name="${this.node.id}_${tf.id}" nillable="false">
+        <xsd:annotation>${annotations}</xsd:annotation>
+        <xsd:complexType>
+        <xsd:sequence>
+        <xsd:element ref="self:${fieldType}" minOccurs="0" maxOccurs="unbound" />
+        </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+            `.trim();
+                } else if (xsdType.startsWith("xsd:")) {
                     return `
     <xsd:element name="${this.node.id}_${tf.id}" nillable="false">
         <xsd:annotation>${annotations}</xsd:annotation>
@@ -74,6 +85,12 @@ export class XsdClass {
             ${restrictions}
         </xsd:restriction>
         </xsd:simpleType>
+    </xsd:element>
+            `.trim();
+                } else if (xsdType.startsWith("self")) {
+                    return `
+    <xsd:element name="${this.node.id}_${tf.id}" type="${xsdType}" nillable="false">
+        <xsd:annotation>${annotations}</xsd:annotation>
     </xsd:element>
             `.trim();
                 } else if (xsdType.startsWith("self")) {

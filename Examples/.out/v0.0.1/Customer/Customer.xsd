@@ -3,9 +3,30 @@
 <xsd:schema 
   xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
   
-  xmlns:self="http://example.con/"
-  targetNamespace="http://example.con/">
+  xmlns:self="http://foo.bar/"
+  targetNamespace="http://foo.bar/">
   <!-- VERSION: 0.0.1 -->
+  <xsd:element name="CreditCard_Number" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="CreditCard_ExpirationDate" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:date"></xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:complexType name="CreditCard">
+    <xsd:all>
+      <xsd:element ref="self:CreditCard_Number" minOccurs="1"/>
+      <xsd:element ref="self:CreditCard_ExpirationDate" minOccurs="1"/>
+    </xsd:all>
+  </xsd:complexType>
   <xsd:simpleType name="Id">
     <xsd:restriction base="xsd:string">
       <xsd:minLength value="2" />
@@ -15,9 +36,9 @@
   </xsd:simpleType>
   <xsd:complexType name="Gender">
     <xsd:choice>
-      <xsd:element name="[object Object]"/>
-      <xsd:element name="[object Object]"/>
-      <xsd:element name="[object Object]"/>
+      <xsd:element name="Male"/>
+      <xsd:element name="Female"/>
+      <xsd:element name="Other"/>
     </xsd:choice>
   </xsd:complexType>
   <xsd:element name="Address_Street" nillable="false">
@@ -96,7 +117,7 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Address">
-    <xsd:sequence>
+    <xsd:all>
       <xsd:element ref="self:Address_Street" minOccurs="1"/>
       <xsd:element ref="self:Address_PostalCode" minOccurs="1"/>
       <xsd:element ref="self:Address_HouseNumber" minOccurs="1"/>
@@ -104,7 +125,7 @@
       <xsd:element ref="self:Address_City" minOccurs="1"/>
       <xsd:element ref="self:Address_CountryCode" minOccurs="1"/>
       <xsd:element ref="self:Address_Country" minOccurs="0"/>
-    </xsd:sequence>
+    </xsd:all>
   </xsd:complexType>
   <xsd:element name="Person_FirstName" nillable="false">
     <xsd:annotation></xsd:annotation>
@@ -134,13 +155,25 @@
     <xsd:annotation></xsd:annotation>
   </xsd:element>
   <xsd:complexType name="Person">
-    <xsd:sequence>
+    <xsd:all>
       <xsd:element ref="self:Person_FirstName" minOccurs="0"/>
       <xsd:element ref="self:Person_LastName" minOccurs="1"/>
       <xsd:element ref="self:Person_Address" minOccurs="1"/>
       <xsd:element ref="self:Person_Gender" minOccurs="1"/>
       <xsd:element ref="self:Person_CustomerId" minOccurs="1"/>
-    </xsd:sequence>
+    </xsd:all>
+  </xsd:complexType>
+  <xsd:element name="PaymentMethod_Customer" type="self:Customer" nillable="false">
+    <xsd:annotation></xsd:annotation>
+  </xsd:element>
+  <xsd:element name="PaymentMethod_CreditCard" type="self:CreditCard" nillable="false">
+    <xsd:annotation></xsd:annotation>
+  </xsd:element>
+  <xsd:complexType name="PaymentMethod">
+    <xsd:all>
+      <xsd:element ref="self:PaymentMethod_Customer" minOccurs="1"/>
+      <xsd:element ref="self:PaymentMethod_CreditCard" minOccurs="1"/>
+    </xsd:all>
   </xsd:complexType>
   <xsd:element name="Company_OrganisationName" nillable="false">
     <xsd:annotation></xsd:annotation>
@@ -155,18 +188,18 @@
     <xsd:annotation></xsd:annotation>
   </xsd:element>
   <xsd:complexType name="Company">
-    <xsd:sequence>
+    <xsd:all>
       <xsd:element ref="self:Company_OrganisationName" minOccurs="1"/>
       <xsd:element ref="self:Company_CustomerId" minOccurs="1"/>
-    </xsd:sequence>
+    </xsd:all>
   </xsd:complexType>
   <xsd:element name="Customer_CustomerId" type="self:Id" nillable="false">
     <xsd:annotation></xsd:annotation>
   </xsd:element>
   <xsd:complexType name="Customer">
-    <xsd:sequence>
+    <xsd:all>
       <xsd:element ref="self:Customer_CustomerId" minOccurs="1"/>
-    </xsd:sequence>
+    </xsd:all>
   </xsd:complexType>
 </xsd:schema>
   

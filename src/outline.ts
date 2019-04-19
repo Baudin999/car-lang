@@ -270,11 +270,13 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
     }
 
     CHOICE_OPTION(ctx: any): IChoiceOption {
-        const value = ctx.StringLiteral
-            ? ctx.StringLiteral[0].image.replace(/"/g, "")
-            : ctx.NumberLiteral
-            ? +ctx.NumberLiteral[0].image
-            : "";
+        let value: string | number = "";
+        if (ctx.StringLiteral) {
+            value = ctx.StringLiteral[0].image.replace(/"/g, "");
+        }
+        if (ctx.NumberLiteral) {
+            value = +ctx.NumberLiteral[0].image;
+        }
 
         return {
             type: ctx.NumberLiteral ? "number" : "string",
@@ -648,7 +650,7 @@ export interface IChoice {
 
 export interface IChoiceOption {
     type: string;
-    id: string;
+    id: string | number;
     annotations: IAnnotation[];
 }
 
