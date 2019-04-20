@@ -76,6 +76,12 @@ const KW_flow = createToken({
     push_mode: "flow_definition"
 });
 
+const KW_map = createToken({
+    pattern: /map/,
+    name: "KW_map",
+    push_mode: "map_definition"
+});
+
 const KW_pluck = createToken({
     pattern: /pluck/,
     name: "KW_pluck"
@@ -296,6 +302,7 @@ const multiModeLexerDefinition = {
             KW_let,
             KW_aggregate,
             KW_flow,
+            KW_map,
             SIGN_close,
             AnnotationLiteral,
             EndBlock,
@@ -449,6 +456,15 @@ const multiModeLexerDefinition = {
             Indent,
             WhiteSpace,
             CommentBlock
+        ],
+        map_definition: [
+            Identifier,
+            StringLiteral,
+            SIGN_open,
+            SIGN_close,
+            SIGN_arrow,
+            NewLine,
+            WhiteSpace
         ]
     },
 
@@ -468,6 +484,7 @@ export const tokenLookup = {
     KW_importing,
     KW_aggregate,
     KW_flow,
+    KW_map,
 
     SIGN_Equals,
     SIGN_EqualsType,

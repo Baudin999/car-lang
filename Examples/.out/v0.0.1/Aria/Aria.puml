@@ -37,10 +37,9 @@ class "Skill " as Skill <Namable,Buyable> {
 	Skilled: Boolean  <i>from Buyable</i>
 	Professional: Boolean  <i>from Buyable</i>
 	Master: Boolean  <i>from Buyable</i>
---
+===
   <b>description</b>: A skill is
  something a character can do
-    
 }
 BoughtFrom --> Skill : Source
 Stat --> Skill : Stat
@@ -88,12 +87,11 @@ class "Statistic" as Statistic  {
 	Description: String 
 	XP: XP 
 	Value: Number 
---
+===
   <b>description</b>: A statistic is a
  base value for a character's potential
  Statistics serve as a base bonus for
  certain abilities.
-    
 }
 Stat --> Statistic : Stat
 class "Character" as Character  {

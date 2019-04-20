@@ -27,6 +27,9 @@ export declare class OutlineVisitor extends BaseCstVisitorWithDefaults {
     };
     CHOICE(ctx: any): IChoice;
     CHOICE_OPTION(ctx: any): IChoiceOption;
+    MAP(ctx: any): IMap;
+    MAP_FLOW(ctx: any): IMapFlow;
+    MAP_FLOW_KEY(ctx: any): string | null;
     IDENTIFIER(ctx: any): IIdentity;
     TYPE_IDENTIFIER(ctx: any): {
         ofType: any;
@@ -132,6 +135,15 @@ export interface IView {
     directives: IDirective[];
     annotations: IAnnotation[];
 }
+export interface IMap {
+    type: NodeType;
+    directives: IDirective[];
+    flows: IMapFlow[];
+}
+export interface IMapFlow {
+    type: NodeType;
+    nodes: string[];
+}
 export interface IAggregate {
     type: NodeType;
     root: string;
@@ -224,7 +236,7 @@ export interface IMarkdownList {
     type: NodeType;
     items: string[];
 }
-export declare type IExpression = IType | IAlias | IData | IComment | IAggregate | IChoice | IFlow | IView | IMarkdownChapter | IMarkdownCode | IMarkdownImage | IMarkdownList | IMarkdownParagraph;
+export declare type IExpression = IType | IAlias | IData | IComment | IAggregate | IChoice | IFlow | IView | IMap | IMarkdownChapter | IMarkdownCode | IMarkdownImage | IMarkdownList | IMarkdownParagraph;
 export declare enum NodeType {
     TYPE = "TYPE",
     TYPE_FIELD = "TYPE_FIELD",
@@ -248,7 +260,9 @@ export declare enum NodeType {
     OPEN = "OPEN",
     FLOW = "FLOW",
     OPERATION = "OPERATION",
-    OPERATION_PARAMETER = "OPERATION_PARAMETER"
+    OPERATION_PARAMETER = "OPERATION_PARAMETER",
+    MAP = "MAP",
+    MAP_FLOW = "MAP_FLOW"
 }
 export interface IError {
     message: string;

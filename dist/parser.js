@@ -26,6 +26,7 @@ class DomainParser extends chevrotain_1.Parser {
                 { ALT: () => $.SUBRULE($.CHOICE) },
                 { ALT: () => $.SUBRULE($.OPEN) },
                 { ALT: () => $.SUBRULE($.AGGREGATE) },
+                { ALT: () => $.SUBRULE($.MAP) },
                 { ALT: () => $.SUBRULE($.FLOW) },
                 { ALT: () => $.SUBRULE($.MARKDOWN_CHAPTER) },
                 { ALT: () => $.SUBRULE($.MARKDOWN_PARAGRAPH) },
@@ -203,6 +204,27 @@ class DomainParser extends chevrotain_1.Parser {
                 { ALT: () => $.CONSUME(lexer_1.tokenLookup.StringLiteral) },
                 { ALT: () => $.CONSUME(lexer_1.tokenLookup.PatternLiteral) },
                 { ALT: () => $.CONSUME(lexer_1.tokenLookup.BooleanLiteral) }
+            ]);
+        });
+        $.RULE("MAP", () => {
+            $.CONSUME(lexer_1.tokenLookup.KW_map);
+            $.CONSUME(lexer_1.tokenLookup.SIGN_open);
+            $.MANY(() => $.SUBRULE($.MAP_FLOW));
+            $.CONSUME(lexer_1.tokenLookup.SIGN_close);
+        });
+        $.RULE("MAP_FLOW", () => {
+            $.OPTION(() => lexer_1.tokenLookup.Indent);
+            $.AT_LEAST_ONE_SEP({
+                SEP: lexer_1.tokenLookup.SIGN_arrow,
+                DEF: () => {
+                    $.SUBRULE($.MAP_FLOW_KEY);
+                }
+            });
+        });
+        $.RULE("MAP_FLOW_KEY", () => {
+            $.OR([
+                { ALT: () => $.CONSUME(lexer_1.tokenLookup.Identifier) },
+                { ALT: () => $.CONSUME(lexer_1.tokenLookup.StringLiteral) }
             ]);
         });
         $.RULE("TYPE_IDENTIFIER", () => {

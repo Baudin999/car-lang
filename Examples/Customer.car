@@ -65,9 +65,11 @@ type PaymentMethod =
 type Company extends Customer  =
     OrganisationName: String
 
+@ Someone or some company who buys things
 type Customer =
     CustomerId: Id
 
+[Customer](http://pas-wordpress-media.s3.amazonaws.com/content/uploads/2015/09/Customer-service-woman-on-headset-gives-OK-1024x770.jpg)
 
 view {
     % title: Customer 
@@ -118,4 +120,14 @@ flow {
     validateCustomer :: CustomerId -> AccountId -> Maybe Customer
 
 
+}
+
+## And a simple mind map
+
+map {
+    Lead -> Prospect -> Customer
+
+    "Temperature of the Lead" -> "Make Lead an Offer" -> Prospect
+
+    Lead -> Offer -> Prospect
 }

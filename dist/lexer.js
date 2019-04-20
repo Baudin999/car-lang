@@ -64,6 +64,11 @@ const KW_flow = chevrotain_1.createToken({
     name: "KW_flow",
     push_mode: "flow_definition"
 });
+const KW_map = chevrotain_1.createToken({
+    pattern: /map/,
+    name: "KW_map",
+    push_mode: "map_definition"
+});
 const KW_pluck = chevrotain_1.createToken({
     pattern: /pluck/,
     name: "KW_pluck"
@@ -247,6 +252,7 @@ const multiModeLexerDefinition = {
             lexer_let_1.KW_let,
             KW_aggregate,
             KW_flow,
+            KW_map,
             SIGN_close,
             AnnotationLiteral,
             exports.EndBlock,
@@ -400,6 +406,15 @@ const multiModeLexerDefinition = {
             Indent,
             WhiteSpace,
             CommentBlock
+        ],
+        map_definition: [
+            Identifier,
+            StringLiteral,
+            SIGN_open,
+            SIGN_close,
+            SIGN_arrow,
+            NewLine,
+            WhiteSpace
         ]
     },
     defaultMode: "root"
@@ -417,6 +432,7 @@ exports.tokenLookup = {
     KW_importing,
     KW_aggregate,
     KW_flow,
+    KW_map,
     SIGN_Equals,
     SIGN_EqualsType,
     SIGN_EqualsData,

@@ -5,411 +5,460 @@
       <link rel="stylesheet" href="./../style.css">
       </head>
       <body>
-        <div class="page">
-          <h1>Links</h1>
-          <a href="Customer.xsd">XSD</a>
-          <a href="Customer.json">JSON schema</a>
-          <p>% domain: Customer</p>
-          <p>% service: DefaultCustomer</p>
-          <p>% version: 0.1</p>
-          <h1> Person</h1>
-          <p>This document will show the way we're going to work with
+        <h1>Links</h1>
+        <ul>
+          <li>
+            <a href="Customer.xsd">XSD</a>
+          </li>
+          <li>
+            <a href="Customer.json">JSON schema</a>
+          </li>
+          <li>
+            <a href="Customer.svg">ERD</a>
+          </li>
+        </ul>
+        <p>% domain: Customer</p>
+        <p>% service: DefaultCustomer</p>
+        <p>% version: 0.1</p>
+        <h1> Person</h1>
+        <p>This document will show the way we're going to work with
 People in the application. People have an Address where
 they live. CHanged</p>
-          <p>These are the fields which are important for Person:</p>
-          <ul>
-            <li>Person</li>
-            <li>Address</li>
-          </ul>
-          <h2> Customer Models</h2>
-          <div class="image-container">
-            <img src="http://www.plantuml.com/plantuml/svg/dOxF2i8m3CRFwrE4tOVtCGeoK0J_WKyGRHs5jPMa7eRktPsq7RYZfoHVldpv1HDwNKFxvE2j9Y5kFJ93UTR4ta49o93w9fial4InCSJXY7OwFk1mrN09P5mdYZrcFIeWYhLIf9bhICqaRRLJccg8TH9o-4xLi5C0ZP5tydOcQrP6Yb7a4QhgBHDPPcwzVQ0R8dGUVgbFrA4pZC5uju3y2o1zcGdICX9av_Vn8bsC7m00" />
-          </div>
-          <h2> Customer Aggregate</h2>
-          <p>This is the customer aggregate.</p>
-          <div class="image-container">
-            <img src="http://www.plantuml.com/plantuml/svg/oqlCJIqkI4nELN0kBIx9pqqjKgZcKW22v9p4ucAu899GG6fHSNuU5rG-FxSWCQ-IgnO0" />
-          </div>
-          <h2> Service Calls</h2>
-          <p>This next flow diagram shows how we can get a customer from
+        <p>These are the fields which are important for Person:</p>
+        <ul>
+          <li>Person</li>
+          <li>Address</li>
+        </ul>
+        <h2> Customer Models</h2>
+        <div class="image-container">
+          <img src="http://pas-wordpress-media.s3.amazonaws.com/content/uploads/2015/09/Customer-service-woman-on-headset-gives-OK-1024x770.jpg" />
+        </div>
+        <div class="image-container">
+          <img src="http://www.plantuml.com/plantuml/svg/dO_DQiCm48JFtgSOSW-v6rjG0Ys1_a6VGBQsYI2Mmgv2CMtUlGgM0isn9ysEHZkVaaz7Rh4zQueJ2z5ujAfOlRDe35Z1AehkQiZWcvf7BvfUxPGVlzXvO7mayM5FpREj_kA0cWVdX5LR596j9mwEfSLoPgCktxaMEmTqtdnAd6vatSORkb0TiLx_c49McRTnEjamBz1r-4lz9diRlDhaOxY3_1T0QRaHbCk5e2QlnNVRgUzxoXs3SQoZ-DCLgDiC9WFbM0oCAD0i2MFvoTSXOZZFYdJ8n4gNNm00" />
+        </div>
+        <h2> Customer Aggregate</h2>
+        <p>This is the customer aggregate.</p>
+        <div class="image-container">
+          <img src="http://www.plantuml.com/plantuml/svg/oqlCJIqkI4nELN0kBIx9pqqjKgZcKW22v9p4ucAu899GG6fHSNuU5rG-FxSWCQ-IgnO0" />
+        </div>
+        <h2> Service Calls</h2>
+        <p>This next flow diagram shows how we can get a customer from
 our CRM backend system.</p>
-          <div class="image-container">
-            <img src="http://www.plantuml.com/plantuml/svg/bPDDRuCm38Rl-HKMzwqzLmYrGjN4j6hJDcs7TPe2c18DaYenJFpx6KfR-g5sEqMn_Rv-ZCFKaRHKbOKWHGN27HA4bIDJeXMo8gEhCaOBdXy77-Fn-DCJmfizHHv81tp2JG33-mJcYd8MF7x3t5fZXJQ4ODKgfpOlV1MmLIqBbKf2ZeIoAFnH7FWZ5GY1EeLM8SIPFYzeQvKWFCW6RPVf8rzTPB8ZZrAkN-ebtR-_RW1CpKm7rJt92cchEajnhMa75ZulkWoVPo1cIM8gJL4wGE7AIm3j6kJE2J9hobO2SGDhwPpIAr1Q07_fGRlR0-u1qtyO-_j2Dl7UUxZ4FVbsYQVuRtq6LDOnxjsL0vbGnJjlDlWSCvkYDLfdD6J6ma_Eyt9CG8eaLS4YYv0X9JbU6lDFZ-HejEiBFddYHmvJvk4_w1S0" />
-          </div>
-          <h1>ERD</h1>
-          <div class="image-container">
-            <img src="Customer.svg" />
-          </div>
-          <h1>Appendix: Entities</h1>
-          <table>
-            <thead>
-              <tr>
-                <th colSpan="4">
-                  <h2>CreditCard</h2>
-                </th>
-              </tr>
-              <tr>
-                <th colSpan="4">
+        <div class="image-container">
+          <img src="http://www.plantuml.com/plantuml/svg/bPDDRuCm38Rl-HKMzwqzLmYrGjN4j6hJDcs7TPe2c18DaYenJFpx6KfR-g5sEqMn_Rv-ZCFKaRHKbOKWHGN27HA4bIDJeXMo8gEhCaOBdXy77-Fn-DCJmfizHHv81tp2JG33-mJcYd8MF7x3t5fZXJQ4ODKgfpOlV1MmLIqBbKf2ZeIoAFnH7FWZ5GY1EeLM8SIPFYzeQvKWFCW6RPVf8rzTPB8ZZrAkN-ebtR-_RW1CpKm7rJt92cchEajnhMa75ZulkWoVPo1cIM8gJL4wGE7AIm3j6kJE2J9hobO2SGDhwPpIAr1Q07_fGRlR0-u1qtyO-_j2Dl7UUxZ4FVbsYQVuRtq6LDOnxjsL0vbGnJjlDlWSCvkYDLfdD6J6ma_Eyt9CG8eaLS4YYv0X9JbU6lDFZ-HejEiBFddYHmvJvk4_w1S0" />
+        </div>
+        <div class="image-container">
+          <img src="http://www.plantuml.com/plantuml/svg/SoWkIImgAStDuUBIy4bDJD5KqBLJq0WeoYykI4qkqUH2CC4IpgN59VcvgKMQN43r8Qcv1Qb5YIMbHQaA-MaA9Hcf2WWZV1Ep8Lo5n3m5_xGqa1viWcZseJW3fWsxIfZ2w8pCb9JKl5YGD2uduNCiidw8OYw7rBmKO9W00000" />
+        </div>
+        <h1>ERD</h1>
+        <div class="image-container">
+          <img src="Customer.svg" />
+        </div>
+        <h1>Appendix: Entities</h1>
+        <table>
+          <thead>
+            <tr>
+              <th colSpan="4">
+                <h2>CreditCard</h2>
+              </th>
+            </tr>
+            <tr>
+              <th colSpan="4">
         No description
       </th>
-              </tr>
-              <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Restrictions</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Number</td>
-                <td>String </td>
-                <td>
-                  <div>
-                    <b>min</b>: 1
-                  </div>
-                  <div>
-                    <b>max</b>: 100
-                  </div>
-                </td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>ExpirationDate</td>
-                <td>Date </td>
-                <td></td>
-                <td></td>
-              </tr>
-            </tbody>
-          </table>
-          <table>
-            <thead>
-              <tr>
-                <th colSpan="4">
-                  <h2>Gender</h2>
-                </th>
-              </tr>
-              <tr>
-                <th colSpan="4">
+            </tr>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Restrictions</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Number</td>
+              <td>String </td>
+              <td>
+                <div>
+                  <b>min</b>: 1
+                </div>
+                <div>
+                  <b>max</b>: 100
+                </div>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>ExpirationDate</td>
+              <td>Date </td>
+              <td></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+        <table>
+          <thead>
+            <tr>
+              <th colSpan="4">
+                <h2>Id</h2>
+              </th>
+            </tr>
+            <tr>
+              <th colSpan="4">
         No description
       </th>
-              </tr>
-              <tr>
-                <th>Name</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Male</td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>Female</td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>Other</td>
-                <td></td>
-              </tr>
-            </tbody>
-          </table>
-          <table>
-            <thead>
-              <tr>
-                <th colSpan="4">
-                  <h2>Address</h2>
-                </th>
-              </tr>
-              <tr>
-                <th colSpan="4">
+            </tr>
+            <tr>
+              <th>Restriction</th>
+              <th>Value</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>min</td>
+              <td>2</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>max</td>
+              <td>2</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>pattern</td>
+              <td>/[A-Z]{2}/</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+        <table>
+          <thead>
+            <tr>
+              <th colSpan="4">
+                <h2>Gender</h2>
+              </th>
+            </tr>
+            <tr>
+              <th colSpan="4">
+        No description
+      </th>
+            </tr>
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Male</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>Female</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>Other</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+        <table>
+          <thead>
+            <tr>
+              <th colSpan="4">
+                <h2>Address</h2>
+              </th>
+            </tr>
+            <tr>
+              <th colSpan="4">
         The address of a person. This is the functional location of where a person lives. This type is of course designed for the Dutch address system.
       </th>
-              </tr>
-              <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Restrictions</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Street</td>
-                <td>String </td>
-                <td>
-                  <div>
-                    <b>min</b>: 1
-                  </div>
-                  <div>
-                    <b>max</b>: 100
-                  </div>
-                </td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>PostalCode</td>
-                <td>String </td>
-                <td>
-                  <div>
-                    <b>min</b>: 1
-                  </div>
-                  <div>
-                    <b>max</b>: 100
-                  </div>
-                </td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>HouseNumber</td>
-                <td>Number </td>
-                <td>
-                  <div>
-                    <b>min</b>: 1
-                  </div>
-                  <div>
-                    <b>max</b>: 9999
-                  </div>
-                </td>
-                <td>
-                  <div>
-                    <b>description</b>: Yes, a real number
-                  </div>
-                  <div>
-                    <b>type</b>: Number
-                  </div>
-                  <div>
-                    <b>note</b>: This is a simple note on a field
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>HouseNumberExtension</td>
-                <td>String </td>
-                <td>
-                  <div>
-                    <b>min</b>: 1
-                  </div>
-                  <div>
-                    <b>max</b>: 100
-                  </div>
-                </td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>City</td>
-                <td>String </td>
-                <td>
-                  <div>
-                    <b>min</b>: 1
-                  </div>
-                  <div>
-                    <b>max</b>: 100
-                  </div>
-                </td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>CountryCode</td>
-                <td>String </td>
-                <td>
-                  <div>
-                    <b>length</b>: 2
-                  </div>
-                  <div>
-                    <b>pattern</b>: /[A-Z]{2}/
-                  </div>
-                </td>
-                <td>
-                  <div>
-                    <b>description</b>: The country code is a two letter code all in capital letters.
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td>Country</td>
-                <td>Maybe String</td>
-                <td>
-                  <div>
-                    <b>min</b>: 1
-                  </div>
-                  <div>
-                    <b>max</b>: 100
-                  </div>
-                </td>
-                <td></td>
-              </tr>
-            </tbody>
-          </table>
-          <table>
-            <thead>
-              <tr>
-                <th colSpan="4">
-                  <h2>Person</h2>
-                </th>
-              </tr>
-              <tr>
-                <th colSpan="4">
+            </tr>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Restrictions</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Street</td>
+              <td>String </td>
+              <td>
+                <div>
+                  <b>min</b>: 1
+                </div>
+                <div>
+                  <b>max</b>: 100
+                </div>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>PostalCode</td>
+              <td>String </td>
+              <td>
+                <div>
+                  <b>min</b>: 1
+                </div>
+                <div>
+                  <b>max</b>: 100
+                </div>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>HouseNumber</td>
+              <td>Number </td>
+              <td>
+                <div>
+                  <b>min</b>: 1
+                </div>
+                <div>
+                  <b>max</b>: 9999
+                </div>
+              </td>
+              <td>
+                <div>
+                  <b>description</b>: Yes, a real number
+                </div>
+                <div>
+                  <b>type</b>: Number
+                </div>
+                <div>
+                  <b>note</b>: This is a simple note on a field
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>HouseNumberExtension</td>
+              <td>String </td>
+              <td>
+                <div>
+                  <b>min</b>: 1
+                </div>
+                <div>
+                  <b>max</b>: 100
+                </div>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>City</td>
+              <td>String </td>
+              <td>
+                <div>
+                  <b>min</b>: 1
+                </div>
+                <div>
+                  <b>max</b>: 100
+                </div>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>CountryCode</td>
+              <td>String </td>
+              <td>
+                <div>
+                  <b>length</b>: 2
+                </div>
+                <div>
+                  <b>pattern</b>: /[A-Z]{2}/
+                </div>
+              </td>
+              <td>
+                <div>
+                  <b>description</b>: The country code is a two letter code all in capital letters.
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Country</td>
+              <td>Maybe String</td>
+              <td>
+                <div>
+                  <b>min</b>: 1
+                </div>
+                <div>
+                  <b>max</b>: 100
+                </div>
+              </td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+        <table>
+          <thead>
+            <tr>
+              <th colSpan="4">
+                <h2>Person</h2>
+              </th>
+            </tr>
+            <tr>
+              <th colSpan="4">
         No description
       </th>
-              </tr>
-              <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Restrictions</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>FirstName</td>
-                <td>Maybe String</td>
-                <td>
-                  <div>
-                    <b>min</b>: 1
-                  </div>
-                  <div>
-                    <b>max</b>: 100
-                  </div>
-                </td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>LastName</td>
-                <td>String </td>
-                <td>
-                  <div>
-                    <b>min</b>: 1
-                  </div>
-                  <div>
-                    <b>max</b>: 100
-                  </div>
-                </td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>Address</td>
-                <td>Address </td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>Gender</td>
-                <td>Gender </td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>CustomerId</td>
-                <td>Id </td>
-                <td></td>
-                <td></td>
-              </tr>
-            </tbody>
-          </table>
-          <table>
-            <thead>
-              <tr>
-                <th colSpan="4">
-                  <h2>PaymentMethod</h2>
-                </th>
-              </tr>
-              <tr>
-                <th colSpan="4">
+            </tr>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Restrictions</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>FirstName</td>
+              <td>Maybe String</td>
+              <td>
+                <div>
+                  <b>min</b>: 1
+                </div>
+                <div>
+                  <b>max</b>: 100
+                </div>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>LastName</td>
+              <td>String </td>
+              <td>
+                <div>
+                  <b>min</b>: 1
+                </div>
+                <div>
+                  <b>max</b>: 100
+                </div>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>Address</td>
+              <td>Address </td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>Gender</td>
+              <td>Gender </td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>CustomerId</td>
+              <td>Id </td>
+              <td></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+        <table>
+          <thead>
+            <tr>
+              <th colSpan="4">
+                <h2>PaymentMethod</h2>
+              </th>
+            </tr>
+            <tr>
+              <th colSpan="4">
         No description
       </th>
-              </tr>
-              <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Restrictions</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Customer</td>
-                <td>Customer </td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>CreditCard</td>
-                <td>CreditCard </td>
-                <td></td>
-                <td></td>
-              </tr>
-            </tbody>
-          </table>
-          <table>
-            <thead>
-              <tr>
-                <th colSpan="4">
-                  <h2>Company</h2>
-                </th>
-              </tr>
-              <tr>
-                <th colSpan="4">
+            </tr>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Restrictions</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Customer</td>
+              <td>Customer </td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>CreditCard</td>
+              <td>CreditCard </td>
+              <td></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+        <table>
+          <thead>
+            <tr>
+              <th colSpan="4">
+                <h2>Company</h2>
+              </th>
+            </tr>
+            <tr>
+              <th colSpan="4">
         No description
       </th>
-              </tr>
-              <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Restrictions</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>OrganisationName</td>
-                <td>String </td>
-                <td>
-                  <div>
-                    <b>min</b>: 1
-                  </div>
-                  <div>
-                    <b>max</b>: 100
-                  </div>
-                </td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>CustomerId</td>
-                <td>Id </td>
-                <td></td>
-                <td></td>
-              </tr>
-            </tbody>
-          </table>
-          <table>
-            <thead>
-              <tr>
-                <th colSpan="4">
-                  <h2>Customer</h2>
-                </th>
-              </tr>
-              <tr>
-                <th colSpan="4">
-        No description
+            </tr>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Restrictions</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>OrganisationName</td>
+              <td>String </td>
+              <td>
+                <div>
+                  <b>min</b>: 1
+                </div>
+                <div>
+                  <b>max</b>: 100
+                </div>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>CustomerId</td>
+              <td>Id </td>
+              <td></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+        <table>
+          <thead>
+            <tr>
+              <th colSpan="4">
+                <h2>Customer</h2>
+              </th>
+            </tr>
+            <tr>
+              <th colSpan="4">
+        Someone or some company who buys things
       </th>
-              </tr>
-              <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Restrictions</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>CustomerId</td>
-                <td>Id </td>
-                <td></td>
-                <td></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+            </tr>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Restrictions</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>CustomerId</td>
+              <td>Id </td>
+              <td></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
       </body>
     </html>

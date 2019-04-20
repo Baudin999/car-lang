@@ -84,6 +84,12 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
                 ...this.visit(ctx.FLOW[0]),
                 ignore
             };
+        } else if (ctx.MAP) {
+            return {
+                annotations,
+                ...this.visit(ctx.MAP[0]),
+                ignore
+            };
         } else if (ctx.MARKDOWN_CHAPTER) {
             return this.visit(ctx.MARKDOWN_CHAPTER[0]);
         } else if (ctx.MARKDOWN_IMAGE) {
@@ -283,6 +289,32 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
             id: value,
             annotations: purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
         };
+    }
+
+    MAP(ctx: any): IMap {
+        // TODO: add directives
+
+        return {
+            type: NodeType.MAP,
+            directives: [],
+            flows: ctx.MAP_FLOW.map(o => this.visit(o))
+        };
+    }
+    MAP_FLOW(ctx: any): IMapFlow {
+        return {
+            type: NodeType.MAP_FLOW,
+            nodes: purge(ctx.MAP_FLOW_KEY.map(o => this.visit(o)))
+        };
+    }
+
+    MAP_FLOW_KEY(ctx: any): string | null {
+        if (ctx.Identifier) {
+            return ctx.Identifier[0].image;
+        } else if (ctx.StringLiteral) {
+            return ctx.StringLiteral[0].image.replace(/"/g, "");
+        } else {
+            return null;
+        }
     }
 
     IDENTIFIER(ctx: any): IIdentity {
@@ -582,6 +614,16 @@ export interface IView {
     annotations: IAnnotation[];
 }
 
+export interface IMap {
+    type: NodeType;
+    directives: IDirective[];
+    flows: IMapFlow[];
+}
+export interface IMapFlow {
+    type: NodeType;
+    nodes: string[];
+}
+
 export interface IAggregate {
     type: NodeType;
     root: string;
@@ -698,6 +740,7 @@ export type IExpression =
     | IChoice
     | IFlow
     | IView
+    | IMap
     | IMarkdownChapter
     | IMarkdownCode
     | IMarkdownImage
@@ -727,7 +770,9 @@ export enum NodeType {
     OPEN = "OPEN",
     FLOW = "FLOW",
     OPERATION = "OPERATION",
-    OPERATION_PARAMETER = "OPERATION_PARAMETER"
+    OPERATION_PARAMETER = "OPERATION_PARAMETER",
+    MAP = "MAP",
+    MAP_FLOW = "MAP_FLOW"
 }
 
 const defaultStart: ITokenStart = {

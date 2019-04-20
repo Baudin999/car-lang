@@ -229,9 +229,15 @@ body {
 
 body {
     overflow: auto;
-    background: rgb(240, 240, 240);
+    /*background: rgb(240, 240, 240);*/
+    padding: 1rem;
 }
 
+p {
+    text-align: justify;
+}
+
+/*
 .page {
     width: 21cm;
     min-height: 100%;
@@ -243,6 +249,7 @@ body {
     border: 1px solid lightgray;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
+*/
 
 table a:link {
     color: #666;
@@ -276,6 +283,8 @@ table {
     -webkit-box-shadow: 0 1px 2px #d1d1d1;
     box-shadow: 0 1px 2px #d1d1d1;
     margin-bottom: 2rem;
+
+    page-break-inside: avoid;
 }
 table th {
     text-align: center;
@@ -343,5 +352,10 @@ table tr:hover td {
     background: -webkit-gradient(linear, left top, left bottom, from(#f2f2f2), to(#f0f0f0));
     background: -moz-linear-gradient(top, #f2f2f2, #f0f0f0);
 }
-
+.image-container {
+    max-width: 100%;
+}
+.image-container img {
+    max-width: 100%;
+}
 `;

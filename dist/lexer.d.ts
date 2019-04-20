@@ -12,6 +12,7 @@ export declare const tokenLookup: {
     KW_importing: import("chevrotain").TokenType;
     KW_aggregate: import("chevrotain").TokenType;
     KW_flow: import("chevrotain").TokenType;
+    KW_map: import("chevrotain").TokenType;
     SIGN_Equals: import("chevrotain").TokenType;
     SIGN_EqualsType: import("chevrotain").TokenType;
     SIGN_EqualsData: import("chevrotain").TokenType;

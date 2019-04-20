@@ -26,6 +26,9 @@ declare class DomainParser extends Parser {
     OPERATION_PARAMETER: any;
     OPERATION_PARAMETER_TYPE: any;
     OPERATION_PARAMETER_FIELD_TYPE: any;
+    MAP: any;
+    MAP_FLOW: any;
+    MAP_FLOW_KEY: any;
     IDENTIFIER: any;
     TYPE_IDENTIFIER: any;
     ANNOTATIONS: any;

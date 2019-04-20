@@ -16,13 +16,12 @@ class "Address" as Address  {
 	City: String 
 	CountryCode: String 
 	Country: Maybe String
---
+===
   <b>description</b>: The address of a
  person. This is the functional
  location of where a person lives. This
  type is of course designed for the
  Dutch address system.
-    
 }
 class "Person " as Person <Customer> {
 	FirstName: Maybe String
@@ -47,4 +46,7 @@ class "Company " as Company <Customer> {
 Customer --|> Company
 class "Customer" as Customer  {
 	CustomerId: Id 
+===
+  <b>description</b>: Someone or some
+ company who buys things
 }

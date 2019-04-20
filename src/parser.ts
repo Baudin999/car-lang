@@ -30,6 +30,9 @@ class DomainParser extends Parser {
     OPERATION_PARAMETER: any;
     OPERATION_PARAMETER_TYPE: any;
     OPERATION_PARAMETER_FIELD_TYPE: any;
+    MAP: any;
+    MAP_FLOW: any;
+    MAP_FLOW_KEY: any;
 
     IDENTIFIER: any;
     TYPE_IDENTIFIER: any;
@@ -71,6 +74,7 @@ class DomainParser extends Parser {
                 { ALT: () => $.SUBRULE($.CHOICE) },
                 { ALT: () => $.SUBRULE($.OPEN) },
                 { ALT: () => $.SUBRULE($.AGGREGATE) },
+                { ALT: () => $.SUBRULE($.MAP) },
                 { ALT: () => $.SUBRULE($.FLOW) },
                 { ALT: () => $.SUBRULE($.MARKDOWN_CHAPTER) },
                 { ALT: () => $.SUBRULE($.MARKDOWN_PARAGRAPH) },
@@ -271,6 +275,30 @@ class DomainParser extends Parser {
                 { ALT: () => $.CONSUME(tokenLookup.StringLiteral) },
                 { ALT: () => $.CONSUME(tokenLookup.PatternLiteral) },
                 { ALT: () => $.CONSUME(tokenLookup.BooleanLiteral) }
+            ]);
+        });
+
+        $.RULE("MAP", () => {
+            $.CONSUME(tokenLookup.KW_map);
+            $.CONSUME(tokenLookup.SIGN_open);
+            $.MANY(() => $.SUBRULE($.MAP_FLOW));
+            $.CONSUME(tokenLookup.SIGN_close);
+        });
+
+        $.RULE("MAP_FLOW", () => {
+            $.OPTION(() => tokenLookup.Indent);
+            $.AT_LEAST_ONE_SEP({
+                SEP: tokenLookup.SIGN_arrow,
+                DEF: () => {
+                    $.SUBRULE($.MAP_FLOW_KEY);
+                }
+            });
+        });
+
+        $.RULE("MAP_FLOW_KEY", () => {
+            $.OR([
+                { ALT: () => $.CONSUME(tokenLookup.Identifier) },
+                { ALT: () => $.CONSUME(tokenLookup.StringLiteral) }
             ]);
         });
 

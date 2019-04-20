@@ -55,6 +55,9 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
         else if (ctx.FLOW) {
             return Object.assign({ annotations }, this.visit(ctx.FLOW[0]), { ignore });
         }
+        else if (ctx.MAP) {
+            return Object.assign({ annotations }, this.visit(ctx.MAP[0]), { ignore });
+        }
         else if (ctx.MARKDOWN_CHAPTER) {
             return this.visit(ctx.MARKDOWN_CHAPTER[0]);
         }
@@ -202,6 +205,31 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
             id: value,
             annotations: helpers_1.purge((ctx.ANNOTATIONS || []).map(a => this.visit(a)))
         };
+    }
+    MAP(ctx) {
+        // TODO: add directives
+        return {
+            type: NodeType.MAP,
+            directives: [],
+            flows: ctx.MAP_FLOW.map(o => this.visit(o))
+        };
+    }
+    MAP_FLOW(ctx) {
+        return {
+            type: NodeType.MAP_FLOW,
+            nodes: helpers_1.purge(ctx.MAP_FLOW_KEY.map(o => this.visit(o)))
+        };
+    }
+    MAP_FLOW_KEY(ctx) {
+        if (ctx.Identifier) {
+            return ctx.Identifier[0].image;
+        }
+        else if (ctx.StringLiteral) {
+            return ctx.StringLiteral[0].image.replace(/"/g, "");
+        }
+        else {
+            return null;
+        }
     }
     IDENTIFIER(ctx) {
         if (ctx.GenericIdentifier) {
@@ -413,6 +441,8 @@ var NodeType;
     NodeType["FLOW"] = "FLOW";
     NodeType["OPERATION"] = "OPERATION";
     NodeType["OPERATION_PARAMETER"] = "OPERATION_PARAMETER";
+    NodeType["MAP"] = "MAP";
+    NodeType["MAP_FLOW"] = "MAP_FLOW";
 })(NodeType = exports.NodeType || (exports.NodeType = {}));
 const defaultStart = {
     startLineNumber: 0,

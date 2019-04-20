@@ -5,10 +5,12 @@ const helpers_1 = require("../helpers");
 const tableTYPE_1 = require("./tableTYPE");
 const tableDATA_1 = require("./tableDATA");
 const tableCHOICE_1 = require("./tableCHOICE");
+const tableALIAS_1 = require("./tableALIAS");
 // @ts-ignore
 const deflate_1 = require("./../deflate/deflate");
 const createERD_1 = require("../erd/createERD");
 const createFlow_1 = require("../flows/createFlow");
+const createMap_1 = require("../maps/createMap");
 const createAggregate_1 = require("../aggregates/createAggregate");
 const pretty_data_1 = require("pretty-data");
 const types = [outline_1.NodeType.TYPE, outline_1.NodeType.ALIAS, outline_1.NodeType.DATA, outline_1.NodeType.CHOICE];
@@ -25,6 +27,10 @@ exports.createHTML = (ast, moduleName) => {
         else if (node.type === outline_1.NodeType.MARKDOWN_PARAGRAPH) {
             let p = node;
             return `<p>${p.content}</p>`;
+        }
+        else if (node.type === outline_1.NodeType.MARKDOWN_IMAGE) {
+            let p = node;
+            return `<div class="image-container"><img src="${p.uri}" /></div>`;
         }
         else if (node.type === outline_1.NodeType.MARKDOWN_LIST) {
             let list = node;
@@ -44,14 +50,21 @@ exports.createHTML = (ast, moduleName) => {
         else if (node.type === outline_1.NodeType.CHOICE) {
             tables.push(tableCHOICE_1.createTableCHOICE(node));
         }
+        else if (node.type === outline_1.NodeType.ALIAS) {
+            tables.push(tableALIAS_1.createTableALIAS(node));
+        }
         else if (node.type === outline_1.NodeType.VIEW) {
             let plantSource = createERD_1.createView(node, ast);
             let url = deflate_1.generateURL(plantSource);
             return `<div class="image-container"><img src="${url}" /></div>`;
         }
+        else if (node.type === outline_1.NodeType.MAP) {
+            let plantSource = createMap_1.createMap(node);
+            let url = deflate_1.generateURL(plantSource);
+            return `<div class="image-container"><img src="${url}" /></div>`;
+        }
         else if (node.type === outline_1.NodeType.AGGREGATE) {
             let plantSource = createAggregate_1.createAggregate(node, ast);
-            console.log(plantSource);
             let url = deflate_1.generateURL(plantSource);
             return `<div class="image-container"><img src="${url}" /></div>`;
         }
@@ -80,11 +93,13 @@ exports.createHTML = (ast, moduleName) => {
   </head>
   <body>
 
-  <div class="page">
 
     <h1>Links</h1>
-    <a href="${moduleName}.xsd">XSD</a>
-    <a href="${moduleName}.json">JSON schema</a>
+    <ul>
+        <li><a href="${moduleName}.xsd">XSD</a></li>
+        <li><a href="${moduleName}.json">JSON schema</a></li>
+        <li><a href="${moduleName}.svg">ERD</a></li>
+    </ul>
 
     ${helpers_1.purge(transformedNodes).join("\n")}
     <h1>ERD</h1>
@@ -92,7 +107,6 @@ exports.createHTML = (ast, moduleName) => {
     <h1>Appendix: Entities</h1>
     ${helpers_1.purge(tables).join("\n")}
 
-  </div>
   </body>
 </html>
   `)

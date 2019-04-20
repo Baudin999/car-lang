@@ -52,9 +52,9 @@ class PlantClass {
             .map(a => helpers_1.foldText(`<b>${a.key}</b>: ${a.value}`))
             .join("\n");
         return `
---
+===
   ${annotations}
-    `;
+    `.trim();
     }
     params() {
         return this.node.params ? " " + this.node.params.join(" ") : "";
