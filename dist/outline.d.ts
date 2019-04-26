@@ -15,16 +15,31 @@ export declare class OutlineVisitor extends BaseCstVisitorWithDefaults {
     VIEW(ctx: any): IView;
     AGGREGATE(ctx: any): IAggregate;
     FLOW(ctx: any): IFlow;
-    OPERATION(ctx: any): IOperation;
+    OPERATION(ctx: any): IOperation | IFireAndForget | IFlowFunction | IPubSub;
+    FLOW_FUNCTION(ctx: any): IFlowFunction;
+    /**
+     * A SYSTEM FLOW looks something like:
+     *
+     * @ id: getCustomer
+     * ("Entity Service", SAP) :: String -> Customer
+     */
+    FLOW_SYSTEM(ctx: any): IOperation | IFireAndForget;
+    /**
+     * Be able to publish to some queue
+     *
+     * "Customer Service" pub "The Event Name" :: Customer
+     */
+    FLOW_PUB(ctx: any): IPubSub;
+    /**
+     * Be able to subscribe to some queue
+     *
+     * "Customer Service" sub "The Event Name" :: String
+     */
+    FLOW_SUB(ctx: any): IPubSub;
+    ID_OR_STRING(ctx: any): string;
     OPERATION_PARAMETER(ctx: any): IOperationParameter;
     OPERATION_PARAMETER_TYPE(ctx: any): any;
     OPERATION_PARAMETER_FIELD_TYPE(ctx: any): any;
-    OPERATION_RESULT(ctx: any): {
-        result: any;
-        result_start: any;
-        result_params: any;
-        result_params_start: any;
-    };
     CHOICE(ctx: any): IChoice;
     CHOICE_OPTION(ctx: any): IChoiceOption;
     MAP(ctx: any): IMap;
@@ -87,16 +102,33 @@ export interface IPluckedField {
 export interface IFlow {
     type: NodeType;
     directives: IDirective[];
-    operations: IOperation[];
+    operations: (IOperation | IFireAndForget | IFlowFunction | IPubSub)[];
 }
 export interface IOperation {
     type: NodeType;
-    id: string;
-    id_start: ITokenStart;
+    id?: string;
+    id_start?: ITokenStart;
     result: string;
+    result_ofType: string;
     result_start: ITokenStart;
     result_params: string[];
     result_params_start: ITokenStart[];
+    from: string;
+    to: string;
+    description: string;
+    params: IOperationParameter[];
+    annotations: IAnnotation[];
+}
+export interface IFlowFunction {
+    type: NodeType;
+    id: string;
+    id_start: ITokenStart;
+    ofType: string;
+    ofType_ofType: string;
+    ofType_start: ITokenStart;
+    ofType_params: string[];
+    ofType_params_start: ITokenStart[];
+    description: string;
     params: IOperationParameter[];
     annotations: IAnnotation[];
 }
@@ -108,6 +140,16 @@ export interface IOperationParameter {
     ofType_start: ITokenStart;
     ofType_params: string[];
     ofType_params_start: ITokenStart[];
+}
+export interface IFireAndForget {
+    type: NodeType;
+    id: string;
+    id_start: ITokenStart;
+    from: string;
+    to: string;
+    description: string;
+    params: IOperationParameter[];
+    annotations: IAnnotation[];
 }
 export interface IData {
     type: NodeType;
@@ -202,6 +244,13 @@ export interface IChoice {
         id: string;
     };
 }
+export interface IPubSub {
+    type: string;
+    service: string;
+    event: string;
+    message: IOperationParameter[];
+    annotations: IAnnotation[];
+}
 export interface IChoiceOption {
     type: string;
     id: string | number;
@@ -262,7 +311,11 @@ export declare enum NodeType {
     OPERATION = "OPERATION",
     OPERATION_PARAMETER = "OPERATION_PARAMETER",
     MAP = "MAP",
-    MAP_FLOW = "MAP_FLOW"
+    MAP_FLOW = "MAP_FLOW",
+    PUB = "PUB",
+    SUB = "SUB",
+    FIRE_FORGET = "FIRE_FORGET",
+    FLOW_FUNCTION = "FLOW_FUNCTION"
 }
 export interface IError {
     message: string;

@@ -21,6 +21,10 @@ declare class DomainParser extends Parser {
     IMPORTING: any;
     AGGREGATE: any;
     FLOW: any;
+    FLOW_FUNCTION: any;
+    FLOW_SYSTEM: any;
+    FLOW_SUB: any;
+    FLOW_PUB: any;
     OPERATION: any;
     OPERATION_RESULT: any;
     OPERATION_PARAMETER: any;
@@ -31,6 +35,7 @@ declare class DomainParser extends Parser {
     MAP_FLOW_KEY: any;
     IDENTIFIER: any;
     TYPE_IDENTIFIER: any;
+    ID_OR_STRING: any;
     ANNOTATIONS: any;
     ANNOTATION: any;
     CHOICE_ANNOTATION: any;
@@ -43,6 +48,8 @@ declare class DomainParser extends Parser {
     isAnnotation(): boolean | undefined;
     isRestriction(): boolean | undefined;
     isGenericParameter(): boolean | undefined;
+    isSub(): boolean;
+    isPub(): boolean;
 }
 export declare const parser: DomainParser;
 export {};

@@ -25,6 +25,10 @@ class DomainParser extends Parser {
     IMPORTING: any;
     AGGREGATE: any;
     FLOW: any;
+    FLOW_FUNCTION: any;
+    FLOW_SYSTEM: any;
+    FLOW_SUB: any;
+    FLOW_PUB: any;
     OPERATION: any;
     OPERATION_RESULT: any;
     OPERATION_PARAMETER: any;
@@ -36,6 +40,7 @@ class DomainParser extends Parser {
 
     IDENTIFIER: any;
     TYPE_IDENTIFIER: any;
+    ID_OR_STRING: any;
 
     //ROOT_ANNOTATIONS: any;
     ANNOTATIONS: any;
@@ -231,12 +236,81 @@ class DomainParser extends Parser {
 
         $.RULE("OPERATION", () => {
             $.MANY(() => $.CONSUME(tokenLookup.AnnotationLiteral));
-            $.CONSUME(tokenLookup.Indent);
+            $.AT_LEAST_ONE(() => $.CONSUME(tokenLookup.Indent));
+            $.OR([
+                { GATE: $.isSub, ALT: () => $.SUBRULE($.FLOW_SUB) },
+                { GATE: $.isPub, ALT: () => $.SUBRULE($.FLOW_PUB) },
+                { ALT: () => $.SUBRULE($.FLOW_SYSTEM) },
+                { ALT: () => $.SUBRULE($.FLOW_FUNCTION) }
+            ]);
+        });
+
+        $.RULE("FLOW_FUNCTION", () => {
             $.CONSUME(tokenLookup.GenericParameter);
             $.CONSUME(tokenLookup.SIGN_TypeDefStart);
             $.CONSUME1(tokenLookup.SIGN_TypeDefStart);
-            $.MANY1(() => $.SUBRULE($.OPERATION_PARAMETER));
-            $.SUBRULE($.OPERATION_RESULT);
+
+            // the parameters
+            $.AT_LEAST_ONE_SEP({
+                SEP: tokenLookup.SIGN_arrow,
+                DEF: () => $.SUBRULE($.OPERATION_PARAMETER)
+            });
+        });
+
+        $.RULE("FLOW_SUB", () => {
+            // "CustomerService" sub "Customer Requested" :: String
+
+            // "CustomerService" sub "Customer Requested"
+            $.SUBRULE($.ID_OR_STRING);
+            $.CONSUME(tokenLookup.KW_sub);
+            $.SUBRULE1($.ID_OR_STRING);
+
+            // ::
+            $.CONSUME(tokenLookup.SIGN_TypeDefStart);
+            $.CONSUME2(tokenLookup.SIGN_TypeDefStart);
+
+            // params
+            $.AT_LEAST_ONE_SEP({
+                SEP: tokenLookup.SIGN_arrow,
+                DEF: () => $.SUBRULE($.OPERATION_PARAMETER)
+            });
+        });
+
+        $.RULE("FLOW_PUB", () => {
+            // "CustomerService" pub to CustomerReceived :: Customer
+            $.SUBRULE($.ID_OR_STRING);
+            $.CONSUME(tokenLookup.KW_pub);
+            $.SUBRULE1($.ID_OR_STRING);
+
+            // ::
+            $.CONSUME(tokenLookup.SIGN_TypeDefStart);
+            $.CONSUME2(tokenLookup.SIGN_TypeDefStart);
+
+            // params
+            $.AT_LEAST_ONE_SEP({
+                SEP: tokenLookup.SIGN_arrow,
+                DEF: () => $.SUBRULE($.OPERATION_PARAMETER)
+            });
+        });
+
+        $.RULE("FLOW_SYSTEM", () => {
+            // Consume the system definition
+            // ("Entity Service", SAP) ::
+            $.CONSUME(tokenLookup.SIGN_wrapOpen);
+            $.SUBRULE($.ID_OR_STRING);
+            $.CONSUME(tokenLookup.SIGN_collectionSeparator);
+            $.SUBRULE2($.ID_OR_STRING);
+            $.CONSUME(tokenLookup.SIGN_wrapClose);
+            $.OPTION(() => $.CONSUME(tokenLookup.SIGN_fireAndForget));
+            $.CONSUME(tokenLookup.SIGN_TypeDefStart);
+            $.CONSUME2(tokenLookup.SIGN_TypeDefStart);
+
+            // Now for the system part which is exactly the same as
+            // the function description in the FLOW_FUNCTION
+            $.AT_LEAST_ONE_SEP({
+                SEP: tokenLookup.SIGN_arrow,
+                DEF: () => $.SUBRULE($.OPERATION_PARAMETER)
+            });
         });
 
         $.RULE("OPERATION_PARAMETER", () => {
@@ -252,16 +326,33 @@ class DomainParser extends Parser {
             $.CONSUME(tokenLookup.SIGN_TypeDefStart);
             $.SUBRULE($.TYPE_IDENTIFIER);
             $.CONSUME(tokenLookup.SIGN_wrapClose);
-            $.CONSUME(tokenLookup.SIGN_arrow);
         });
 
         $.RULE("OPERATION_PARAMETER_TYPE", () => {
             $.SUBRULE($.TYPE_IDENTIFIER);
-            $.CONSUME(tokenLookup.SIGN_arrow);
         });
 
-        $.RULE("OPERATION_RESULT", () => {
-            $.SUBRULE($.TYPE_IDENTIFIER);
+        // $.RULE("OPERATION_RESULT", () => {
+        //     $.OR([
+        //         {
+        //             ALT: () => {
+        //                 $.CONSUME(tokenLookup.SIGN_wrapOpen);
+        //                 $.CONSUME(tokenLookup.GenericParameter);
+        //                 $.CONSUME(tokenLookup.SIGN_TypeDefStart);
+        //                 $.SUBRULE($.TYPE_IDENTIFIER);
+        //                 $.CONSUME(tokenLookup.SIGN_wrapClose);
+        //             }
+        //         },
+        //         { ALT: () => $.SUBRULE1($.TYPE_IDENTIFIER) }
+        //     ]);
+        // });
+
+        $.RULE("ID_OR_STRING", () => {
+            $.OR([
+                { ALT: () => $.CONSUME(tokenLookup.GenericIdentifier) },
+                { ALT: () => $.CONSUME(tokenLookup.Identifier) },
+                { ALT: () => $.CONSUME(tokenLookup.StringLiteral) }
+            ]);
         });
 
         $.RULE("RESTRICTION", () => {
@@ -422,6 +513,15 @@ class DomainParser extends Parser {
         let t1 = this.LA(1) as IToken;
 
         return t1.image !== "extends";
+    }
+
+    isSub() {
+        let t2 = this.LA(2) as IToken;
+        return t2.image === "sub";
+    }
+    isPub() {
+        let t2 = this.LA(2) as IToken;
+        return t2.image === "pub";
     }
 }
 

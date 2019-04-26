@@ -1,3 +1,0 @@
-class "Foo" as Foo  {
-	Bar: String 
-}

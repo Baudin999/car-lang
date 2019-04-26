@@ -73,6 +73,14 @@ const KW_pluck = chevrotain_1.createToken({
     pattern: /pluck/,
     name: "KW_pluck"
 });
+const KW_sub = chevrotain_1.createToken({
+    pattern: /sub/,
+    name: "KW_sub"
+});
+const KW_pub = chevrotain_1.createToken({
+    pattern: /pub/,
+    name: "KW_pub"
+});
 const SIGN_Equals = chevrotain_1.createToken({
     name: "SIGN_Equals",
     pattern: /=/
@@ -114,7 +122,7 @@ const SIGN_open = chevrotain_1.createToken({
 const SIGN_close = chevrotain_1.createToken({
     name: "SIGN_close",
     pattern: /}/,
-    push_mode: "root"
+    pop_mode: true
 });
 const SIGN_collectionOpen = chevrotain_1.createToken({
     name: "SIGN_collectionOpen",
@@ -140,6 +148,10 @@ const SIGN_wrapClose = chevrotain_1.createToken({
 const SIGN_arrow = chevrotain_1.createToken({
     name: "SIGN_arrow",
     pattern: /->/
+});
+const SIGN_fireAndForget = chevrotain_1.createToken({
+    name: "SIGN_fireAndForget",
+    pattern: /\*/
 });
 const Identifier = chevrotain_1.createToken({
     name: "Identifier",
@@ -171,7 +183,7 @@ const FieldName = chevrotain_1.createToken({
 });
 const NewLine = chevrotain_1.createToken({
     name: "NewLine",
-    pattern: /\n(?=\s+)/,
+    pattern: /\s*\n(?=\s+)/,
     group: chevrotain_1.Lexer.SKIPPED
 });
 const Indent = chevrotain_1.createToken({
@@ -179,7 +191,7 @@ const Indent = chevrotain_1.createToken({
     name: "Indent"
 });
 const WhiteSpace = chevrotain_1.createToken({
-    pattern: /\s/,
+    pattern: /\s+/,
     name: "WhiteSpace",
     group: chevrotain_1.Lexer.SKIPPED
 });
@@ -391,16 +403,21 @@ const multiModeLexerDefinition = {
         ],
         flow_definition: [
             ViewIdentifier,
+            KW_sub,
+            KW_pub,
             SIGN_open,
             SIGN_close,
             SIGN_arrow,
             SIGN_TypeDefStart,
             SIGN_wrapOpen,
             SIGN_wrapClose,
+            SIGN_collectionSeparator,
+            SIGN_fireAndForget,
             AnnotationLiteral,
             DirectiveLiteral,
             GenericIdentifier,
             GenericParameter,
+            StringLiteral,
             Identifier,
             NewLine,
             Indent,
@@ -433,6 +450,8 @@ exports.tokenLookup = {
     KW_aggregate,
     KW_flow,
     KW_map,
+    KW_sub,
+    KW_pub,
     SIGN_Equals,
     SIGN_EqualsType,
     SIGN_EqualsData,
@@ -449,6 +468,7 @@ exports.tokenLookup = {
     SIGN_TypeDefStart,
     SIGN_wrapOpen,
     SIGN_wrapClose,
+    SIGN_fireAndForget,
     Operator,
     AnnotationLiteral,
     Identifier,

@@ -1,5 +1,7 @@
 import { parser } from "./parser";
 import { purge, getStartToken, ITokenStart } from "./helpers";
+import { resolve } from "path";
+import { nullLiteral, isTSTypeOperator } from "@babel/types";
 
 const BaseCstVisitorWithDefaults: any = parser.getBaseCstVisitorConstructorWithDefaults();
 
@@ -208,20 +210,142 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
     FLOW(ctx: any): IFlow {
         return {
             type: NodeType.FLOW,
-            operations: (ctx.OPERATION || []).map(o => this.visit(o)),
+            operations: purge((ctx.OPERATION || []).map(o => this.visit(o))),
             directives: parseDirectives(ctx)
         };
     }
 
-    OPERATION(ctx: any): IOperation {
+    OPERATION(ctx: any): IOperation | IFireAndForget | IFlowFunction | IPubSub {
+        let annotations = purge(this.ROOT_ANNOTATIONS(ctx));
+
+        let r: any = {};
+        if (ctx.FLOW_FUNCTION) {
+            r = this.visit(ctx.FLOW_FUNCTION[0]) as IFlowFunction;
+        } else if (ctx.FLOW_PUB) {
+            r = this.visit(ctx.FLOW_PUB[0]) as IPubSub;
+        } else if (ctx.FLOW_SUB) {
+            r = this.visit(ctx.FLOW_SUB[0]) as IPubSub;
+        } else if (ctx.FLOW_SYSTEM) {
+            r = this.visit(ctx.FLOW_SYSTEM[0]) as IOperation | IFireAndForget;
+        }
+
+        r.annotations = annotations;
+        annotations.forEach(a => {
+            r[a.key] = r[a.key] || a.value;
+        });
+
+        // it can be typed a "FLOW_FUNCTION" but actually be an operation,
+        // we will rectify this...
+        if (r.type === NodeType.FLOW_FUNCTION && r.to && r.from) {
+            r.type = NodeType.OPERATION;
+            r.result = r.ofType;
+            r.result_start = r.ofType_start;
+            r.result_params = r.ofType_params;
+            r.result_params_start = r.ofType_params_start;
+            delete r.ofType;
+            delete r.ofType_params;
+            delete r.ofType_start;
+            delete r.ofType_params_start;
+        }
+
+        return r;
+    }
+
+    FLOW_FUNCTION(ctx: any): IFlowFunction {
+        let params = (ctx.OPERATION_PARAMETER || []).map(p => this.visit(p));
         return {
-            annotations: purge(this.ROOT_ANNOTATIONS(ctx)),
-            type: NodeType.OPERATION,
+            ...params[params.length - 1],
+            type: NodeType.FLOW_FUNCTION,
             id: ctx.GenericParameter[0].image,
             id_start: getStartToken(ctx.GenericParameter[0]),
-            ...this.visit(ctx.OPERATION_RESULT[0]),
-            params: (ctx.OPERATION_PARAMETER || []).map(p => this.visit(p))
+            params: (params as []).slice(0, params.length - 1)
         };
+    }
+
+    /**
+     * A SYSTEM FLOW looks something like:
+     *
+     * @ id: getCustomer
+     * ("Entity Service", SAP) :: String -> Customer
+     */
+    FLOW_SYSTEM(ctx: any): IOperation | IFireAndForget {
+        let fireAndForget = !!ctx.SIGN_fireAndForget;
+        let from: string = this.visit(ctx.ID_OR_STRING[0]) as string;
+        let to: string = this.visit(ctx.ID_OR_STRING[1]) as string;
+
+        let params: IOperationParameter[] = purge(
+            (ctx.OPERATION_PARAMETER || []).map(p => this.visit(p))
+        );
+        let result = params[params.length - 1];
+
+        if (fireAndForget) {
+            return {
+                type: NodeType.FIRE_FORGET,
+                from,
+                to,
+                params
+            } as IFireAndForget;
+        } else {
+            return {
+                type: NodeType.OPERATION,
+                from: from,
+                to: to,
+                params: (params as []).slice(0, params.length - 1),
+                result: result.id || result.ofType,
+                result_start: result.id_start || result.ofType_start,
+                result_params: result.ofType_params,
+                result_params_start: result.ofType_params_start,
+                result_ofType: result.ofType,
+                description: "",
+                annotations: []
+            };
+        }
+    }
+
+    /**
+     * Be able to publish to some queue
+     *
+     * "Customer Service" pub "The Event Name" :: Customer
+     */
+    FLOW_PUB(ctx: any): IPubSub {
+        let params: IOperationParameter[] = purge(
+            (ctx.OPERATION_PARAMETER || []).map(p => this.visit(p))
+        );
+        return {
+            type: NodeType.PUB,
+            service: this.visit(ctx.ID_OR_STRING[0]),
+            event: this.visit(ctx.ID_OR_STRING[1]),
+            message: params, //this.visit(ctx.OPERATION_RESULT).result,
+            annotations: []
+        };
+    }
+
+    /**
+     * Be able to subscribe to some queue
+     *
+     * "Customer Service" sub "The Event Name" :: String
+     */
+    FLOW_SUB(ctx: any): IPubSub {
+        let params: IOperationParameter[] = purge(
+            (ctx.OPERATION_PARAMETER || []).map(p => this.visit(p))
+        );
+        return {
+            type: NodeType.SUB,
+            service: this.visit(ctx.ID_OR_STRING[0]),
+            event: this.visit(ctx.ID_OR_STRING[1]),
+            message: params,
+            annotations: []
+        };
+    }
+
+    ID_OR_STRING(ctx: any): string {
+        if (ctx.Identifier) {
+            return ctx.Identifier[0].image;
+        } else if (ctx.GenericIdentifier) {
+            return ctx.GenericIdentifier[0].image;
+        } else {
+            return ctx.StringLiteral[0].image.replace(/"/g, "");
+        }
     }
 
     OPERATION_PARAMETER(ctx: any): IOperationParameter {
@@ -237,8 +361,11 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
         };
     }
     OPERATION_PARAMETER_TYPE(ctx: any) {
+        let t = this.visit(ctx.TYPE_IDENTIFIER[0]);
         return {
-            ...this.visit(ctx.TYPE_IDENTIFIER[0])
+            id: t.ofType,
+            id_start: t.ofType_start,
+            ...t
         };
     }
     OPERATION_PARAMETER_FIELD_TYPE(ctx: any) {
@@ -246,17 +373,6 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
             id: ctx.GenericParameter[0].image,
             id_start: getStartToken(ctx.GenericParameter[0]),
             ...this.visit(ctx.TYPE_IDENTIFIER[0])
-        };
-    }
-    OPERATION_RESULT(ctx: any) {
-        const { ofType, ofType_start, ofType_params, ofType_params_start } = this.visit(
-            ctx.TYPE_IDENTIFIER[0]
-        );
-        return {
-            result: ofType,
-            result_start: ofType_start,
-            result_params: ofType_params,
-            result_params_start: ofType_params_start
         };
     }
 
@@ -410,11 +526,13 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
         const pattern = /(\[)(.*)(\])(\()(.*)(\))/;
         const segments = pattern.exec(ctx.MarkdownImageLiteral[0].image) || [];
 
+        let uri = segments[5].startsWith("http") ? segments[5] : "file://" + resolve(segments[5]);
+
         return {
             type: NodeType.MARKDOWN_IMAGE,
             content: ctx.MarkdownImageLiteral[0].image,
             alt: segments[2],
-            uri: segments[5]
+            uri
         };
     }
 
@@ -485,7 +603,7 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
         return result
             ? {
                   type: NodeType.ANNOTATION,
-                  key: result[3].trim(),
+                  key: result[3].trim().toLowerCase(),
                   value: result[5].trim()
               }
             : null;
@@ -560,17 +678,35 @@ export interface IPluckedField {
 export interface IFlow {
     type: NodeType;
     directives: IDirective[];
-    operations: IOperation[];
+    operations: (IOperation | IFireAndForget | IFlowFunction | IPubSub)[];
 }
 
 export interface IOperation {
     type: NodeType;
-    id: string;
-    id_start: ITokenStart;
+    id?: string;
+    id_start?: ITokenStart;
     result: string;
+    result_ofType: string;
     result_start: ITokenStart;
     result_params: string[];
     result_params_start: ITokenStart[];
+    from: string;
+    to: string;
+    description: string;
+    params: IOperationParameter[];
+    annotations: IAnnotation[];
+}
+
+export interface IFlowFunction {
+    type: NodeType;
+    id: string;
+    id_start: ITokenStart;
+    ofType: string;
+    ofType_ofType: string;
+    ofType_start: ITokenStart;
+    ofType_params: string[];
+    ofType_params_start: ITokenStart[];
+    description: string;
     params: IOperationParameter[];
     annotations: IAnnotation[];
 }
@@ -583,6 +719,17 @@ export interface IOperationParameter {
     ofType_start: ITokenStart;
     ofType_params: string[];
     ofType_params_start: ITokenStart[];
+}
+
+export interface IFireAndForget {
+    type: NodeType;
+    id: string;
+    id_start: ITokenStart;
+    from: string;
+    to: string;
+    description: string;
+    params: IOperationParameter[];
+    annotations: IAnnotation[];
 }
 
 export interface IData {
@@ -690,6 +837,14 @@ export interface IChoice {
     };
 }
 
+export interface IPubSub {
+    type: string;
+    service: string;
+    event: string;
+    message: IOperationParameter[];
+    annotations: IAnnotation[];
+}
+
 export interface IChoiceOption {
     type: string;
     id: string | number;
@@ -772,7 +927,11 @@ export enum NodeType {
     OPERATION = "OPERATION",
     OPERATION_PARAMETER = "OPERATION_PARAMETER",
     MAP = "MAP",
-    MAP_FLOW = "MAP_FLOW"
+    MAP_FLOW = "MAP_FLOW",
+    PUB = "PUB",
+    SUB = "SUB",
+    FIRE_FORGET = "FIRE_FORGET",
+    FLOW_FUNCTION = "FLOW_FUNCTION"
 }
 
 const defaultStart: ITokenStart = {

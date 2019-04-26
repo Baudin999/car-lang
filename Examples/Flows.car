@@ -1,0 +1,29 @@
+# Flows in the CAR language
+
+This document will describe the flows in the car document.
+
+
+flow {
+    getCustomer :: String -> Duck -> Goose -> Customer
+
+    logCustomer :: Customer -> Customer
+}
+
+We will now publish a message from a service:
+
+flow {
+
+    "Customer Service" sub "Create Customer" :: (name: String) -> (id: String) -> Customer
+
+    "Customer Service" pub CustomerCreated :: Customer
+    "Customer Service" pub LogCustomer :: (customer: Customer) -> ILogger
+
+
+    @from: FS
+    @to: ES
+    doSomething :: (one: Number) -> Bar
+
+    (ES, SAP) :: Foo -> Bar
+
+    (FS, "SAP CRM")* :: Bar
+}

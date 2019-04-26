@@ -195,7 +195,6 @@ data Maybe a =
                             }
                         })
                         .on("ready", () => {
-                            console.log("READY");
                             Promise.all(promises).then(modules => {
                                 modules.forEach(module => moduleDictionary.addModule(module));
                                 compile(moduleDictionary);

@@ -165,12 +165,70 @@ class DomainParser extends chevrotain_1.Parser {
         });
         $.RULE("OPERATION", () => {
             $.MANY(() => $.CONSUME(lexer_1.tokenLookup.AnnotationLiteral));
-            $.CONSUME(lexer_1.tokenLookup.Indent);
+            $.AT_LEAST_ONE(() => $.CONSUME(lexer_1.tokenLookup.Indent));
+            $.OR([
+                { GATE: $.isSub, ALT: () => $.SUBRULE($.FLOW_SUB) },
+                { GATE: $.isPub, ALT: () => $.SUBRULE($.FLOW_PUB) },
+                { ALT: () => $.SUBRULE($.FLOW_SYSTEM) },
+                { ALT: () => $.SUBRULE($.FLOW_FUNCTION) }
+            ]);
+        });
+        $.RULE("FLOW_FUNCTION", () => {
             $.CONSUME(lexer_1.tokenLookup.GenericParameter);
             $.CONSUME(lexer_1.tokenLookup.SIGN_TypeDefStart);
             $.CONSUME1(lexer_1.tokenLookup.SIGN_TypeDefStart);
-            $.MANY1(() => $.SUBRULE($.OPERATION_PARAMETER));
-            $.SUBRULE($.OPERATION_RESULT);
+            // the parameters
+            $.AT_LEAST_ONE_SEP({
+                SEP: lexer_1.tokenLookup.SIGN_arrow,
+                DEF: () => $.SUBRULE($.OPERATION_PARAMETER)
+            });
+        });
+        $.RULE("FLOW_SUB", () => {
+            // "CustomerService" sub "Customer Requested" :: String
+            // "CustomerService" sub "Customer Requested"
+            $.SUBRULE($.ID_OR_STRING);
+            $.CONSUME(lexer_1.tokenLookup.KW_sub);
+            $.SUBRULE1($.ID_OR_STRING);
+            // ::
+            $.CONSUME(lexer_1.tokenLookup.SIGN_TypeDefStart);
+            $.CONSUME2(lexer_1.tokenLookup.SIGN_TypeDefStart);
+            // params
+            $.AT_LEAST_ONE_SEP({
+                SEP: lexer_1.tokenLookup.SIGN_arrow,
+                DEF: () => $.SUBRULE($.OPERATION_PARAMETER)
+            });
+        });
+        $.RULE("FLOW_PUB", () => {
+            // "CustomerService" pub to CustomerReceived :: Customer
+            $.SUBRULE($.ID_OR_STRING);
+            $.CONSUME(lexer_1.tokenLookup.KW_pub);
+            $.SUBRULE1($.ID_OR_STRING);
+            // ::
+            $.CONSUME(lexer_1.tokenLookup.SIGN_TypeDefStart);
+            $.CONSUME2(lexer_1.tokenLookup.SIGN_TypeDefStart);
+            // params
+            $.AT_LEAST_ONE_SEP({
+                SEP: lexer_1.tokenLookup.SIGN_arrow,
+                DEF: () => $.SUBRULE($.OPERATION_PARAMETER)
+            });
+        });
+        $.RULE("FLOW_SYSTEM", () => {
+            // Consume the system definition
+            // ("Entity Service", SAP) ::
+            $.CONSUME(lexer_1.tokenLookup.SIGN_wrapOpen);
+            $.SUBRULE($.ID_OR_STRING);
+            $.CONSUME(lexer_1.tokenLookup.SIGN_collectionSeparator);
+            $.SUBRULE2($.ID_OR_STRING);
+            $.CONSUME(lexer_1.tokenLookup.SIGN_wrapClose);
+            $.OPTION(() => $.CONSUME(lexer_1.tokenLookup.SIGN_fireAndForget));
+            $.CONSUME(lexer_1.tokenLookup.SIGN_TypeDefStart);
+            $.CONSUME2(lexer_1.tokenLookup.SIGN_TypeDefStart);
+            // Now for the system part which is exactly the same as
+            // the function description in the FLOW_FUNCTION
+            $.AT_LEAST_ONE_SEP({
+                SEP: lexer_1.tokenLookup.SIGN_arrow,
+                DEF: () => $.SUBRULE($.OPERATION_PARAMETER)
+            });
         });
         $.RULE("OPERATION_PARAMETER", () => {
             $.OR([
@@ -184,14 +242,30 @@ class DomainParser extends chevrotain_1.Parser {
             $.CONSUME(lexer_1.tokenLookup.SIGN_TypeDefStart);
             $.SUBRULE($.TYPE_IDENTIFIER);
             $.CONSUME(lexer_1.tokenLookup.SIGN_wrapClose);
-            $.CONSUME(lexer_1.tokenLookup.SIGN_arrow);
         });
         $.RULE("OPERATION_PARAMETER_TYPE", () => {
             $.SUBRULE($.TYPE_IDENTIFIER);
-            $.CONSUME(lexer_1.tokenLookup.SIGN_arrow);
         });
-        $.RULE("OPERATION_RESULT", () => {
-            $.SUBRULE($.TYPE_IDENTIFIER);
+        // $.RULE("OPERATION_RESULT", () => {
+        //     $.OR([
+        //         {
+        //             ALT: () => {
+        //                 $.CONSUME(tokenLookup.SIGN_wrapOpen);
+        //                 $.CONSUME(tokenLookup.GenericParameter);
+        //                 $.CONSUME(tokenLookup.SIGN_TypeDefStart);
+        //                 $.SUBRULE($.TYPE_IDENTIFIER);
+        //                 $.CONSUME(tokenLookup.SIGN_wrapClose);
+        //             }
+        //         },
+        //         { ALT: () => $.SUBRULE1($.TYPE_IDENTIFIER) }
+        //     ]);
+        // });
+        $.RULE("ID_OR_STRING", () => {
+            $.OR([
+                { ALT: () => $.CONSUME(lexer_1.tokenLookup.GenericIdentifier) },
+                { ALT: () => $.CONSUME(lexer_1.tokenLookup.Identifier) },
+                { ALT: () => $.CONSUME(lexer_1.tokenLookup.StringLiteral) }
+            ]);
         });
         $.RULE("RESTRICTION", () => {
             $.AT_LEAST_ONE(() => {
@@ -330,6 +404,14 @@ class DomainParser extends chevrotain_1.Parser {
     isGenericParameter() {
         let t1 = this.LA(1);
         return t1.image !== "extends";
+    }
+    isSub() {
+        let t2 = this.LA(2);
+        return t2.image === "sub";
+    }
+    isPub() {
+        let t2 = this.LA(2);
+        return t2.image === "pub";
     }
 }
 exports.parser = new DomainParser();

@@ -13,6 +13,8 @@ export declare const tokenLookup: {
     KW_aggregate: import("chevrotain").TokenType;
     KW_flow: import("chevrotain").TokenType;
     KW_map: import("chevrotain").TokenType;
+    KW_sub: import("chevrotain").TokenType;
+    KW_pub: import("chevrotain").TokenType;
     SIGN_Equals: import("chevrotain").TokenType;
     SIGN_EqualsType: import("chevrotain").TokenType;
     SIGN_EqualsData: import("chevrotain").TokenType;
@@ -29,6 +31,7 @@ export declare const tokenLookup: {
     SIGN_TypeDefStart: import("chevrotain").TokenType;
     SIGN_wrapOpen: import("chevrotain").TokenType;
     SIGN_wrapClose: import("chevrotain").TokenType;
+    SIGN_fireAndForget: import("chevrotain").TokenType;
     Operator: import("chevrotain").TokenType;
     AnnotationLiteral: import("chevrotain").TokenType;
     Identifier: import("chevrotain").TokenType;

@@ -8,6 +8,10 @@ export class PlantClass {
     constructor(node: IType, lookup: ILookup) {
         this.node = node;
         this.lookup = lookup;
+
+        if (this.node.id === "CommunicationAddress") {
+            console.log(JSON.stringify(this.node, null, 4));
+        }
     }
 
     fields() {

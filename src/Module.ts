@@ -3,7 +3,7 @@ import { IModule, fetchImage, IConfiguration } from "./helpers";
 import { readFile } from "fs";
 import { outputFile } from "fs-extra";
 import { normalize, join } from "path";
-import { createAST } from "./transpiler";
+import { createAST, transpile } from "./transpiler";
 import * as stringHash from "string-hash";
 import { IToken } from "chevrotain";
 //@ts-ignore
@@ -45,7 +45,7 @@ export class Module implements IModule {
     public parse(fullPath: string): Promise<Module> {
         return new Promise<Module>(resolve => {
             readFile(fullPath, "utf8", (error, source) => {
-                const { ast, tokens } = createAST(source);
+                const { ast, errors, tokens } = transpile(source); //createAST(source);
                 this.hash = stringHash(source || "");
                 this.ast = ast;
                 this.path = normalize(fullPath);
@@ -56,7 +56,7 @@ export class Module implements IModule {
                     .replace(/\.car/, "")
                     .replace(/^\./, "");
                 this.timestamp = new Date();
-                this.errors = [];
+                this.errors = errors;
                 this.tokens = tokens;
 
                 resolve(this);

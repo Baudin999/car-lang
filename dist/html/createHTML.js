@@ -70,7 +70,11 @@ exports.createHTML = (ast, moduleName) => {
         }
         else if (node.type === outline_1.NodeType.FLOW) {
             let result = "";
-            const { sequence, useCase } = createFlow_1.createFlow(node);
+            const { state, sequence, useCase } = createFlow_1.createFlow(node);
+            if (state) {
+                const state_url = deflate_1.generateURL(state);
+                result += `<div class="image-container"><img src="${state_url}" /></div>`;
+            }
             if (sequence) {
                 const s_url = deflate_1.generateURL(sequence);
                 result += `<div class="image-container"><img src="${s_url}" /></div>`;

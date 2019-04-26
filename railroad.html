@@ -884,7 +884,7 @@
   {
     "type": "Rule",
     "name": "OPERATION",
-    "orgText": "() => {\n            $.MANY(() => $.CONSUME(lexer_1.tokenLookup.AnnotationLiteral));\n            $.CONSUME(lexer_1.tokenLookup.Indent);\n            $.CONSUME(lexer_1.tokenLookup.GenericParameter);\n            $.CONSUME(lexer_1.tokenLookup.SIGN_TypeDefStart);\n            $.CONSUME1(lexer_1.tokenLookup.SIGN_TypeDefStart);\n            $.MANY1(() => $.SUBRULE($.OPERATION_PARAMETER));\n            $.SUBRULE($.OPERATION_RESULT);\n        }",
+    "orgText": "() => {\n            $.MANY(() => $.CONSUME(lexer_1.tokenLookup.AnnotationLiteral));\n            $.AT_LEAST_ONE(() => $.CONSUME(lexer_1.tokenLookup.Indent));\n            $.OR([\n                { GATE: $.isSub, ALT: () => $.SUBRULE($.FLOW_SUB) },\n                { GATE: $.isPub, ALT: () => $.SUBRULE($.FLOW_PUB) },\n                { ALT: () => $.SUBRULE($.FLOW_SYSTEM) },\n                { ALT: () => $.SUBRULE($.FLOW_FUNCTION) }\n            ]);\n        }",
     "definition": [
       {
         "type": "Repetition",
@@ -900,12 +900,71 @@
         ]
       },
       {
-        "type": "Terminal",
-        "name": "Indent",
-        "label": "Indent",
+        "type": "RepetitionMandatory",
         "idx": 0,
-        "pattern": "( {4})"
+        "definition": [
+          {
+            "type": "Terminal",
+            "name": "Indent",
+            "label": "Indent",
+            "idx": 0,
+            "pattern": "( {4})"
+          }
+        ]
       },
+      {
+        "type": "Alternation",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "FLOW_SUB",
+                "idx": 0
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "FLOW_PUB",
+                "idx": 0
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "FLOW_SYSTEM",
+                "idx": 0
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "FLOW_FUNCTION",
+                "idx": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "FLOW_FUNCTION",
+    "orgText": "() => {\n            $.CONSUME(lexer_1.tokenLookup.GenericParameter);\n            $.CONSUME(lexer_1.tokenLookup.SIGN_TypeDefStart);\n            $.CONSUME1(lexer_1.tokenLookup.SIGN_TypeDefStart);\n            // the parameters\n            $.AT_LEAST_ONE_SEP({\n                SEP: lexer_1.tokenLookup.SIGN_arrow,\n                DEF: () => $.SUBRULE($.OPERATION_PARAMETER)\n            });\n        }",
+    "definition": [
       {
         "type": "Terminal",
         "name": "GenericParameter",
@@ -928,8 +987,15 @@
         "pattern": ":"
       },
       {
-        "type": "Repetition",
-        "idx": 1,
+        "type": "RepetitionMandatoryWithSeparator",
+        "idx": 0,
+        "separator": {
+          "type": "Terminal",
+          "name": "SIGN_arrow",
+          "label": "SIGN_arrow",
+          "idx": 1,
+          "pattern": "->"
+        },
         "definition": [
           {
             "type": "NonTerminal",
@@ -937,11 +1003,201 @@
             "idx": 0
           }
         ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "FLOW_SUB",
+    "orgText": "() => {\n            // \"CustomerService\" sub \"Customer Requested\" :: String\n            // \"CustomerService\" sub \"Customer Requested\"\n            $.SUBRULE($.ID_OR_STRING);\n            $.CONSUME(lexer_1.tokenLookup.KW_sub);\n            $.SUBRULE1($.ID_OR_STRING);\n            // ::\n            $.CONSUME(lexer_1.tokenLookup.SIGN_TypeDefStart);\n            $.CONSUME2(lexer_1.tokenLookup.SIGN_TypeDefStart);\n            // params\n            $.AT_LEAST_ONE_SEP({\n                SEP: lexer_1.tokenLookup.SIGN_arrow,\n                DEF: () => $.SUBRULE($.OPERATION_PARAMETER)\n            });\n        }",
+    "definition": [
+      {
+        "type": "NonTerminal",
+        "name": "ID_OR_STRING",
+        "idx": 0
+      },
+      {
+        "type": "Terminal",
+        "name": "KW_sub",
+        "label": "KW_sub",
+        "idx": 0,
+        "pattern": "sub"
       },
       {
         "type": "NonTerminal",
-        "name": "OPERATION_RESULT",
+        "name": "ID_OR_STRING",
+        "idx": 1
+      },
+      {
+        "type": "Terminal",
+        "name": "SIGN_TypeDefStart",
+        "label": "SIGN_TypeDefStart",
+        "idx": 0,
+        "pattern": ":"
+      },
+      {
+        "type": "Terminal",
+        "name": "SIGN_TypeDefStart",
+        "label": "SIGN_TypeDefStart",
+        "idx": 2,
+        "pattern": ":"
+      },
+      {
+        "type": "RepetitionMandatoryWithSeparator",
+        "idx": 0,
+        "separator": {
+          "type": "Terminal",
+          "name": "SIGN_arrow",
+          "label": "SIGN_arrow",
+          "idx": 1,
+          "pattern": "->"
+        },
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "OPERATION_PARAMETER",
+            "idx": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "FLOW_PUB",
+    "orgText": "() => {\n            // \"CustomerService\" pub to CustomerReceived :: Customer\n            $.SUBRULE($.ID_OR_STRING);\n            $.CONSUME(lexer_1.tokenLookup.KW_pub);\n            $.SUBRULE1($.ID_OR_STRING);\n            // ::\n            $.CONSUME(lexer_1.tokenLookup.SIGN_TypeDefStart);\n            $.CONSUME2(lexer_1.tokenLookup.SIGN_TypeDefStart);\n            // params\n            $.AT_LEAST_ONE_SEP({\n                SEP: lexer_1.tokenLookup.SIGN_arrow,\n                DEF: () => $.SUBRULE($.OPERATION_PARAMETER)\n            });\n        }",
+    "definition": [
+      {
+        "type": "NonTerminal",
+        "name": "ID_OR_STRING",
         "idx": 0
+      },
+      {
+        "type": "Terminal",
+        "name": "KW_pub",
+        "label": "KW_pub",
+        "idx": 0,
+        "pattern": "pub"
+      },
+      {
+        "type": "NonTerminal",
+        "name": "ID_OR_STRING",
+        "idx": 1
+      },
+      {
+        "type": "Terminal",
+        "name": "SIGN_TypeDefStart",
+        "label": "SIGN_TypeDefStart",
+        "idx": 0,
+        "pattern": ":"
+      },
+      {
+        "type": "Terminal",
+        "name": "SIGN_TypeDefStart",
+        "label": "SIGN_TypeDefStart",
+        "idx": 2,
+        "pattern": ":"
+      },
+      {
+        "type": "RepetitionMandatoryWithSeparator",
+        "idx": 0,
+        "separator": {
+          "type": "Terminal",
+          "name": "SIGN_arrow",
+          "label": "SIGN_arrow",
+          "idx": 1,
+          "pattern": "->"
+        },
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "OPERATION_PARAMETER",
+            "idx": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "FLOW_SYSTEM",
+    "orgText": "() => {\n            // Consume the system definition\n            // (\"Entity Service\", SAP) ::\n            $.CONSUME(lexer_1.tokenLookup.SIGN_wrapOpen);\n            $.SUBRULE($.ID_OR_STRING);\n            $.CONSUME(lexer_1.tokenLookup.SIGN_collectionSeparator);\n            $.SUBRULE2($.ID_OR_STRING);\n            $.CONSUME(lexer_1.tokenLookup.SIGN_wrapClose);\n            $.OPTION(() => $.CONSUME(lexer_1.tokenLookup.SIGN_fireAndForget));\n            $.CONSUME(lexer_1.tokenLookup.SIGN_TypeDefStart);\n            $.CONSUME2(lexer_1.tokenLookup.SIGN_TypeDefStart);\n            // Now for the system part which is exactly the same as\n            // the function description in the FLOW_FUNCTION\n            $.AT_LEAST_ONE_SEP({\n                SEP: lexer_1.tokenLookup.SIGN_arrow,\n                DEF: () => $.SUBRULE($.OPERATION_PARAMETER)\n            });\n        }",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "SIGN_wrapOpen",
+        "label": "SIGN_wrapOpen",
+        "idx": 0,
+        "pattern": "\\("
+      },
+      {
+        "type": "NonTerminal",
+        "name": "ID_OR_STRING",
+        "idx": 0
+      },
+      {
+        "type": "Terminal",
+        "name": "SIGN_collectionSeparator",
+        "label": "SIGN_collectionSeparator",
+        "idx": 0,
+        "pattern": ","
+      },
+      {
+        "type": "NonTerminal",
+        "name": "ID_OR_STRING",
+        "idx": 2
+      },
+      {
+        "type": "Terminal",
+        "name": "SIGN_wrapClose",
+        "label": "SIGN_wrapClose",
+        "idx": 0,
+        "pattern": "\\)"
+      },
+      {
+        "type": "Option",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Terminal",
+            "name": "SIGN_fireAndForget",
+            "label": "SIGN_fireAndForget",
+            "idx": 0,
+            "pattern": "\\*"
+          }
+        ]
+      },
+      {
+        "type": "Terminal",
+        "name": "SIGN_TypeDefStart",
+        "label": "SIGN_TypeDefStart",
+        "idx": 0,
+        "pattern": ":"
+      },
+      {
+        "type": "Terminal",
+        "name": "SIGN_TypeDefStart",
+        "label": "SIGN_TypeDefStart",
+        "idx": 2,
+        "pattern": ":"
+      },
+      {
+        "type": "RepetitionMandatoryWithSeparator",
+        "idx": 0,
+        "separator": {
+          "type": "Terminal",
+          "name": "SIGN_arrow",
+          "label": "SIGN_arrow",
+          "idx": 1,
+          "pattern": "->"
+        },
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "OPERATION_PARAMETER",
+            "idx": 0
+          }
+        ]
       }
     ]
   },
@@ -981,7 +1237,7 @@
   {
     "type": "Rule",
     "name": "OPERATION_PARAMETER_FIELD_TYPE",
-    "orgText": "() => {\n            $.CONSUME(lexer_1.tokenLookup.SIGN_wrapOpen);\n            $.CONSUME(lexer_1.tokenLookup.GenericParameter);\n            $.CONSUME(lexer_1.tokenLookup.SIGN_TypeDefStart);\n            $.SUBRULE($.TYPE_IDENTIFIER);\n            $.CONSUME(lexer_1.tokenLookup.SIGN_wrapClose);\n            $.CONSUME(lexer_1.tokenLookup.SIGN_arrow);\n        }",
+    "orgText": "() => {\n            $.CONSUME(lexer_1.tokenLookup.SIGN_wrapOpen);\n            $.CONSUME(lexer_1.tokenLookup.GenericParameter);\n            $.CONSUME(lexer_1.tokenLookup.SIGN_TypeDefStart);\n            $.SUBRULE($.TYPE_IDENTIFIER);\n            $.CONSUME(lexer_1.tokenLookup.SIGN_wrapClose);\n        }",
     "definition": [
       {
         "type": "Terminal",
@@ -1015,44 +1271,67 @@
         "label": "SIGN_wrapClose",
         "idx": 0,
         "pattern": "\\)"
-      },
-      {
-        "type": "Terminal",
-        "name": "SIGN_arrow",
-        "label": "SIGN_arrow",
-        "idx": 0,
-        "pattern": "->"
       }
     ]
   },
   {
     "type": "Rule",
     "name": "OPERATION_PARAMETER_TYPE",
-    "orgText": "() => {\n            $.SUBRULE($.TYPE_IDENTIFIER);\n            $.CONSUME(lexer_1.tokenLookup.SIGN_arrow);\n        }",
-    "definition": [
-      {
-        "type": "NonTerminal",
-        "name": "TYPE_IDENTIFIER",
-        "idx": 0
-      },
-      {
-        "type": "Terminal",
-        "name": "SIGN_arrow",
-        "label": "SIGN_arrow",
-        "idx": 0,
-        "pattern": "->"
-      }
-    ]
-  },
-  {
-    "type": "Rule",
-    "name": "OPERATION_RESULT",
     "orgText": "() => {\n            $.SUBRULE($.TYPE_IDENTIFIER);\n        }",
     "definition": [
       {
         "type": "NonTerminal",
         "name": "TYPE_IDENTIFIER",
         "idx": 0
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "ID_OR_STRING",
+    "orgText": "() => {\n            $.OR([\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.GenericIdentifier) },\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.Identifier) },\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.StringLiteral) }\n            ]);\n        }",
+    "definition": [
+      {
+        "type": "Alternation",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "GenericIdentifier",
+                "label": "GenericIdentifier",
+                "idx": 0,
+                "pattern": "[A-Z][a-zA-Z0-9_]*(?= +[a-z])"
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Identifier",
+                "label": "Identifier",
+                "idx": 0,
+                "pattern": "[A-Z][a-zA-Z0-9_]*"
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "StringLiteral",
+                "label": "StringLiteral",
+                "idx": 0,
+                "pattern": "([\"'])(?:(?=(\\\\?))\\2.)*?\\1"
+              }
+            ]
+          }
+        ]
       }
     ]
   },

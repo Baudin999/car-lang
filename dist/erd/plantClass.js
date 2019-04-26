@@ -6,6 +6,9 @@ class PlantClass {
     constructor(node, lookup) {
         this.node = node;
         this.lookup = lookup;
+        if (this.node.id === "CommunicationAddress") {
+            console.log(JSON.stringify(this.node, null, 4));
+        }
     }
     fields() {
         return this.node.fields

@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const parser_1 = require("./parser");
 const helpers_1 = require("./helpers");
+const path_1 = require("path");
 const BaseCstVisitorWithDefaults = parser_1.parser.getBaseCstVisitorConstructorWithDefaults();
 class OutlineVisitor extends BaseCstVisitorWithDefaults {
     constructor(modules) {
@@ -146,12 +147,124 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
     FLOW(ctx) {
         return {
             type: NodeType.FLOW,
-            operations: (ctx.OPERATION || []).map(o => this.visit(o)),
+            operations: helpers_1.purge((ctx.OPERATION || []).map(o => this.visit(o))),
             directives: parseDirectives(ctx)
         };
     }
     OPERATION(ctx) {
-        return Object.assign({ annotations: helpers_1.purge(this.ROOT_ANNOTATIONS(ctx)), type: NodeType.OPERATION, id: ctx.GenericParameter[0].image, id_start: helpers_1.getStartToken(ctx.GenericParameter[0]) }, this.visit(ctx.OPERATION_RESULT[0]), { params: (ctx.OPERATION_PARAMETER || []).map(p => this.visit(p)) });
+        let annotations = helpers_1.purge(this.ROOT_ANNOTATIONS(ctx));
+        let r = {};
+        if (ctx.FLOW_FUNCTION) {
+            r = this.visit(ctx.FLOW_FUNCTION[0]);
+        }
+        else if (ctx.FLOW_PUB) {
+            r = this.visit(ctx.FLOW_PUB[0]);
+        }
+        else if (ctx.FLOW_SUB) {
+            r = this.visit(ctx.FLOW_SUB[0]);
+        }
+        else if (ctx.FLOW_SYSTEM) {
+            r = this.visit(ctx.FLOW_SYSTEM[0]);
+        }
+        r.annotations = annotations;
+        annotations.forEach(a => {
+            r[a.key] = r[a.key] || a.value;
+        });
+        // it can be typed a "FLOW_FUNCTION" but actually be an operation,
+        // we will rectify this...
+        if (r.type === NodeType.FLOW_FUNCTION && r.to && r.from) {
+            r.type = NodeType.OPERATION;
+            r.result = r.ofType;
+            r.result_start = r.ofType_start;
+            r.result_params = r.ofType_params;
+            r.result_params_start = r.ofType_params_start;
+            delete r.ofType;
+            delete r.ofType_params;
+            delete r.ofType_start;
+            delete r.ofType_params_start;
+        }
+        return r;
+    }
+    FLOW_FUNCTION(ctx) {
+        let params = (ctx.OPERATION_PARAMETER || []).map(p => this.visit(p));
+        return Object.assign({}, params[params.length - 1], { type: NodeType.FLOW_FUNCTION, id: ctx.GenericParameter[0].image, id_start: helpers_1.getStartToken(ctx.GenericParameter[0]), params: params.slice(0, params.length - 1) });
+    }
+    /**
+     * A SYSTEM FLOW looks something like:
+     *
+     * @ id: getCustomer
+     * ("Entity Service", SAP) :: String -> Customer
+     */
+    FLOW_SYSTEM(ctx) {
+        let fireAndForget = !!ctx.SIGN_fireAndForget;
+        let from = this.visit(ctx.ID_OR_STRING[0]);
+        let to = this.visit(ctx.ID_OR_STRING[1]);
+        let params = helpers_1.purge((ctx.OPERATION_PARAMETER || []).map(p => this.visit(p)));
+        let result = params[params.length - 1];
+        if (fireAndForget) {
+            return {
+                type: NodeType.FIRE_FORGET,
+                from,
+                to,
+                params
+            };
+        }
+        else {
+            return {
+                type: NodeType.OPERATION,
+                from: from,
+                to: to,
+                params: params.slice(0, params.length - 1),
+                result: result.id || result.ofType,
+                result_start: result.id_start || result.ofType_start,
+                result_params: result.ofType_params,
+                result_params_start: result.ofType_params_start,
+                result_ofType: result.ofType,
+                description: "",
+                annotations: []
+            };
+        }
+    }
+    /**
+     * Be able to publish to some queue
+     *
+     * "Customer Service" pub "The Event Name" :: Customer
+     */
+    FLOW_PUB(ctx) {
+        let params = helpers_1.purge((ctx.OPERATION_PARAMETER || []).map(p => this.visit(p)));
+        return {
+            type: NodeType.PUB,
+            service: this.visit(ctx.ID_OR_STRING[0]),
+            event: this.visit(ctx.ID_OR_STRING[1]),
+            message: params,
+            annotations: []
+        };
+    }
+    /**
+     * Be able to subscribe to some queue
+     *
+     * "Customer Service" sub "The Event Name" :: String
+     */
+    FLOW_SUB(ctx) {
+        let params = helpers_1.purge((ctx.OPERATION_PARAMETER || []).map(p => this.visit(p)));
+        return {
+            type: NodeType.SUB,
+            service: this.visit(ctx.ID_OR_STRING[0]),
+            event: this.visit(ctx.ID_OR_STRING[1]),
+            message: params,
+            annotations: []
+        };
+    }
+    ID_OR_STRING(ctx) {
+        if (ctx.Identifier) {
+            return ctx.Identifier[0].image;
+        }
+        else if (ctx.GenericIdentifier) {
+            return ctx.GenericIdentifier[0].image;
+        }
+        else {
+            return ctx.StringLiteral[0].image.replace(/"/g, "");
+        }
     }
     OPERATION_PARAMETER(ctx) {
         let paramDetails;
@@ -164,19 +277,11 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
         return Object.assign({ type: NodeType.OPERATION_PARAMETER }, paramDetails);
     }
     OPERATION_PARAMETER_TYPE(ctx) {
-        return Object.assign({}, this.visit(ctx.TYPE_IDENTIFIER[0]));
+        let t = this.visit(ctx.TYPE_IDENTIFIER[0]);
+        return Object.assign({ id: t.ofType, id_start: t.ofType_start }, t);
     }
     OPERATION_PARAMETER_FIELD_TYPE(ctx) {
         return Object.assign({ id: ctx.GenericParameter[0].image, id_start: helpers_1.getStartToken(ctx.GenericParameter[0]) }, this.visit(ctx.TYPE_IDENTIFIER[0]));
-    }
-    OPERATION_RESULT(ctx) {
-        const { ofType, ofType_start, ofType_params, ofType_params_start } = this.visit(ctx.TYPE_IDENTIFIER[0]);
-        return {
-            result: ofType,
-            result_start: ofType_start,
-            result_params: ofType_params,
-            result_params_start: ofType_params_start
-        };
     }
     CHOICE(ctx) {
         let type = this.visit(ctx.TYPE_IDENTIFIER[0]);
@@ -320,11 +425,12 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
     MARKDOWN_IMAGE(ctx) {
         const pattern = /(\[)(.*)(\])(\()(.*)(\))/;
         const segments = pattern.exec(ctx.MarkdownImageLiteral[0].image) || [];
+        let uri = segments[5].startsWith("http") ? segments[5] : "file://" + path_1.resolve(segments[5]);
         return {
             type: NodeType.MARKDOWN_IMAGE,
             content: ctx.MarkdownImageLiteral[0].image,
             alt: segments[2],
-            uri: segments[5]
+            uri
         };
     }
     MARKDOWN_PARAGRAPH(ctx) {
@@ -385,7 +491,7 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
         return result
             ? {
                 type: NodeType.ANNOTATION,
-                key: result[3].trim(),
+                key: result[3].trim().toLowerCase(),
                 value: result[5].trim()
             }
             : null;
@@ -443,6 +549,10 @@ var NodeType;
     NodeType["OPERATION_PARAMETER"] = "OPERATION_PARAMETER";
     NodeType["MAP"] = "MAP";
     NodeType["MAP_FLOW"] = "MAP_FLOW";
+    NodeType["PUB"] = "PUB";
+    NodeType["SUB"] = "SUB";
+    NodeType["FIRE_FORGET"] = "FIRE_FORGET";
+    NodeType["FLOW_FUNCTION"] = "FLOW_FUNCTION";
 })(NodeType = exports.NodeType || (exports.NodeType = {}));
 const defaultStart = {
     startLineNumber: 0,

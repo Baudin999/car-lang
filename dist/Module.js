@@ -31,7 +31,7 @@ class Module {
     parse(fullPath) {
         return new Promise(resolve => {
             fs_1.readFile(fullPath, "utf8", (error, source) => {
-                const { ast, tokens } = transpiler_1.createAST(source);
+                const { ast, errors, tokens } = transpiler_1.transpile(source); //createAST(source);
                 this.hash = stringHash(source || "");
                 this.ast = ast;
                 this.path = path_1.normalize(fullPath);
@@ -42,7 +42,7 @@ class Module {
                     .replace(/\.car/, "")
                     .replace(/^\./, "");
                 this.timestamp = new Date();
-                this.errors = [];
+                this.errors = errors;
                 this.tokens = tokens;
                 resolve(this);
             });

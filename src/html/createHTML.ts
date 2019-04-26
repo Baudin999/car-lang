@@ -75,7 +75,11 @@ export const createHTML = (ast: IExpression[], moduleName?: string) => {
                 return `<div class="image-container"><img src="${url}" /></div>`;
             } else if (node.type === NodeType.FLOW) {
                 let result = "";
-                const { sequence, useCase } = createFlow(node as any);
+                const { state, sequence, useCase } = createFlow(node as any);
+                if (state) {
+                    const state_url = generateURL(state);
+                    result += `<div class="image-container"><img src="${state_url}" /></div>`;
+                }
                 if (sequence) {
                     const s_url = generateURL(sequence);
                     result += `<div class="image-container"><img src="${s_url}" /></div>`;

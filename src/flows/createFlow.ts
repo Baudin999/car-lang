@@ -1,104 +1,75 @@
-import { IExpression, NodeType, IFlow } from "../outline";
+import {
+    IExpression,
+    NodeType,
+    IFlow,
+    IFlowFunction,
+    IPubSub,
+    IOperation,
+    IFireAndForget
+} from "../outline";
 import { purge, foldText } from "../helpers";
+import { createFunction } from "./function";
+import { createPub } from "./pub";
+import { createSub } from "./sub";
+import { createOperation } from "./operation";
+import { createFireAndForget } from "./fireAndForget";
 
-export const createFlow = (flow: IFlow): { sequence: string | null; useCase: string | null } => {
-    const sequence: string[] = [];
-    const sequenceEnd: string[] = [];
-    const useCase: string[] = [];
+export const createFlow = (flow: IFlow): IFlowResult => {
+    // here we'll export a flow diagram for PlantUML
+    // this will be a difficult execise because it will
+    // be a rather messy mapping...
 
-    //console.log(JSON.stringify(flow, null, 4));
+    let definitions = [];
+    let state: string[] = [];
+    let operations: string[] = [];
+    let _results: string[] = [];
 
-    const titleDirective = flow.directives.find(d => d.key === "title");
-    const title = titleDirective ? "title " + titleDirective.value : "";
-
-    const operations = flow.operations.forEach((operation, i) => {
-        let from = operation.annotations.find(a => a.key === "from");
-        let to = operation.annotations.find(a => a.key === "to");
-
-        if (from && to) {
-            let descriptionAnnotation = operation.annotations.find(a => a.key === "description");
-            let description = descriptionAnnotation
-                ? "\n" + foldText(descriptionAnnotation.value)
-                : "";
-            let $from = from.value.replace(/ /g, "_");
-            let $to = to.value.replace(/ /g, "_");
-            let base = `"${from.value}" as ${$from} -> "${to.value}" as ${$to}`;
-            let reversed = `"${to.value}" as ${$to} --> "${from.value}" as ${$from}`;
-            let params = operation.params
-                .map((p, i) => {
-                    let params = p.ofType_params.length > 0 ? " " + p.ofType_params.join(" ") : "";
-                    if (p.id) {
-                        return `(${p.id}: ${p.ofType}${params})`;
-                    } else {
-                        return `${p.ofType}${params}`;
-                    }
-                })
-                .join(" ->\\n\\t")
-                .trim();
-            if ($from !== $to) {
-                sequence.push(`
-${base}: ${params}
-note over ${$to}
-<i><b>${operation.id}</b></i>
-${description}
-end note
-`);
-                sequenceEnd.unshift(
-                    `${reversed}: ${operation.result} ${operation.result_params.join(" ")}`
-                );
-            } else {
-                const arrowDescription =
-                    params.length > 0
-                        ? `${params} ->\\n\\t${operation.result} ${operation.result_params.join(
-                              " "
-                          )}`
-                        : `${operation.result} ${operation.result_params.join(" ")}`;
-
-                sequence.push(`
-${base}: ${arrowDescription}
-note right ${$to}
-<i><b>${operation.id}</b></i>
-${description}
-end note
-
-`);
-            }
-        } else {
-            const defs = operation.params
-                .map(
-                    param =>
-                        `(${param.id ? param.id + ": " : ""}${param.ofType}) as ${operation.id}_${
-                            param.ofType
-                        }_${i}`
-                )
-                .join("\n");
-            const froms = operation.params
-                .map(param => `${operation.id}_${param.ofType}_${i} --> (${operation.id})`)
-                .join("\n");
-            const to = `(${operation.id}) --> (${operation.result})`;
-            useCase.push("\n" + defs + "\n" + froms + "\n" + to + "\n");
+    flow.operations.forEach((operation, index) => {
+        if (operation.type === NodeType.FLOW_FUNCTION) {
+            let { template } = createFunction(operation as IFlowFunction);
+            state.push(template);
+        } else if (operation.type === NodeType.PUB) {
+            let { template } = createPub(operation as IPubSub, index);
+            operations.push(template);
+        } else if (operation.type === NodeType.SUB) {
+            let { template } = createSub(operation as IPubSub, index);
+            operations.push(template);
+        } else if (operation.type === NodeType.OPERATION) {
+            let { template, results } = createOperation(operation as IOperation, index);
+            operations.push(template);
+            _results.unshift(results);
+        } else if (operation.type === NodeType.FIRE_FORGET) {
+            let { template } = createFireAndForget(operation as IFireAndForget, index);
+            _results.forEach(r => operations.push(r));
+            operations.push(template);
+            _results = [];
         }
     });
 
-    return {
-        sequence:
-            sequence.length > 0
-                ? `
+    let result: IFlowResult = {};
+
+    if (operations.length > 0) {
+        result.sequence = `
 @startuml
-${title}
-autonumber "<b>[000]"
-${purge(sequence).join("\n")}
-${purge(sequenceEnd).join("\n")}
+${operations.join("\n")}
+${_results.join("\n")}
 @enduml
-            `.trim()
-                : null,
-        useCase:
-            useCase.length > 0
-                ? `
+        `.trim();
+    }
+
+    if (state.length > 0) {
+        result.state = `
 @startuml
-${purge(useCase).join("\n")}
+${state.join("\n")}
 @enduml
-            `.trim()
-                : null
-    };
+        `.trim();
+    }
+
+    return result;
 };
+
+export interface IFlowResult {
+    state?: string;
+    sequence?: string;
+    useCase?: string;
+}

@@ -87,6 +87,15 @@ const KW_pluck = createToken({
     name: "KW_pluck"
 });
 
+const KW_sub = createToken({
+    pattern: /sub/,
+    name: "KW_sub"
+});
+const KW_pub = createToken({
+    pattern: /pub/,
+    name: "KW_pub"
+});
+
 const SIGN_Equals = createToken({
     name: "SIGN_Equals",
     pattern: /=/
@@ -137,7 +146,7 @@ const SIGN_open = createToken({
 const SIGN_close = createToken({
     name: "SIGN_close",
     pattern: /}/,
-    push_mode: "root"
+    pop_mode: true
 });
 
 const SIGN_collectionOpen = createToken({
@@ -169,6 +178,11 @@ const SIGN_wrapClose = createToken({
 const SIGN_arrow = createToken({
     name: "SIGN_arrow",
     pattern: /->/
+});
+
+const SIGN_fireAndForget = createToken({
+    name: "SIGN_fireAndForget",
+    pattern: /\*/
 });
 
 const Identifier = createToken({
@@ -208,7 +222,7 @@ const FieldName = createToken({
 
 const NewLine = createToken({
     name: "NewLine",
-    pattern: /\n(?=\s+)/,
+    pattern: /\s*\n(?=\s+)/,
     group: Lexer.SKIPPED
 });
 
@@ -218,7 +232,7 @@ const Indent = createToken({
 });
 
 const WhiteSpace = createToken({
-    pattern: /\s/,
+    pattern: /\s+/,
     name: "WhiteSpace",
     group: Lexer.SKIPPED
 });
@@ -441,16 +455,21 @@ const multiModeLexerDefinition = {
         ],
         flow_definition: [
             ViewIdentifier,
+            KW_sub,
+            KW_pub,
             SIGN_open,
             SIGN_close,
             SIGN_arrow,
             SIGN_TypeDefStart,
             SIGN_wrapOpen,
             SIGN_wrapClose,
+            SIGN_collectionSeparator,
+            SIGN_fireAndForget,
             AnnotationLiteral,
             DirectiveLiteral,
             GenericIdentifier,
             GenericParameter,
+            StringLiteral,
             Identifier,
             NewLine,
             Indent,
@@ -485,6 +504,8 @@ export const tokenLookup = {
     KW_aggregate,
     KW_flow,
     KW_map,
+    KW_sub,
+    KW_pub,
 
     SIGN_Equals,
     SIGN_EqualsType,
@@ -502,6 +523,7 @@ export const tokenLookup = {
     SIGN_TypeDefStart,
     SIGN_wrapOpen,
     SIGN_wrapClose,
+    SIGN_fireAndForget,
     Operator,
 
     AnnotationLiteral,
