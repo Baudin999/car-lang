@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createFireAndForget = (fun, i) => {
     let index = i * 2;
-    console.log(fun);
+    //console.log(fun);
     let fromName = fun.from.replace(" ", "_");
     let toName = fun.to.replace(" ", "_");
     let params = fun.params

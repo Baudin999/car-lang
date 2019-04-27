@@ -18,6 +18,8 @@ exports.createMap = (node) => {
     }
     return `
 @startuml
+skinparam linetype ortho
+left to right direction
 ${title}
 ${maps}
 ${rows}

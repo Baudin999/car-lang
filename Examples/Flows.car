@@ -4,7 +4,7 @@ This document will describe the flows in the car document.
 
 
 flow {
-    getCustomer :: String -> Duck -> Goose -> Customer
+    getCustomer :: Duck -> Duck -> Goose -> Customer
 
     logCustomer :: Customer -> Customer
 }
@@ -26,4 +26,12 @@ flow {
     (ES, SAP) :: Foo -> Bar
 
     (FS, "SAP CRM")* :: Bar
+}
+
+
+We can also create simple graphs; a graph is called a "map" in the car-lang!
+
+map {
+    Foo -> Bar -> Duck
+    Duck -> Duck -> Goose
 }

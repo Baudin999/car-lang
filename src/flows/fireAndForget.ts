@@ -2,7 +2,7 @@ import { IPubSub, IFireAndForget } from "../outline";
 
 export const createFireAndForget = (fun: IFireAndForget, i: number) => {
     let index = i * 2;
-    console.log(fun);
+    //console.log(fun);
 
     let fromName = fun.from.replace(" ", "_");
     let toName = fun.to.replace(" ", "_");

@@ -22,6 +22,8 @@ export const createMap = (node: IMap) => {
 
     return `
 @startuml
+skinparam linetype ortho
+left to right direction
 ${title}
 ${maps}
 ${rows}
