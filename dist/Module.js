@@ -11,6 +11,7 @@ const deflate_1 = require("./deflate/deflate");
 const createERD_1 = require("./erd/createERD");
 const createHTML_1 = require("./html/createHTML");
 const createXSD_1 = require("./xsd/createXSD");
+const createTS_1 = require("./typescript/createTS");
 const createJsonSchema_1 = require("./jsonSchema/createJsonSchema");
 class Module {
     /**
@@ -82,6 +83,10 @@ class Module {
                 const schemaPath = path_1.join(outPath, this.name, this.name + "_" + schema.name + ".json");
                 fs_extra_1.outputFile(schemaPath, JSON.stringify(schema.schema, null, 4));
             });
+            // Generate the TypeScript file
+            const tsFileContent = createTS_1.createTS(this.ast);
+            const tsPath = path_1.join(outPath, this.name, this.name + ".ts");
+            fs_extra_1.outputFile(tsPath, tsFileContent);
             resolve(puml);
             console.log("Compiled: ", this.name);
         });

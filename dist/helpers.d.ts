@@ -62,12 +62,13 @@ export declare const clone: (source: any, template?: any) => any;
  * @param useSpaces - if true, attempt to insert newlines at whitespace
  * @param a - array used to build result, defaults to new array
  */
-export declare function foldText(s: string, split?: string, n?: number, useSpaces?: boolean, a?: string[]): string;
+export declare function foldText(s: string, n?: number, split?: string, useSpaces?: boolean, a?: string[]): string;
 export declare const fetchImage: (url: any) => Promise<{}>;
 export declare const baseTypes: string[];
 export declare const baseTypeToXSDType: (b: string) => string;
 export declare const mapRestrictionToXSD: (baseType: string, restriction: IRestriction) => string;
 export declare const baseTypeToJSONType: (b: string) => string | null;
+export declare const baseTypeToTypeScriptType: (b: string) => string | null;
 export interface IConfiguration {
     name: string;
     version: string;

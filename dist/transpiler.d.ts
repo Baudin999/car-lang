@@ -3,9 +3,15 @@ import { IToken } from "chevrotain";
 import { ModuleDictionary } from "./ModuleDictionary";
 export declare const transpile: (source: string) => ITranspilationResult;
 export declare const createAST: (source: string) => {
+    ast: {};
+    tokens: never[];
+    cst: never[];
+    errors?: undefined;
+} | {
     ast: any;
     tokens: IToken[];
     cst: any;
+    errors: IError[];
 };
 export declare const resolveImports: (modules: ModuleDictionary) => ModuleDictionary;
 export declare const extensions: (modules: ModuleDictionary) => ModuleDictionary;

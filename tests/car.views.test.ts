@@ -1,11 +1,11 @@
 import { transpile } from "../src/transpiler";
 
 const log = source => {
-    console.log(JSON.stringify(source, null, 4));
+  console.log(JSON.stringify(source, null, 4));
 };
 
 describe("Define a simple view", () => {
-    const source = `
+  const source = `
 
 data Maybe a =
     | Just a
@@ -37,15 +37,15 @@ view PersonView {
 
 `;
 
-    const { tokens, errors, ast } = transpile(source);
+  const { tokens, errors, ast } = transpile(source);
 
-    it("AST should be defined", () => {
-        expect(ast).toBeDefined();
-    });
+  it("AST should be defined", () => {
+    expect(ast).toBeDefined();
+  });
 });
 
 describe("The View should only have nodes which are known", () => {
-    const source = `
+  const source = `
 
 view PersonView {
     Person
@@ -57,9 +57,9 @@ type Address
 
 `;
 
-    const { tokens, errors, ast } = transpile(source);
+  const { tokens, errors, ast } = transpile(source);
 
-    it("Errors should be of length 2", () => {
-        expect(errors.length).toEqual(2);
-    });
+  it("Errors should be of length 2", () => {
+    expect(errors.length).toEqual(2);
+  });
 });

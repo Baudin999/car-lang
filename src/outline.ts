@@ -2,6 +2,7 @@ import { parser } from "./parser";
 import { purge, getStartToken, ITokenStart } from "./helpers";
 import { resolve } from "path";
 import { nullLiteral, isTSTypeOperator } from "@babel/types";
+import add from "ramda/es/add";
 
 const BaseCstVisitorWithDefaults: any = parser.getBaseCstVisitorConstructorWithDefaults();
 

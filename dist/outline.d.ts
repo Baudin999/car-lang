@@ -318,10 +318,11 @@ export declare enum NodeType {
     FLOW_FUNCTION = "FLOW_FUNCTION"
 }
 export interface IError {
-    message: string;
+    message: string | object;
     startLineNumber: number;
     endLineNumber: number;
     startColumn: number;
     endColumn: number;
+    ruleStack?: string[];
 }
 export {};

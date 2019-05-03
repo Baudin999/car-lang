@@ -39,7 +39,7 @@ exports.clone = (source, template) => {
  * @param useSpaces - if true, attempt to insert newlines at whitespace
  * @param a - array used to build result, defaults to new array
  */
-function foldText(s, split = "\n", n = 40, useSpaces = true, a = []) {
+function foldText(s, n = 40, split = "\n", useSpaces = true, a = []) {
     a = a || [];
     if (s.length <= n) {
         a.push(s);
@@ -49,7 +49,7 @@ function foldText(s, split = "\n", n = 40, useSpaces = true, a = []) {
     if (!useSpaces) {
         // insert newlines anywhere
         a.push(line);
-        return foldText(s.substring(n), split, n, useSpaces, a);
+        return foldText(s.substring(n), n, split, useSpaces, a);
     }
     else {
         // attempt to insert newlines after whitespace
@@ -61,7 +61,7 @@ function foldText(s, split = "\n", n = 40, useSpaces = true, a = []) {
             nextIdx = idx;
         }
         a.push(line);
-        return foldText(s.substring(nextIdx), split, n, useSpaces, a);
+        return foldText(s.substring(nextIdx), n, split, useSpaces, a);
     }
 }
 exports.foldText = foldText;
@@ -155,6 +155,24 @@ exports.baseTypeToJSONType = (b) => {
             return "time";
         default:
             return null;
+    }
+};
+exports.baseTypeToTypeScriptType = (b) => {
+    switch (b) {
+        case "String":
+            return "string";
+        case "Number":
+            return "number";
+        case "Boolean":
+            return "boolean";
+        case "Date":
+            return "Date";
+        case "DateTime":
+            return "Date";
+        case "Time":
+            return "string";
+        default:
+            return "I" + b;
     }
 };
 //# sourceMappingURL=helpers.js.map

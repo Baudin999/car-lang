@@ -14,9 +14,13 @@ exports.createERD = (ast, title, depth = 0) => {
         enums: ast
             .filter((node) => node && node.type && node.type === outline_1.NodeType.CHOICE)
             .map((n) => n.id),
-        data: ast.filter((node) => node && node.type && node.type === outline_1.NodeType.DATA).map((n) => n.id)
+        data: ast
+            .filter((node) => node && node.type && node.type === outline_1.NodeType.DATA)
+            .map((n) => n.id)
     };
-    const transformedNodes = ast.filter((n) => n && !n.ignore).map(node => {
+    const transformedNodes = ast
+        .filter((n) => n && !n.ignore)
+        .map(node => {
         if (!node)
             return null;
         if (node.type && node.type === outline_1.NodeType.TYPE) {

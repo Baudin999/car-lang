@@ -9,7 +9,7 @@ const helpers_1 = require("./helpers");
 // Modules is the associated hash for looking up module references
 // in the other modules (the imports).
 exports.transpile = (source) => {
-    const { ast, cst, tokens } = exports.createAST(source);
+    const { ast, cst, tokens, errors: astErrors } = exports.createAST(source);
     let pluckResult = substitute_1.substitutePluckedFields(ast);
     let pluckAST = pluckResult.newAST;
     let rwAlias = substitute_1.substituteAliases(pluckAST);
@@ -21,7 +21,7 @@ exports.transpile = (source) => {
         tokens,
         cst,
         ast: newAST,
-        errors: [...rwAliasErrors, ...errors, ...checkASTs]
+        errors: [...(astErrors || []), ...rwAliasErrors, ...errors, ...checkASTs]
     };
 };
 exports.createAST = (source) => {
@@ -35,12 +35,31 @@ exports.createAST = (source) => {
     const lexedSource = lexer_1.DomainLexer.tokenize(source);
     parser_1.parser.input = lexedSource.tokens;
     const cst = parser_1.parser.START();
-    if (parser_1.parser.errors && parser_1.parser.errors.length > 0) {
-        console.log(JSON.stringify(parser_1.parser.errors, null, 4));
-    }
+    //   // We've removed this in favour of our custom error messages. But
+    //   // uncomment if you want to debug something.
+    //   if (parser.errors && parser.errors.length > 0) {
+    //     console.log(JSON.stringify(parser.errors, null, 4));
+    //   }
     const visitor = new outline_1.OutlineVisitor();
     const ast = visitor.visit(cst);
-    return { ast, tokens: lexedSource.tokens, cst };
+    let errors = parser_1.parser.errors.map(error => {
+        let message = "";
+        if (error.name === "MismatchedTokenException") {
+            message =
+                error.message +
+                    `
+Previous token was: ${error.previousToken.image}`;
+        }
+        return {
+            message: message,
+            ruleStack: error.context ? error.context.ruleStack || [] : null,
+            startLineNumber: error.token.startLine,
+            endLineNumber: error.token.endLine,
+            startColumn: error.token.startColumn,
+            endColumn: error.token.endColumn
+        };
+    });
+    return { ast, tokens: lexedSource.tokens, cst, errors };
 };
 exports.resolveImports = (modules) => {
     return modules.map(module => {
