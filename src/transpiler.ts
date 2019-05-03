@@ -8,112 +8,134 @@ import { IModule, IModuleDictionary } from "./helpers";
 import { clone } from "./helpers";
 import { Module } from "./Module";
 import { ModuleDictionary } from "./ModuleDictionary";
+import { ifError } from "assert";
 
 // Modules is the associated hash for looking up module references
 // in the other modules (the imports).
 
 export const transpile = (source: string): ITranspilationResult => {
-    const { ast, cst, tokens } = createAST(source);
+  const { ast, cst, tokens, errors: astErrors } = createAST(source);
 
-    let pluckResult = substitutePluckedFields(ast);
-    let pluckAST = pluckResult.newAST;
+  let pluckResult = substitutePluckedFields(ast);
+  let pluckAST = pluckResult.newAST;
 
-    let rwAlias = substituteAliases(pluckAST);
-    let rwAliasAST = rwAlias.newAST;
-    let rwAliasErrors = rwAlias.errors;
+  let rwAlias = substituteAliases(pluckAST);
+  let rwAliasAST = rwAlias.newAST;
+  let rwAliasErrors = rwAlias.errors;
 
-    var { newAST, errors } = substituteExtensions(rwAliasAST);
+  var { newAST, errors } = substituteExtensions(rwAliasAST);
 
-    const checkASTs = typeChecker(newAST) || [];
+  const checkASTs = typeChecker(newAST) || [];
 
-    return {
-        tokens,
-        cst,
-        ast: newAST,
-        errors: [...rwAliasErrors, ...errors, ...checkASTs]
-    };
+  return {
+    tokens,
+    cst,
+    ast: newAST,
+    errors: [...(astErrors || []), ...rwAliasErrors, ...errors, ...checkASTs]
+  };
 };
 
 export const createAST = (source: string) => {
-    if (!source || source.length === 0) {
-        return {
-            ast: {},
-            tokens: [],
-            cst: []
-        };
+  if (!source || source.length === 0) {
+    return {
+      ast: {},
+      tokens: [],
+      cst: []
+    };
+  }
+  const lexedSource = DomainLexer.tokenize(source);
+  parser.input = lexedSource.tokens;
+  const cst = parser.START();
+
+  //   // We've removed this in favour of our custom error messages. But
+  //   // uncomment if you want to debug something.
+  //   if (parser.errors && parser.errors.length > 0) {
+  //     console.log(JSON.stringify(parser.errors, null, 4));
+  //   }
+
+  const visitor = new OutlineVisitor();
+  const ast = visitor.visit(cst);
+
+  let errors = parser.errors.map(error => {
+    let message = "";
+    if (error.name === "MismatchedTokenException") {
+      message =
+        error.message +
+        `
+Previous token was: ${(error as any).previousToken.image}`;
     }
-    const lexedSource = DomainLexer.tokenize(source);
-    parser.input = lexedSource.tokens;
-    const cst = parser.START();
 
-    if (parser.errors && parser.errors.length > 0) {
-        console.log(JSON.stringify(parser.errors, null, 4));
-    }
+    return {
+      message: message,
+      ruleStack: (error as any).context ? (error as any).context.ruleStack || [] : null,
+      startLineNumber: error.token.startLine,
+      endLineNumber: error.token.endLine,
+      startColumn: error.token.startColumn,
+      endColumn: error.token.endColumn
+    } as IError;
+  });
 
-    const visitor = new OutlineVisitor();
-    const ast = visitor.visit(cst);
-
-    return { ast, tokens: lexedSource.tokens, cst };
+  return { ast, tokens: lexedSource.tokens, cst, errors };
 };
 
 export const resolveImports = (modules: ModuleDictionary) => {
-    return modules.map(module => {
-        module.ast
-            .filter(node => node.type === NodeType.OPEN)
-            .map((node: any) => {
-                const m: Module | null = modules.getModule(node.module);
-                if (!m) {
-                    throw "Can't find module " + node.module;
-                }
-                node.imports.forEach(id => {
-                    const ref = getNodeById(id, m.ast || []);
-                    if (ref) module.ast.unshift(clone(ref, { imported: true }));
-                });
-                return module;
-            });
+  return modules.map(module => {
+    module.ast
+      .filter(node => node.type === NodeType.OPEN)
+      .map((node: any) => {
+        const m: Module | null = modules.getModule(node.module);
+        if (!m) {
+          throw "Can't find module " + node.module;
+        }
+        node.imports.forEach(id => {
+          const ref = getNodeById(id, m.ast || []);
+          if (ref) module.ast.unshift(clone(ref, { imported: true }));
+        });
         return module;
-    });
+      });
+    return module;
+  });
 };
 
 export const extensions = (modules: ModuleDictionary) => {
-    return modules.map(module => {
-        let { errors, newAST } = substituteExtensions(module.ast);
-        return { ...module, ast: newAST, errors: [...module.errors, ...errors] } as Module;
-    });
+  return modules.map(module => {
+    let { errors, newAST } = substituteExtensions(module.ast);
+    return { ...module, ast: newAST, errors: [...module.errors, ...errors] } as Module;
+  });
 };
 
 export const pluck = (modules: ModuleDictionary) => {
-    return modules.map(module => {
-        let { errors, newAST } = substitutePluckedFields(module.ast);
-        return { ...module, ast: newAST, errors: [...module.errors, ...errors] } as Module;
-    });
+  return modules.map(module => {
+    let { errors, newAST } = substitutePluckedFields(module.ast);
+    return { ...module, ast: newAST, errors: [...module.errors, ...errors] } as Module;
+  });
 };
 
 export const resolveAlias = (modules: ModuleDictionary) => {
-    return modules.map(module => {
-        const { newAST, errors } = substituteAliases(module.ast);
-        return { ...module, ast: newAST, errors: [...module.errors, ...errors] } as Module;
-    });
+  return modules.map(module => {
+    const { newAST, errors } = substituteAliases(module.ast);
+    return { ...module, ast: newAST, errors: [...module.errors, ...errors] } as Module;
+  });
 };
 
 export const typeCheck = (modules: ModuleDictionary) => {
-    return modules.map(module => {
-        let errors = typeChecker(module.ast);
-        return { ...module, errors: [...module.errors, ...errors] } as Module;
-    });
+  return modules.map(module => {
+    let errors = typeChecker(module.ast);
+    return { ...module, errors: [...module.errors, ...errors] } as Module;
+  });
 };
 
 export const compile = (modules: ModuleDictionary): ModuleDictionary => {
-    return typeCheck(pluck(resolveAlias(extensions(resolveImports(modules)))));
+  return typeCheck(pluck(resolveAlias(extensions(resolveImports(modules)))));
 };
 
 const getNodeById = (id, ast) => {
-    return ast.find(node => node.id && node.id === id);
+  return ast.find(node => node.id && node.id === id);
 };
 
 export interface ITranspilationResult {
-    tokens: IToken[];
-    cst: any[];
-    ast: IExpression[];
-    errors: IError[];
+  tokens: IToken[];
+  cst: any[];
+  ast: IExpression[];
+  errors: IError[];
 }
