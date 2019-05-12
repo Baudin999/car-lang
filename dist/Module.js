@@ -51,16 +51,19 @@ class Module {
     }
     generateFullOutput(outPath) {
         return new Promise(resolve => {
+            // the modulePath is the location all the assets of a module will
+            // be saved to.
+            let modulePath = path_1.join(outPath, this.name);
             // Save the plantUML code to a .puml file
             const savePlantUML = (puml) => {
-                const filePathPuml = path_1.join(outPath, this.name, this.name + ".puml");
+                const filePathPuml = path_1.join(modulePath, this.name + ".puml");
                 fs_extra_1.outputFile(filePathPuml, puml);
             };
             // Generate the SVG by going to the site and generating the svg
             const generateSVG = (puml) => {
                 const url = deflate_1.generateURL(puml);
                 helpers_1.fetchImage(url).then(img => {
-                    const filePathSVG = path_1.join(outPath, this.name, this.name + ".svg");
+                    const filePathSVG = path_1.join(modulePath, this.name + ".svg");
                     fs_extra_1.outputFile(filePathSVG, img);
                 });
             };
@@ -72,20 +75,22 @@ class Module {
             }
             // Generate the XSD file
             const xsd = createXSD_1.createXSD(this.ast, this.config);
-            const filePathXSD = path_1.join(outPath, this.name, this.name + ".xsd");
+            const filePathXSD = path_1.join(modulePath, this.name + ".xsd");
             fs_extra_1.outputFile(filePathXSD, xsd);
             // Generate the HTML file
-            const html = createHTML_1.createHTML(this.ast, puml ? this.name : undefined);
-            const filePathHTML = path_1.join(outPath, this.name, this.name + ".html");
+            const { html, svgs } = createHTML_1.createHTML(this.ast, modulePath, {}, puml ? this.name : undefined);
+            const filePathHTML = path_1.join(modulePath, this.name + ".html");
             fs_extra_1.outputFile(filePathHTML, html);
+            fs_extra_1.outputFile(path_1.join(modulePath, "svgs.json"), JSON.stringify(svgs, null, 4));
+            this.svgs = svgs;
             const schemas = createJsonSchema_1.createJsonSchema(this.ast);
             schemas.map(schema => {
-                const schemaPath = path_1.join(outPath, this.name, this.name + "_" + schema.name + ".json");
+                const schemaPath = path_1.join(modulePath, this.name + "_" + schema.name + ".json");
                 fs_extra_1.outputFile(schemaPath, JSON.stringify(schema.schema, null, 4));
             });
             // Generate the TypeScript file
             const tsFileContent = createTS_1.createTS(this.ast);
-            const tsPath = path_1.join(outPath, this.name, this.name + ".ts");
+            const tsPath = path_1.join(modulePath, this.name + ".ts");
             fs_extra_1.outputFile(tsPath, tsFileContent);
             resolve(puml);
             console.log("Compiled: ", this.name);

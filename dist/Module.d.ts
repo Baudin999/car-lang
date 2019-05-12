@@ -10,6 +10,7 @@ export declare class Module implements IModule {
     errors: IError[];
     timestamp: Date;
     config?: IConfiguration;
+    svgs: any;
     projectDirectory: string;
     /**
      * Ceate/initialize a module.

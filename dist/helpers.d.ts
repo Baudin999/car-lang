@@ -78,4 +78,5 @@ export interface IConfiguration {
     json: {
         namespace: string;
     };
+    outPath?: string;
 }

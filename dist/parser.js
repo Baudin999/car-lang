@@ -2,16 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const chevrotain_1 = require("chevrotain");
 const lexer_1 = require("./lexer");
-const lexer_let_1 = require("./lexer.let");
 class DomainParser extends chevrotain_1.Parser {
     constructor() {
-        let tokens = lexer_let_1.modTokens(lexer_1.tokenLookup);
-        super(tokens, {
-        // passing our custom error message provider
-        //errorMessageProvider: carErrorProvider
-        });
+        super(lexer_1.tokenLookup);
         const $ = this;
-        //ModifyLet($, tokenLookup);
         $.RULE("START", () => {
             $.MANY(() => $.SUBRULE($.EXPRESSION));
         });

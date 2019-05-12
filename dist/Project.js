@@ -37,6 +37,7 @@ class Project {
                     }
                     else {
                         this.config = JSON.parse(config);
+                        this.outPath = path_1.join(this.projectDirectory, this.config.outPath || ".out");
                         let version = this.config.version;
                         if (!version.startsWith("v")) {
                             version = "v" + version;
@@ -83,9 +84,7 @@ data Maybe a =
             fs_1.exists(this.configPath, e => {
                 fs_extra_1.remove(this.configPath, e2 => {
                     try {
-                        let promises = [
-                            fs_extra_1.outputFile(this.configPath, JSON.stringify(defaultConfig, null, 4))
-                        ];
+                        let promises = [fs_extra_1.outputFile(this.configPath, JSON.stringify(defaultConfig, null, 4))];
                         Promise.all(promises).then(results => {
                             resolve(true);
                         });
@@ -159,9 +158,7 @@ data Maybe a =
                                 promises.push(new Module_1.Module(this.projectDirectory).parse(fullPath));
                             }
                             else if (event === "change") {
-                                new Module_1.Module(this.projectDirectory)
-                                    .parse(fullPath)
-                                    .then(module => {
+                                new Module_1.Module(this.projectDirectory).parse(fullPath).then(module => {
                                     moduleDictionary.changeAndWrite(module, this.versionPath);
                                 });
                             }

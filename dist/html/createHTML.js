@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const outline_1 = require("../outline");
+const stringHash = require("string-hash");
 const helpers_1 = require("../helpers");
 const tableTYPE_1 = require("./tableTYPE");
 const tableDATA_1 = require("./tableDATA");
@@ -13,8 +14,10 @@ const createFlow_1 = require("../flows/createFlow");
 const createMap_1 = require("../maps/createMap");
 const createAggregate_1 = require("../aggregates/createAggregate");
 const pretty_data_1 = require("pretty-data");
+const path_1 = require("path");
+const fs_extra_1 = require("fs-extra");
 const types = [outline_1.NodeType.TYPE, outline_1.NodeType.ALIAS, outline_1.NodeType.DATA, outline_1.NodeType.CHOICE];
-exports.createHTML = (ast, moduleName) => {
+exports.createHTML = (ast, modulePath, svgs, moduleName) => {
     const tables = [];
     const transformedNodes = ast
         .filter((node) => !!!node.ignore)
@@ -55,8 +58,16 @@ exports.createHTML = (ast, moduleName) => {
         }
         else if (node.type === outline_1.NodeType.VIEW) {
             let plantSource = createERD_1.createView(node, ast);
-            let url = deflate_1.generateURL(plantSource);
-            return `<div class="image-container"><img src="${url}" /></div>`;
+            let hash = stringHash(plantSource);
+            if (!svgs[hash]) {
+                let url = deflate_1.generateURL(plantSource);
+                svgs[hash] = url;
+                helpers_1.fetchImage(url).then(img => {
+                    const filePathSVG = path_1.join(modulePath, hash + ".svg");
+                    fs_extra_1.outputFile(filePathSVG, img);
+                });
+            }
+            return `<div class="image-container"><img src="./${hash}.svg" /></div>`;
         }
         else if (node.type === outline_1.NodeType.MAP) {
             let plantSource = createMap_1.createMap(node);
@@ -87,7 +98,7 @@ exports.createHTML = (ast, moduleName) => {
         }
         return null;
     });
-    return pretty_data_1.pd
+    const html = pretty_data_1.pd
         .xml(`
 <html>
   <head>
@@ -115,5 +126,6 @@ exports.createHTML = (ast, moduleName) => {
 </html>
   `)
         .trim();
+    return { html, svgs };
 };
 //# sourceMappingURL=createHTML.js.map
