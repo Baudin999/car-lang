@@ -29,7 +29,7 @@ class Module {
      * @param {string} fullPath The full path the file
      * @returns {Promise<Module>} The updated module
      */
-    parse(fullPath) {
+    parse(fullPath, versionPath) {
         return new Promise(resolve => {
             fs_1.readFile(fullPath, "utf8", (error, source) => {
                 const { ast, errors, tokens } = transpiler_1.transpile(source); //createAST(source);
@@ -45,7 +45,16 @@ class Module {
                 this.timestamp = new Date();
                 this.errors = errors;
                 this.tokens = tokens;
-                resolve(this);
+                this.outPath = path_1.join(versionPath, this.name);
+                fs_1.readFile(path_1.join(this.outPath, "svgs.json"), "utf8", (error2, svgsJSON) => {
+                    if (!error2) {
+                        this.svgs = JSON.parse(svgsJSON);
+                    }
+                    else {
+                        this.svgs = {};
+                    }
+                    resolve(this);
+                });
             });
         });
     }
@@ -69,7 +78,10 @@ class Module {
             };
             // Create the entire ERD
             const puml = createERD_1.createERD(this.ast);
-            if (puml) {
+            const pumlHash = stringHash(puml).toString();
+            const isChanged = !this.svgs.erd || this.svgs.erd !== pumlHash;
+            if (puml && isChanged) {
+                this.svgs.erd = pumlHash;
                 savePlantUML(puml);
                 generateSVG(puml);
             }
@@ -77,18 +89,36 @@ class Module {
             const xsd = createXSD_1.createXSD(this.ast, this.config);
             const filePathXSD = path_1.join(modulePath, this.name + ".xsd");
             fs_extra_1.outputFile(filePathXSD, xsd);
+            //
             // Generate the HTML file
-            const { html, svgs } = createHTML_1.createHTML(this.ast, modulePath, {}, puml ? this.name : undefined);
+            //
+            const { html, svgs } = createHTML_1.createHTML(this.ast, modulePath, this.svgs || {}, puml ? this.name : undefined);
             const filePathHTML = path_1.join(modulePath, this.name + ".html");
             fs_extra_1.outputFile(filePathHTML, html);
+            //
+            // DO SOMETHING WITH THE HASHES
+            //
+            this.svgs = Object.assign({}, svgs);
+            Object.keys(this.svgs).forEach(hash => {
+                if (hash === "erd" || hash === "hashes")
+                    return;
+                if (this.svgs.hashes.indexOf(hash) === -1) {
+                    fs_extra_1.remove(path_1.join(modulePath, hash + ".svg"));
+                    delete this.svgs[hash];
+                }
+            });
             fs_extra_1.outputFile(path_1.join(modulePath, "svgs.json"), JSON.stringify(svgs, null, 4));
-            this.svgs = svgs;
+            //
+            // JSON SCHEMAS
+            //
             const schemas = createJsonSchema_1.createJsonSchema(this.ast);
             schemas.map(schema => {
                 const schemaPath = path_1.join(modulePath, this.name + "_" + schema.name + ".json");
                 fs_extra_1.outputFile(schemaPath, JSON.stringify(schema.schema, null, 4));
             });
+            //
             // Generate the TypeScript file
+            //
             const tsFileContent = createTS_1.createTS(this.ast);
             const tsPath = path_1.join(modulePath, this.name + ".ts");
             fs_extra_1.outputFile(tsPath, tsFileContent);

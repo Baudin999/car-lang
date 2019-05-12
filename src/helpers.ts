@@ -127,6 +127,7 @@ export function foldText(
 }
 
 export const fetchImage = url => {
+  console.log("Fetching image: " + url);
   return new Promise((resolve, reject) => {
     fetch(url)
       .then(r => r.text())

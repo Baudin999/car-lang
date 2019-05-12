@@ -9,6 +9,7 @@ export declare class Module implements IModule {
     tokens: IToken[];
     errors: IError[];
     timestamp: Date;
+    outPath: string;
     config?: IConfiguration;
     svgs: any;
     projectDirectory: string;
@@ -23,6 +24,6 @@ export declare class Module implements IModule {
      * @param {string} fullPath The full path the file
      * @returns {Promise<Module>} The updated module
      */
-    parse(fullPath: string): Promise<Module>;
+    parse(fullPath: string, versionPath: string): Promise<Module>;
     generateFullOutput(outPath: string): Promise<string>;
 }

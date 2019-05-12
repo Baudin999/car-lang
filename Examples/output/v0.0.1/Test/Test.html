@@ -1,0 +1,130 @@
+<html>
+  <head>
+    <title></title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+      <link rel="stylesheet" href="./../style.css">
+      </head>
+      <body>
+        <h1>Index</h1>
+        <ul>
+          <li>
+            <a href="#2"> Chapter</a>
+            <ul></ul>
+          </li>
+        </ul>
+        <h1>Links</h1>
+        <ul>
+          <li>
+            <a href="Test.xsd">XSD</a>
+          </li>
+          <li>
+            <a href="Test.json">JSON schema</a>
+          </li>
+          <li>
+            <a href="Test.svg">ERD</a>
+          </li>
+        </ul>
+        <p>% domain: Carlos</p>
+        <h1 id="2"> Chapter</h1>
+        <h1>ERD</h1>
+        <div class="image-container">
+          <img src="Test.svg" />
+        </div>
+        <h1>Appendix: Entities</h1>
+        <table>
+          <thead>
+            <tr>
+              <th colSpan="4">
+                <h2>Item</h2>
+              </th>
+            </tr>
+            <tr>
+              <th colSpan="4">
+        Een item is iets wat we kunnen gebruiken
+      </th>
+            </tr>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Restrictions</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Key</td>
+              <td>String </td>
+              <td>
+                <div>
+                  <b>min</b>: 1
+                </div>
+                <div>
+                  <b>max</b>: 100
+                </div>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>Value</td>
+              <td>String </td>
+              <td>
+                <div>
+                  <b>min</b>: 1
+                </div>
+                <div>
+                  <b>max</b>: 100
+                </div>
+              </td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+        <table>
+          <thead>
+            <tr>
+              <th colSpan="4">
+                <h2>Person</h2>
+              </th>
+            </tr>
+            <tr>
+              <th colSpan="4">
+        No description
+      </th>
+            </tr>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Restrictions</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Name</td>
+              <td>String </td>
+              <td>
+                <div>
+                  <b>min</b>: 1
+                </div>
+                <div>
+                  <b>max</b>: 100
+                </div>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>Something</td>
+              <td>Item </td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>Items</td>
+              <td>List Item</td>
+              <td></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </body>
+    </html>

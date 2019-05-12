@@ -19,13 +19,37 @@ const fs_extra_1 = require("fs-extra");
 const types = [outline_1.NodeType.TYPE, outline_1.NodeType.ALIAS, outline_1.NodeType.DATA, outline_1.NodeType.CHOICE];
 exports.createHTML = (ast, modulePath, svgs, moduleName) => {
     const tables = [];
+    let currentChapter;
+    let chapters = [];
+    // We will remove the hashes
+    svgs.hashes = [];
     const transformedNodes = ast
         .filter((node) => !!!node.ignore)
         .filter(node => node.type)
-        .map(node => {
+        .map((node, index) => {
         if (node.type === outline_1.NodeType.MARKDOWN_CHAPTER) {
             let chapter = node;
-            return `<h${chapter.depth}>${chapter.content}</h${chapter.depth}>`;
+            if (chapter.depth === 1) {
+                // clear the last one
+                if (currentChapter)
+                    chapters.push(Object.assign({}, currentChapter));
+                // create a new chapter
+                currentChapter = {
+                    title: chapter.content,
+                    id: index,
+                    subChapters: []
+                };
+            }
+            else if (chapter.depth === 2) {
+                if (!currentChapter) {
+                    // This happens when people start with an ##Header (h2)
+                    currentChapter = { title: chapter.content, id: index, subChapters: [] };
+                }
+                else {
+                    currentChapter.subChapters.push({ title: chapter.content, id: index });
+                }
+            }
+            return `<h${chapter.depth} id="${index}">${chapter.content}</h${chapter.depth}>`;
         }
         else if (node.type === outline_1.NodeType.MARKDOWN_PARAGRAPH) {
             let p = node;
@@ -58,46 +82,35 @@ exports.createHTML = (ast, modulePath, svgs, moduleName) => {
         }
         else if (node.type === outline_1.NodeType.VIEW) {
             let plantSource = createERD_1.createView(node, ast);
-            let hash = stringHash(plantSource);
-            if (!svgs[hash]) {
-                let url = deflate_1.generateURL(plantSource);
-                svgs[hash] = url;
-                helpers_1.fetchImage(url).then(img => {
-                    const filePathSVG = path_1.join(modulePath, hash + ".svg");
-                    fs_extra_1.outputFile(filePathSVG, img);
-                });
-            }
-            return `<div class="image-container"><img src="./${hash}.svg" /></div>`;
+            return generateHashAndFetchUrl(plantSource, svgs, modulePath);
         }
         else if (node.type === outline_1.NodeType.MAP) {
             let plantSource = createMap_1.createMap(node);
-            let url = deflate_1.generateURL(plantSource);
-            return `<div class="image-container"><img src="${url}" /></div>`;
+            return generateHashAndFetchUrl(plantSource, svgs, modulePath);
         }
         else if (node.type === outline_1.NodeType.AGGREGATE) {
             let plantSource = createAggregate_1.createAggregate(node, ast);
-            let url = deflate_1.generateURL(plantSource);
-            return `<div class="image-container"><img src="${url}" /></div>`;
+            return generateHashAndFetchUrl(plantSource, svgs, modulePath);
         }
         else if (node.type === outline_1.NodeType.FLOW) {
             let result = "";
             const { state, sequence, useCase } = createFlow_1.createFlow(node);
             if (state) {
-                const state_url = deflate_1.generateURL(state);
-                result += `<div class="image-container"><img src="${state_url}" /></div>`;
+                result += generateHashAndFetchUrl(state, svgs, modulePath);
             }
             if (sequence) {
-                const s_url = deflate_1.generateURL(sequence);
-                result += `<div class="image-container"><img src="${s_url}" /></div>`;
+                result += generateHashAndFetchUrl(sequence, svgs, modulePath);
             }
             if (useCase) {
-                const u_url = deflate_1.generateURL(useCase);
-                result += `<div class="image-container"><img src="${u_url}" /></div>`;
+                result += generateHashAndFetchUrl(useCase, svgs, modulePath);
             }
             return result;
         }
         return null;
     });
+    if (currentChapter) {
+        chapters.push(currentChapter);
+    }
     const html = pretty_data_1.pd
         .xml(`
 <html>
@@ -108,6 +121,16 @@ exports.createHTML = (ast, modulePath, svgs, moduleName) => {
   </head>
   <body>
 
+    <h1>Index</h1>
+    <ul>
+    ${chapters
+        .map(c => {
+        return `<li><a href="#${c.id}">${c.title}</a><ul>${c.subChapters
+            .map(s => `<li><a href="#${s.id}">${s.title}</a></li>`)
+            .join("")}</ul></li>`;
+    })
+        .join("")}
+    </ul>
 
     <h1>Links</h1>
     <ul>
@@ -128,4 +151,21 @@ exports.createHTML = (ast, modulePath, svgs, moduleName) => {
         .trim();
     return { html, svgs };
 };
+function generateHashAndFetchUrl(plantSource, svgs, modulePath) {
+    let hash = stringHash(plantSource);
+    svgs.hashes.push(hash.toString());
+    if (!svgs[hash]) {
+        let url = deflate_1.generateURL(plantSource);
+        svgs[hash] = url;
+        helpers_1.fetchImage(url).then(img => {
+            const filePathSVG = path_1.join(modulePath, hash + ".svg");
+            fs_extra_1.outputFile(filePathSVG, img);
+        });
+        console.log("Hash doesn't exits: " + hash);
+    }
+    else {
+        //
+    }
+    return `<div class="image-container"><img src="./${hash}.svg" /></div>`;
+}
 //# sourceMappingURL=createHTML.js.map

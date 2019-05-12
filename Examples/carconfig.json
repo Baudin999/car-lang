@@ -8,5 +8,5 @@
   "json": {
     "namespace": "https://example.com"
   },
-  "outPath": "lib"
+  "outPath": "output"
 }

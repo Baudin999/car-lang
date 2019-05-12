@@ -101,51 +101,15 @@ data Maybe a =
         // compile stuff
         return new Promise((resolve, reject) => {
             // clear the out path
-            fs_extra_1.remove(this.versionPath, () => {
-                fs_extra_1.outputFile(path_1.join(this.versionPath, "style.css"), exports.styleCSS);
-                // This function will compile the entire project
-                const moduleDictionary = new ModuleDictionary_1.ModuleDictionary(this.config);
-                let promises = [];
-                fs_1.exists(this.configPath, (e) => {
-                    if (!e)
-                        reject("Could not find 'carconfig.json' see manual for details.\n Searching at: " +
-                            this.outPath);
-                    fs_extra_1.readFile(this.configPath, "utf8", (err, configSource) => {
-                        const config = JSON.parse(configSource);
-                        const chokidarConfig = {
-                            ignored: this.outPath
-                        };
-                        const watcher = chokidar_1.watch(this.projectDirectory, chokidarConfig)
-                            .on("all", (event, fullPath) => {
-                            if (fullPath.endsWith(".car")) {
-                                promises.push(new Module_1.Module(this.projectDirectory, config).parse(fullPath));
-                            }
-                        })
-                            .on("ready", () => {
-                            watcher.close();
-                            Promise.all(promises).then(modules => {
-                                modules.forEach(module => moduleDictionary.addModule(module));
-                                transpiler_1.compile(moduleDictionary);
-                                moduleDictionary.writeFiles(this.versionPath);
-                                resolve(moduleDictionary);
-                            });
-                        });
-                    });
-                });
-            });
-        });
-    }
-    watch() {
-        fs_extra_1.remove(this.versionPath, () => {
+            //remove(this.versionPath, () => {
             fs_extra_1.outputFile(path_1.join(this.versionPath, "style.css"), exports.styleCSS);
             // This function will compile the entire project
             const moduleDictionary = new ModuleDictionary_1.ModuleDictionary(this.config);
             let promises = [];
             fs_1.exists(this.configPath, (e) => {
-                if (!e) {
-                    console.log("Could not find 'carcofig.json' see manual for details.");
-                    process.exit(1);
-                }
+                if (!e)
+                    reject("Could not find 'carconfig.json' see manual for details.\n Searching at: " +
+                        this.outPath);
                 fs_extra_1.readFile(this.configPath, "utf8", (err, configSource) => {
                     const config = JSON.parse(configSource);
                     const chokidarConfig = {
@@ -154,26 +118,62 @@ data Maybe a =
                     const watcher = chokidar_1.watch(this.projectDirectory, chokidarConfig)
                         .on("all", (event, fullPath) => {
                         if (fullPath.endsWith(".car")) {
-                            if (event === "add") {
-                                promises.push(new Module_1.Module(this.projectDirectory).parse(fullPath));
-                            }
-                            else if (event === "change") {
-                                new Module_1.Module(this.projectDirectory).parse(fullPath).then(module => {
-                                    moduleDictionary.changeAndWrite(module, this.versionPath);
-                                });
-                            }
+                            promises.push(new Module_1.Module(this.projectDirectory, config).parse(fullPath, this.versionPath));
                         }
                     })
                         .on("ready", () => {
+                        watcher.close();
                         Promise.all(promises).then(modules => {
                             modules.forEach(module => moduleDictionary.addModule(module));
                             transpiler_1.compile(moduleDictionary);
                             moduleDictionary.writeFiles(this.versionPath);
+                            resolve(moduleDictionary);
                         });
                     });
                 });
             });
         });
+        //});
+    }
+    watch() {
+        //remove(this.versionPath, () => {
+        fs_extra_1.outputFile(path_1.join(this.versionPath, "style.css"), exports.styleCSS);
+        // This function will compile the entire project
+        const moduleDictionary = new ModuleDictionary_1.ModuleDictionary(this.config);
+        let promises = [];
+        fs_1.exists(this.configPath, (e) => {
+            if (!e) {
+                console.log("Could not find 'carcofig.json' see manual for details.");
+                process.exit(1);
+            }
+            fs_extra_1.readFile(this.configPath, "utf8", (err, configSource) => {
+                const config = JSON.parse(configSource);
+                const chokidarConfig = {
+                    ignored: this.outPath
+                };
+                const watcher = chokidar_1.watch(this.projectDirectory, chokidarConfig)
+                    .on("all", (event, fullPath) => {
+                    if (fullPath.endsWith(".car")) {
+                        if (event === "add") {
+                            promises.push(new Module_1.Module(this.projectDirectory).parse(fullPath, this.versionPath));
+                        }
+                        else if (event === "change") {
+                            new Module_1.Module(this.projectDirectory).parse(fullPath, this.versionPath).then(module => {
+                                moduleDictionary.changeAndWrite(module, this.versionPath);
+                            });
+                        }
+                    }
+                })
+                    .on("ready", () => {
+                    Promise.all(promises).then(modules => {
+                        modules.forEach(module => moduleDictionary.addModule(module));
+                        transpiler_1.compile(moduleDictionary);
+                        moduleDictionary.writeFiles(this.versionPath);
+                    });
+                });
+            });
+        });
+        //});
     }
 }
 exports.Project = Project;

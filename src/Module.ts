@@ -1,7 +1,7 @@
 import { IError, IExpression } from "./outline";
 import { IModule, fetchImage, IConfiguration } from "./helpers";
 import { readFile } from "fs";
-import { outputFile } from "fs-extra";
+import { outputFile, remove } from "fs-extra";
 import { normalize, join } from "path";
 import { createAST, transpile } from "./transpiler";
 import * as stringHash from "string-hash";
@@ -22,6 +22,9 @@ export class Module implements IModule {
   tokens: IToken[];
   errors: IError[];
   timestamp: Date;
+  // The output path of this module, use this to load the svgs and
+  // other assets needed to avoid useless HTTP requests.
+  outPath: string;
   config?: IConfiguration;
   // a hash of stringHashes and urls
   svgs: any;
@@ -45,7 +48,7 @@ export class Module implements IModule {
    * @param {string} fullPath The full path the file
    * @returns {Promise<Module>} The updated module
    */
-  public parse(fullPath: string): Promise<Module> {
+  public parse(fullPath: string, versionPath: string): Promise<Module> {
     return new Promise<Module>(resolve => {
       readFile(fullPath, "utf8", (error, source) => {
         const { ast, errors, tokens } = transpile(source); //createAST(source);
@@ -61,8 +64,16 @@ export class Module implements IModule {
         this.timestamp = new Date();
         this.errors = errors;
         this.tokens = tokens;
+        this.outPath = join(versionPath, this.name);
 
-        resolve(this);
+        readFile(join(this.outPath, "svgs.json"), "utf8", (error2, svgsJSON) => {
+          if (!error2) {
+            this.svgs = JSON.parse(svgsJSON);
+          } else {
+            this.svgs = {};
+          }
+          resolve(this);
+        });
       });
     });
   }
@@ -90,7 +101,10 @@ export class Module implements IModule {
 
       // Create the entire ERD
       const puml = createERD(this.ast);
-      if (puml) {
+      const pumlHash = stringHash(puml).toString();
+      const isChanged = !this.svgs.erd || this.svgs.erd !== pumlHash;
+      if (puml && isChanged) {
+        this.svgs.erd = pumlHash;
         savePlantUML(puml);
         generateSVG(puml);
       }
@@ -100,20 +114,43 @@ export class Module implements IModule {
       const filePathXSD = join(modulePath, this.name + ".xsd");
       outputFile(filePathXSD, xsd);
 
+      //
       // Generate the HTML file
-      const { html, svgs } = createHTML(this.ast, modulePath, {}, puml ? this.name : undefined);
+      //
+      const { html, svgs } = createHTML(
+        this.ast,
+        modulePath,
+        this.svgs || {},
+        puml ? this.name : undefined
+      );
       const filePathHTML = join(modulePath, this.name + ".html");
       outputFile(filePathHTML, html);
-      outputFile(join(modulePath, "svgs.json"), JSON.stringify(svgs, null, 4));
-      this.svgs = svgs;
 
+      //
+      // DO SOMETHING WITH THE HASHES
+      //
+      this.svgs = { ...svgs };
+      Object.keys(this.svgs).forEach(hash => {
+        if (hash === "erd" || hash === "hashes") return;
+        if (this.svgs.hashes.indexOf(hash) === -1) {
+          remove(join(modulePath, hash + ".svg"));
+          delete this.svgs[hash];
+        }
+      });
+      outputFile(join(modulePath, "svgs.json"), JSON.stringify(svgs, null, 4));
+
+      //
+      // JSON SCHEMAS
+      //
       const schemas = createJsonSchema(this.ast);
       schemas.map(schema => {
         const schemaPath = join(modulePath, this.name + "_" + schema.name + ".json");
         outputFile(schemaPath, JSON.stringify(schema.schema, null, 4));
       });
 
+      //
       // Generate the TypeScript file
+      //
       const tsFileContent = createTS(this.ast);
       const tsPath = join(modulePath, this.name + ".ts");
       outputFile(tsPath, tsFileContent);

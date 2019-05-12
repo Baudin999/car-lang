@@ -40,13 +40,36 @@ export const createHTML = (
 ) => {
   const tables: string[] = [];
 
+  let currentChapter;
+  let chapters: any[] = [];
+
+  // We will remove the hashes
+  svgs.hashes = [];
+
   const transformedNodes = ast
     .filter((node: any) => !!!node.ignore)
     .filter(node => node.type)
-    .map(node => {
+    .map((node, index) => {
       if (node.type === NodeType.MARKDOWN_CHAPTER) {
         let chapter = node as IMarkdownChapter;
-        return `<h${chapter.depth}>${chapter.content}</h${chapter.depth}>`;
+        if (chapter.depth === 1) {
+          // clear the last one
+          if (currentChapter) chapters.push({ ...currentChapter });
+          // create a new chapter
+          currentChapter = {
+            title: chapter.content,
+            id: index,
+            subChapters: []
+          };
+        } else if (chapter.depth === 2) {
+          if (!currentChapter) {
+            // This happens when people start with an ##Header (h2)
+            currentChapter = { title: chapter.content, id: index, subChapters: [] };
+          } else {
+            currentChapter.subChapters.push({ title: chapter.content, id: index });
+          }
+        }
+        return `<h${chapter.depth} id="${index}">${chapter.content}</h${chapter.depth}>`;
       } else if (node.type === NodeType.MARKDOWN_PARAGRAPH) {
         let p = node as IMarkdownParagraph;
         return `<p>${p.content}</p>`;
@@ -70,43 +93,33 @@ export const createHTML = (
         tables.push(createTableALIAS(node as IAlias));
       } else if (node.type === NodeType.VIEW) {
         let plantSource = createView(node as IView, ast);
-        let hash = stringHash(plantSource);
-        if (!svgs[hash]) {
-          let url = generateURL(plantSource);
-          svgs[hash] = url;
-          fetchImage(url).then(img => {
-            const filePathSVG = join(modulePath, hash + ".svg");
-            outputFile(filePathSVG, img);
-          });
-        }
-        return `<div class="image-container"><img src="./${hash}.svg" /></div>`;
+        return generateHashAndFetchUrl(plantSource, svgs, modulePath);
       } else if (node.type === NodeType.MAP) {
         let plantSource = createMap(node as IMap);
-        let url = generateURL(plantSource);
-        return `<div class="image-container"><img src="${url}" /></div>`;
+        return generateHashAndFetchUrl(plantSource, svgs, modulePath);
       } else if (node.type === NodeType.AGGREGATE) {
         let plantSource = createAggregate(node as IAggregate, ast);
-        let url = generateURL(plantSource);
-        return `<div class="image-container"><img src="${url}" /></div>`;
+        return generateHashAndFetchUrl(plantSource, svgs, modulePath);
       } else if (node.type === NodeType.FLOW) {
         let result = "";
         const { state, sequence, useCase } = createFlow(node as any);
         if (state) {
-          const state_url = generateURL(state);
-          result += `<div class="image-container"><img src="${state_url}" /></div>`;
+          result += generateHashAndFetchUrl(state, svgs, modulePath);
         }
         if (sequence) {
-          const s_url = generateURL(sequence);
-          result += `<div class="image-container"><img src="${s_url}" /></div>`;
+          result += generateHashAndFetchUrl(sequence, svgs, modulePath);
         }
         if (useCase) {
-          const u_url = generateURL(useCase);
-          result += `<div class="image-container"><img src="${u_url}" /></div>`;
+          result += generateHashAndFetchUrl(useCase, svgs, modulePath);
         }
         return result;
       }
       return null;
     });
+
+  if (currentChapter) {
+    chapters.push(currentChapter);
+  }
 
   const html = pd
     .xml(
@@ -119,6 +132,16 @@ export const createHTML = (
   </head>
   <body>
 
+    <h1>Index</h1>
+    <ul>
+    ${chapters
+      .map(c => {
+        return `<li><a href="#${c.id}">${c.title}</a><ul>${c.subChapters
+          .map(s => `<li><a href="#${s.id}">${s.title}</a></li>`)
+          .join("")}</ul></li>`;
+      })
+      .join("")}
+    </ul>
 
     <h1>Links</h1>
     <ul>
@@ -145,4 +168,21 @@ export const createHTML = (
 export interface ILookup {
   types: string[];
   enums: string[];
+}
+
+function generateHashAndFetchUrl(plantSource: string, svgs: any, modulePath: string) {
+  let hash = stringHash(plantSource);
+  svgs.hashes.push(hash.toString());
+  if (!svgs[hash]) {
+    let url = generateURL(plantSource);
+    svgs[hash] = url;
+    fetchImage(url).then(img => {
+      const filePathSVG = join(modulePath, hash + ".svg");
+      outputFile(filePathSVG, img);
+    });
+    console.log("Hash doesn't exits: " + hash);
+  } else {
+    //
+  }
+  return `<div class="image-container"><img src="./${hash}.svg" /></div>`;
 }

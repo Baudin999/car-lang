@@ -117,83 +117,85 @@ data Maybe a =
     // compile stuff
     return new Promise<ModuleDictionary>((resolve, reject) => {
       // clear the out path
-      remove(this.versionPath, () => {
-        outputFile(join(this.versionPath, "style.css"), styleCSS);
-        // This function will compile the entire project
-        const moduleDictionary = new ModuleDictionary(this.config);
-        let promises: Promise<Module>[] = [];
-        exists(this.configPath, (e: boolean) => {
-          if (!e)
-            reject(
-              "Could not find 'carconfig.json' see manual for details.\n Searching at: " +
-                this.outPath
-            );
-
-          readFile(this.configPath, "utf8", (err, configSource) => {
-            const config = JSON.parse(configSource) as IConfiguration;
-            const chokidarConfig = {
-              ignored: this.outPath
-            };
-            const watcher = watch(this.projectDirectory, chokidarConfig)
-              .on("all", (event: string, fullPath: string) => {
-                if (fullPath.endsWith(".car")) {
-                  promises.push(new Module(this.projectDirectory, config).parse(fullPath));
-                }
-              })
-              .on("ready", () => {
-                watcher.close();
-                Promise.all(promises).then(modules => {
-                  modules.forEach(module => moduleDictionary.addModule(module));
-                  compile(moduleDictionary);
-                  moduleDictionary.writeFiles(this.versionPath);
-                  resolve(moduleDictionary);
-                });
-              });
-          });
-        });
-      });
-    });
-  }
-
-  watch() {
-    remove(this.versionPath, () => {
+      //remove(this.versionPath, () => {
       outputFile(join(this.versionPath, "style.css"), styleCSS);
       // This function will compile the entire project
       const moduleDictionary = new ModuleDictionary(this.config);
       let promises: Promise<Module>[] = [];
       exists(this.configPath, (e: boolean) => {
-        if (!e) {
-          console.log("Could not find 'carcofig.json' see manual for details.");
-          process.exit(1);
-        }
+        if (!e)
+          reject(
+            "Could not find 'carconfig.json' see manual for details.\n Searching at: " +
+              this.outPath
+          );
 
         readFile(this.configPath, "utf8", (err, configSource) => {
-          const config = JSON.parse(configSource);
+          const config = JSON.parse(configSource) as IConfiguration;
           const chokidarConfig = {
             ignored: this.outPath
           };
           const watcher = watch(this.projectDirectory, chokidarConfig)
             .on("all", (event: string, fullPath: string) => {
               if (fullPath.endsWith(".car")) {
-                if (event === "add") {
-                  promises.push(new Module(this.projectDirectory).parse(fullPath));
-                } else if (event === "change") {
-                  new Module(this.projectDirectory).parse(fullPath).then(module => {
-                    moduleDictionary.changeAndWrite(module, this.versionPath);
-                  });
-                }
+                promises.push(
+                  new Module(this.projectDirectory, config).parse(fullPath, this.versionPath)
+                );
               }
             })
             .on("ready", () => {
+              watcher.close();
               Promise.all(promises).then(modules => {
                 modules.forEach(module => moduleDictionary.addModule(module));
                 compile(moduleDictionary);
                 moduleDictionary.writeFiles(this.versionPath);
+                resolve(moduleDictionary);
               });
             });
         });
       });
     });
+    //});
+  }
+
+  watch() {
+    //remove(this.versionPath, () => {
+    outputFile(join(this.versionPath, "style.css"), styleCSS);
+    // This function will compile the entire project
+    const moduleDictionary = new ModuleDictionary(this.config);
+    let promises: Promise<Module>[] = [];
+    exists(this.configPath, (e: boolean) => {
+      if (!e) {
+        console.log("Could not find 'carcofig.json' see manual for details.");
+        process.exit(1);
+      }
+
+      readFile(this.configPath, "utf8", (err, configSource) => {
+        const config = JSON.parse(configSource);
+        const chokidarConfig = {
+          ignored: this.outPath
+        };
+        const watcher = watch(this.projectDirectory, chokidarConfig)
+          .on("all", (event: string, fullPath: string) => {
+            if (fullPath.endsWith(".car")) {
+              if (event === "add") {
+                promises.push(new Module(this.projectDirectory).parse(fullPath, this.versionPath));
+              } else if (event === "change") {
+                new Module(this.projectDirectory).parse(fullPath, this.versionPath).then(module => {
+                  moduleDictionary.changeAndWrite(module, this.versionPath);
+                });
+              }
+            }
+          })
+          .on("ready", () => {
+            Promise.all(promises).then(modules => {
+              modules.forEach(module => moduleDictionary.addModule(module));
+              compile(moduleDictionary);
+              moduleDictionary.writeFiles(this.versionPath);
+            });
+          });
+      });
+    });
+    //});
   }
 }
 
