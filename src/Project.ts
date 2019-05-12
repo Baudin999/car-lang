@@ -13,70 +13,71 @@ import { IConfiguration } from "./helpers";
  */
 
 export class Project {
-    projectDirectory: string;
-    configPath: string;
-    outPath: string;
-    versionPath: string;
-    preludePath: string;
-    indexPath: string;
-    config: IConfiguration;
+  projectDirectory: string;
+  configPath: string;
+  outPath: string;
+  versionPath: string;
+  preludePath: string;
+  indexPath: string;
+  config: IConfiguration;
 
-    constructor(projectDirectory: string) {
-        this.projectDirectory = projectDirectory;
-        this.configPath = join(this.projectDirectory, "carconfig.json");
-        this.outPath = join(this.projectDirectory, ".out");
-    }
+  constructor(projectDirectory: string) {
+    this.projectDirectory = projectDirectory;
+    this.configPath = join(this.projectDirectory, "carconfig.json");
+    this.outPath = join(this.projectDirectory, ".out");
+  }
 
-    /**
-     * Verify the directory and inspect if the directory is ready to
-     * be used for the models.
-     */
-    verify(): Promise<Project> {
-        // we'll need to verify if:
-        //   1) the projectDirectory exists
-        //   2) there is a carconfig.json file
+  /**
+   * Verify the directory and inspect if the directory is ready to
+   * be used for the models.
+   */
+  verify(): Promise<Project> {
+    // we'll need to verify if:
+    //   1) the projectDirectory exists
+    //   2) there is a carconfig.json file
 
-        return new Promise((resolve, reject) => {
-            const message =
-                "Project does not exists. Please run -i --init to initialize the Project.";
-            exists(this.projectDirectory, e => {
-                if (!e) {
-                    reject(message);
-                }
-                readFile(this.configPath, (err, config) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        this.config = JSON.parse(config) as IConfiguration;
-                        let version = this.config.version;
-                        if (!version.startsWith("v")) {
-                            version = "v" + version;
-                        }
-                        this.versionPath = join(this.outPath, version);
-                        this.preludePath = join(this.versionPath, "Prelude.car");
-                        this.indexPath = join(this.versionPath, "index.html");
-
-                        resolve(this);
-                    }
-                });
-            });
-        });
-    }
-
-    init(): Promise<boolean> {
-        const defaultConfig = {
-            name: "Unknown",
-            description: "No description",
-            version: "0.0.0",
-            xsd: {
-                namespace: "http://example.com/"
-            },
-            json: {
-                namespace: "https://example.com"
+    return new Promise((resolve, reject) => {
+      const message = "Project does not exists. Please run -i --init to initialize the Project.";
+      exists(this.projectDirectory, e => {
+        if (!e) {
+          reject(message);
+        }
+        readFile(this.configPath, (err, config) => {
+          if (err) {
+            reject(err);
+          } else {
+            this.config = JSON.parse(config) as IConfiguration;
+            this.outPath = join(this.projectDirectory, this.config.outPath || ".out");
+            let version = this.config.version;
+            if (!version.startsWith("v")) {
+              version = "v" + version;
             }
-        };
 
-        const prelude = `
+            this.versionPath = join(this.outPath, version);
+            this.preludePath = join(this.versionPath, "Prelude.car");
+            this.indexPath = join(this.versionPath, "index.html");
+
+            resolve(this);
+          }
+        });
+      });
+    });
+  }
+
+  init(): Promise<boolean> {
+    const defaultConfig = {
+      name: "Unknown",
+      description: "No description",
+      version: "0.0.0",
+      xsd: {
+        namespace: "http://example.com/"
+      },
+      json: {
+        namespace: "https://example.com"
+      }
+    };
+
+    const prelude = `
 # Prelude
 
 The prelude is a simple set of types you can use to build 
@@ -93,118 +94,107 @@ data Maybe a =
 
         `.trim();
 
-        return new Promise<boolean | any>((resolve, reject) => {
-            console.log("Check existance");
-            exists(this.configPath, e => {
-                remove(this.configPath, e2 => {
-                    try {
-                        let promises = [
-                            outputFile(this.configPath, JSON.stringify(defaultConfig, null, 4))
-                        ];
+    return new Promise<boolean | any>((resolve, reject) => {
+      console.log("Check existance");
+      exists(this.configPath, e => {
+        remove(this.configPath, e2 => {
+          try {
+            let promises = [outputFile(this.configPath, JSON.stringify(defaultConfig, null, 4))];
 
-                        Promise.all(promises).then(results => {
-                            resolve(true);
-                        });
-                    } catch (err) {
-                        console.log(err);
-                        reject(err);
-                    }
-                });
+            Promise.all(promises).then(results => {
+              resolve(true);
             });
+          } catch (err) {
+            console.log(err);
+            reject(err);
+          }
         });
-    }
+      });
+    });
+  }
 
-    compile(): Promise<ModuleDictionary> | undefined {
-        // compile stuff
-        return new Promise<ModuleDictionary>((resolve, reject) => {
-            // clear the out path
-            remove(this.versionPath, () => {
-                outputFile(join(this.versionPath, "style.css"), styleCSS);
-                // This function will compile the entire project
-                const moduleDictionary = new ModuleDictionary(this.config);
-                let promises: Promise<Module>[] = [];
-                exists(this.configPath, (e: boolean) => {
-                    if (!e)
-                        reject(
-                            "Could not find 'carconfig.json' see manual for details.\n Searching at: " +
-                                this.outPath
-                        );
+  compile(): Promise<ModuleDictionary> | undefined {
+    // compile stuff
+    return new Promise<ModuleDictionary>((resolve, reject) => {
+      // clear the out path
+      remove(this.versionPath, () => {
+        outputFile(join(this.versionPath, "style.css"), styleCSS);
+        // This function will compile the entire project
+        const moduleDictionary = new ModuleDictionary(this.config);
+        let promises: Promise<Module>[] = [];
+        exists(this.configPath, (e: boolean) => {
+          if (!e)
+            reject(
+              "Could not find 'carconfig.json' see manual for details.\n Searching at: " +
+                this.outPath
+            );
 
-                    readFile(this.configPath, "utf8", (err, configSource) => {
-                        const config = JSON.parse(configSource) as IConfiguration;
-                        const chokidarConfig = {
-                            ignored: this.outPath
-                        };
-                        const watcher = watch(this.projectDirectory, chokidarConfig)
-                            .on("all", (event: string, fullPath: string) => {
-                                if (fullPath.endsWith(".car")) {
-                                    promises.push(
-                                        new Module(this.projectDirectory, config).parse(fullPath)
-                                    );
-                                }
-                            })
-                            .on("ready", () => {
-                                watcher.close();
-                                Promise.all(promises).then(modules => {
-                                    modules.forEach(module => moduleDictionary.addModule(module));
-                                    compile(moduleDictionary);
-                                    moduleDictionary.writeFiles(this.versionPath);
-                                    resolve(moduleDictionary);
-                                });
-                            });
-                    });
-                });
-            });
-        });
-    }
-
-    watch() {
-        remove(this.versionPath, () => {
-            outputFile(join(this.versionPath, "style.css"), styleCSS);
-            // This function will compile the entire project
-            const moduleDictionary = new ModuleDictionary(this.config);
-            let promises: Promise<Module>[] = [];
-            exists(this.configPath, (e: boolean) => {
-                if (!e) {
-                    console.log("Could not find 'carcofig.json' see manual for details.");
-                    process.exit(1);
+          readFile(this.configPath, "utf8", (err, configSource) => {
+            const config = JSON.parse(configSource) as IConfiguration;
+            const chokidarConfig = {
+              ignored: this.outPath
+            };
+            const watcher = watch(this.projectDirectory, chokidarConfig)
+              .on("all", (event: string, fullPath: string) => {
+                if (fullPath.endsWith(".car")) {
+                  promises.push(new Module(this.projectDirectory, config).parse(fullPath));
                 }
-
-                readFile(this.configPath, "utf8", (err, configSource) => {
-                    const config = JSON.parse(configSource);
-                    const chokidarConfig = {
-                        ignored: this.outPath
-                    };
-                    const watcher = watch(this.projectDirectory, chokidarConfig)
-                        .on("all", (event: string, fullPath: string) => {
-                            if (fullPath.endsWith(".car")) {
-                                if (event === "add") {
-                                    promises.push(
-                                        new Module(this.projectDirectory).parse(fullPath)
-                                    );
-                                } else if (event === "change") {
-                                    new Module(this.projectDirectory)
-                                        .parse(fullPath)
-                                        .then(module => {
-                                            moduleDictionary.changeAndWrite(
-                                                module,
-                                                this.versionPath
-                                            );
-                                        });
-                                }
-                            }
-                        })
-                        .on("ready", () => {
-                            Promise.all(promises).then(modules => {
-                                modules.forEach(module => moduleDictionary.addModule(module));
-                                compile(moduleDictionary);
-                                moduleDictionary.writeFiles(this.versionPath);
-                            });
-                        });
+              })
+              .on("ready", () => {
+                watcher.close();
+                Promise.all(promises).then(modules => {
+                  modules.forEach(module => moduleDictionary.addModule(module));
+                  compile(moduleDictionary);
+                  moduleDictionary.writeFiles(this.versionPath);
+                  resolve(moduleDictionary);
                 });
+              });
+          });
+        });
+      });
+    });
+  }
+
+  watch() {
+    remove(this.versionPath, () => {
+      outputFile(join(this.versionPath, "style.css"), styleCSS);
+      // This function will compile the entire project
+      const moduleDictionary = new ModuleDictionary(this.config);
+      let promises: Promise<Module>[] = [];
+      exists(this.configPath, (e: boolean) => {
+        if (!e) {
+          console.log("Could not find 'carcofig.json' see manual for details.");
+          process.exit(1);
+        }
+
+        readFile(this.configPath, "utf8", (err, configSource) => {
+          const config = JSON.parse(configSource);
+          const chokidarConfig = {
+            ignored: this.outPath
+          };
+          const watcher = watch(this.projectDirectory, chokidarConfig)
+            .on("all", (event: string, fullPath: string) => {
+              if (fullPath.endsWith(".car")) {
+                if (event === "add") {
+                  promises.push(new Module(this.projectDirectory).parse(fullPath));
+                } else if (event === "change") {
+                  new Module(this.projectDirectory).parse(fullPath).then(module => {
+                    moduleDictionary.changeAndWrite(module, this.versionPath);
+                  });
+                }
+              }
+            })
+            .on("ready", () => {
+              Promise.all(promises).then(modules => {
+                modules.forEach(module => moduleDictionary.addModule(module));
+                compile(moduleDictionary);
+                moduleDictionary.writeFiles(this.versionPath);
+              });
             });
         });
-    }
+      });
+    });
+  }
 }
 
 export const styleCSS = `

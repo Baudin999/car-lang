@@ -79,6 +79,11 @@ view {
     Customer
 }
 
+view {
+    Company
+}
+
+
 ## Customer Aggregate
 
 This is the customer aggregate.

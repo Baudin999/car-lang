@@ -1,11 +1,12 @@
 {
-    "version": "0.0.1",
-    "title": "The title",
-    "description": "The description",
-    "xsd": {
-        "namespace": "http://foo.bar/"
-    },
-    "json": {
-        "namespace": "https://example.com"
-    }
+  "version": "0.0.1",
+  "title": "The title",
+  "description": "The description",
+  "xsd": {
+    "namespace": "http://foo.bar/"
+  },
+  "json": {
+    "namespace": "https://example.com"
+  },
+  "outPath": "lib"
 }

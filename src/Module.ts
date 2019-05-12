@@ -23,6 +23,8 @@ export class Module implements IModule {
   errors: IError[];
   timestamp: Date;
   config?: IConfiguration;
+  // a hash of stringHashes and urls
+  svgs: any;
 
   // other fields
   projectDirectory: string;
@@ -67,9 +69,13 @@ export class Module implements IModule {
 
   generateFullOutput(outPath: string): Promise<string> {
     return new Promise(resolve => {
+      // the modulePath is the location all the assets of a module will
+      // be saved to.
+      let modulePath = join(outPath, this.name);
+
       // Save the plantUML code to a .puml file
       const savePlantUML = (puml: string) => {
-        const filePathPuml = join(outPath, this.name, this.name + ".puml");
+        const filePathPuml = join(modulePath, this.name + ".puml");
         outputFile(filePathPuml, puml);
       };
 
@@ -77,7 +83,7 @@ export class Module implements IModule {
       const generateSVG = (puml: string) => {
         const url = generateURL(puml);
         fetchImage(url).then(img => {
-          const filePathSVG = join(outPath, this.name, this.name + ".svg");
+          const filePathSVG = join(modulePath, this.name + ".svg");
           outputFile(filePathSVG, img);
         });
       };
@@ -91,23 +97,25 @@ export class Module implements IModule {
 
       // Generate the XSD file
       const xsd = createXSD(this.ast, this.config);
-      const filePathXSD = join(outPath, this.name, this.name + ".xsd");
+      const filePathXSD = join(modulePath, this.name + ".xsd");
       outputFile(filePathXSD, xsd);
 
       // Generate the HTML file
-      const html = createHTML(this.ast, puml ? this.name : undefined);
-      const filePathHTML = join(outPath, this.name, this.name + ".html");
+      const { html, svgs } = createHTML(this.ast, modulePath, {}, puml ? this.name : undefined);
+      const filePathHTML = join(modulePath, this.name + ".html");
       outputFile(filePathHTML, html);
+      outputFile(join(modulePath, "svgs.json"), JSON.stringify(svgs, null, 4));
+      this.svgs = svgs;
 
       const schemas = createJsonSchema(this.ast);
       schemas.map(schema => {
-        const schemaPath = join(outPath, this.name, this.name + "_" + schema.name + ".json");
+        const schemaPath = join(modulePath, this.name + "_" + schema.name + ".json");
         outputFile(schemaPath, JSON.stringify(schema.schema, null, 4));
       });
 
       // Generate the TypeScript file
       const tsFileContent = createTS(this.ast);
-      const tsPath = join(outPath, this.name, this.name + ".ts");
+      const tsPath = join(modulePath, this.name + ".ts");
       outputFile(tsPath, tsFileContent);
 
       resolve(puml);
