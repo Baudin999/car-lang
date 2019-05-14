@@ -14,6 +14,8 @@ export declare class OutlineVisitor extends BaseCstVisitorWithDefaults {
     ALIAS(ctx: any): IAlias;
     VIEW(ctx: any): IView;
     AGGREGATE(ctx: any): IAggregate;
+    GUIDELINE(ctx: any): IGuideline;
+    MARKDOWN(ctx: any): IMarkdown | null;
     FLOW(ctx: any): IFlow;
     OPERATION(ctx: any): IOperation | IFireAndForget | IFlowFunction | IPubSub;
     FLOW_FUNCTION(ctx: any): IFlowFunction;
@@ -98,6 +100,14 @@ export interface IPluckedField {
     type: NodeType;
     parts: string[];
     parts_start: ITokenStart[];
+}
+export interface IGuideline {
+    type: NodeType;
+    markdown: IMarkdown[];
+    directives: IDirective[];
+    title?: string;
+    version?: string;
+    subject?: string;
 }
 export interface IFlow {
     type: NodeType;
@@ -285,7 +295,8 @@ export interface IMarkdownList {
     type: NodeType;
     items: string[];
 }
-export declare type IExpression = IType | IAlias | IData | IComment | IAggregate | IChoice | IFlow | IView | IMap | IMarkdownChapter | IMarkdownCode | IMarkdownImage | IMarkdownList | IMarkdownParagraph;
+export declare type IMarkdown = IMarkdownChapter | IMarkdownCode | IMarkdownImage | IMarkdownList | IMarkdownCode;
+export declare type IExpression = IType | IAlias | IData | IComment | IAggregate | IChoice | IFlow | IView | IMap | IGuideline | IMarkdownChapter | IMarkdownCode | IMarkdownImage | IMarkdownList | IMarkdownParagraph;
 export declare enum NodeType {
     TYPE = "TYPE",
     TYPE_FIELD = "TYPE_FIELD",
@@ -315,7 +326,8 @@ export declare enum NodeType {
     PUB = "PUB",
     SUB = "SUB",
     FIRE_FORGET = "FIRE_FORGET",
-    FLOW_FUNCTION = "FLOW_FUNCTION"
+    FLOW_FUNCTION = "FLOW_FUNCTION",
+    GUIDELINE = "GUIDELINE"
 }
 export interface IError {
     message: string | object;

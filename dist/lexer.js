@@ -1,12 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const chevrotain_1 = require("chevrotain");
-const lexer_let_1 = require("./lexer.let");
 exports.EndBlock = chevrotain_1.createToken({
     name: "EndBlock",
     pattern: /\n(\s*\n)+(?!\s)/,
-    push_mode: "root" //,
-    //group: Lexer.SKIPPED
+    push_mode: "root"
 });
 const CommentBlock = chevrotain_1.createToken({
     name: "CommentBlock",
@@ -58,6 +56,11 @@ const KW_aggregate = chevrotain_1.createToken({
 const KW_as = chevrotain_1.createToken({
     pattern: /as/,
     name: "KW_as"
+});
+const KW_guideline = chevrotain_1.createToken({
+    pattern: /guideline/,
+    name: "KW_guideline",
+    push_mode: "guideline_definition"
 });
 const KW_flow = chevrotain_1.createToken({
     pattern: /flow/,
@@ -261,10 +264,10 @@ const multiModeLexerDefinition = {
             KW_view,
             KW_pluck,
             KW_open,
-            lexer_let_1.KW_let,
             KW_aggregate,
             KW_flow,
             KW_map,
+            KW_guideline,
             SIGN_close,
             AnnotationLiteral,
             exports.EndBlock,
@@ -382,7 +385,6 @@ const multiModeLexerDefinition = {
             SIGN_collectionSeparator,
             SIGN_collectionClose
         ],
-        let_definition: lexer_let_1.let_definition,
         aggregate_definition: [
             KW_type,
             KW_alias,
@@ -432,6 +434,18 @@ const multiModeLexerDefinition = {
             SIGN_arrow,
             NewLine,
             WhiteSpace
+        ],
+        guideline_definition: [
+            SIGN_open,
+            WhiteSpace,
+            SIGN_close,
+            DirectiveLiteral,
+            MarkdownChapterLiteral,
+            MarkdownCodeLiteral,
+            MarkdownImageLiteral,
+            MarkdownListLiteral,
+            MarkdownParagraphLiteral,
+            NewLine
         ]
     },
     defaultMode: "root"
@@ -448,6 +462,7 @@ exports.tokenLookup = {
     KW_open,
     KW_importing,
     KW_aggregate,
+    KW_guideline,
     KW_flow,
     KW_map,
     KW_sub,

@@ -41,7 +41,7 @@
   {
     "type": "Rule",
     "name": "EXPRESSION",
-    "orgText": "() => {\n            $.SUBRULE($.ANNOTATIONS);\n            $.OR([\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.CommentBlock) },\n                { ALT: () => $.SUBRULE($.TYPE) },\n                { ALT: () => $.SUBRULE($.ALIAS) },\n                { ALT: () => $.SUBRULE($.DATA) },\n                { ALT: () => $.SUBRULE($.VIEW) },\n                { ALT: () => $.SUBRULE($.CHOICE) },\n                { ALT: () => $.SUBRULE($.OPEN) },\n                { ALT: () => $.SUBRULE($.AGGREGATE) },\n                { ALT: () => $.SUBRULE($.MAP) },\n                { ALT: () => $.SUBRULE($.FLOW) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_CHAPTER) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_PARAGRAPH) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_IMAGE) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_CODE) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_LIST) },\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.EndBlock) }\n            ]);\n        }",
+    "orgText": "() => {\n            $.SUBRULE($.ANNOTATIONS);\n            $.OR([\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.CommentBlock) },\n                { ALT: () => $.SUBRULE($.TYPE) },\n                { ALT: () => $.SUBRULE($.ALIAS) },\n                { ALT: () => $.SUBRULE($.DATA) },\n                { ALT: () => $.SUBRULE($.VIEW) },\n                { ALT: () => $.SUBRULE($.CHOICE) },\n                { ALT: () => $.SUBRULE($.OPEN) },\n                { ALT: () => $.SUBRULE($.AGGREGATE) },\n                { ALT: () => $.SUBRULE($.GUIDELINE) },\n                { ALT: () => $.SUBRULE($.MAP) },\n                { ALT: () => $.SUBRULE($.FLOW) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_CHAPTER) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_PARAGRAPH) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_IMAGE) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_CODE) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_LIST) },\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.EndBlock) }\n            ]);\n        }",
     "definition": [
       {
         "type": "NonTerminal",
@@ -130,6 +130,16 @@
               {
                 "type": "NonTerminal",
                 "name": "AGGREGATE",
+                "idx": 0
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "GUIDELINE",
                 "idx": 0
               }
             ]
@@ -826,6 +836,121 @@
         "label": "SIGN_close",
         "idx": 0,
         "pattern": "}"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "GUIDELINE",
+    "orgText": "() => {\n            $.CONSUME(lexer_1.tokenLookup.KW_guideline);\n            $.CONSUME(lexer_1.tokenLookup.SIGN_open);\n            $.MANY(() => {\n                $.CONSUME(lexer_1.tokenLookup.DirectiveLiteral);\n            });\n            $.MANY1(() => {\n                $.SUBRULE($.MARKDOWN);\n            });\n            $.CONSUME(lexer_1.tokenLookup.SIGN_close);\n        }",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "KW_guideline",
+        "label": "KW_guideline",
+        "idx": 0,
+        "pattern": "guideline"
+      },
+      {
+        "type": "Terminal",
+        "name": "SIGN_open",
+        "label": "SIGN_open",
+        "idx": 0,
+        "pattern": "{"
+      },
+      {
+        "type": "Repetition",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Terminal",
+            "name": "DirectiveLiteral",
+            "label": "DirectiveLiteral",
+            "idx": 0,
+            "pattern": "[ \\n\\t]*%.*\\n"
+          }
+        ]
+      },
+      {
+        "type": "Repetition",
+        "idx": 1,
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "MARKDOWN",
+            "idx": 0
+          }
+        ]
+      },
+      {
+        "type": "Terminal",
+        "name": "SIGN_close",
+        "label": "SIGN_close",
+        "idx": 0,
+        "pattern": "}"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "MARKDOWN",
+    "orgText": "() => {\n            $.OR([\n                { ALT: () => $.SUBRULE($.MARKDOWN_CHAPTER) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_PARAGRAPH) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_IMAGE) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_CODE) },\n                { ALT: () => $.SUBRULE($.MARKDOWN_LIST) }\n            ]);\n        }",
+    "definition": [
+      {
+        "type": "Alternation",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "MARKDOWN_CHAPTER",
+                "idx": 0
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "MARKDOWN_PARAGRAPH",
+                "idx": 0
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "MARKDOWN_IMAGE",
+                "idx": 0
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "MARKDOWN_CODE",
+                "idx": 0
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "MARKDOWN_LIST",
+                "idx": 0
+              }
+            ]
+          }
+        ]
       }
     ]
   },

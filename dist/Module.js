@@ -107,7 +107,8 @@ class Module {
                     delete this.svgs[hash];
                 }
             });
-            fs_extra_1.outputFile(path_1.join(modulePath, "svgs.json"), JSON.stringify(svgs, null, 4));
+            this.svgs.hashes = [];
+            fs_extra_1.outputFile(path_1.join(modulePath, "svgs.json"), JSON.stringify(this.svgs, null, 4));
             //
             // JSON SCHEMAS
             //

@@ -180,11 +180,13 @@ exports.Project = Project;
 exports.styleCSS = `
 /* RESET */
 
+/*
 *,
 *:before,
 *:after {
     box-sizing: border-box;
 }
+*/
 
 html,
 body {
@@ -326,6 +328,43 @@ table tr:hover td {
 }
 .image-container img {
     max-width: 100%;
+}
+
+.guideline {
+  border: 1px solid gray;
+  width: 800px;
+  min-width: 800px;
+  max-width: 800px;
+  margin-bottom: 1rem;
+}
+
+.guideline .gl-header {
+  background: #0f3f91;
+  color: white;
+  padding: 0.5rem;
+}
+.guideline .gl-version {
+  padding: 0.5rem;
+  border-bottom: 1px solid gray;
+}
+.guideline .gl-body {
+  padding: 0.5rem;
+}
+.guideline .gl-body h1,
+.guideline .gl-body h2,
+.guideline .gl-body h3,
+.guideline .gl-body h4 {
+  font-size: 1rem;
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+}
+.guideline .gl-body h1 {
+  text-transform: uppercase;
+}
+.guideline .gl-body p {
+  margin-top: 0;
+  padding-top: 0;
 }
 `;
 //# sourceMappingURL=Project.js.map

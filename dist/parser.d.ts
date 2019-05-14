@@ -20,6 +20,7 @@ declare class DomainParser extends Parser {
     OPEN: any;
     IMPORTING: any;
     AGGREGATE: any;
+    GUIDELINE: any;
     FLOW: any;
     FLOW_FUNCTION: any;
     FLOW_SYSTEM: any;
@@ -44,6 +45,7 @@ declare class DomainParser extends Parser {
     MARKDOWN_IMAGE: any;
     MARKDOWN_CODE: any;
     MARKDOWN_LIST: any;
+    MARKDOWN: any;
     constructor();
     isAnnotation(): boolean | undefined;
     isRestriction(): boolean | undefined;

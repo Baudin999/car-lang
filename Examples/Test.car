@@ -16,3 +16,19 @@ type Person =
     Name: String
     Something: Item
     Items: List Item
+
+guideline {
+    % title: Flows contain steps
+
+    # Flows contain steps
+
+    A flow should and must always contain steps. 
+}
+
+guideline {
+    % title: Sometihng else
+    % version: 0.1
+    % author: Carlos Kelkboom
+
+    We can just add a pragraph, and be happy with it!
+}

@@ -12,7 +12,8 @@ import {
   IData,
   IMarkdownImage,
   IAlias,
-  IMap
+  IMap,
+  IGuideline
 } from "../outline";
 import * as stringHash from "string-hash";
 import { purge, fetchImage } from "../helpers";
@@ -26,9 +27,13 @@ import { createView } from "../erd/createERD";
 import { createFlow } from "../flows/createFlow";
 import { createMap } from "../maps/createMap";
 import { createAggregate } from "../aggregates/createAggregate";
+import { createGuideline } from "./createGuideline";
 import { pd } from "pretty-data";
 import { join } from "path";
 import { outputFile } from "fs-extra";
+import { readFileSync } from "fs";
+
+const highlightStyle = readFileSync(join(__dirname, "./hljs.xcode.css"), "utf8");
 
 const types = [NodeType.TYPE, NodeType.ALIAS, NodeType.DATA, NodeType.CHOICE];
 
@@ -113,6 +118,8 @@ export const createHTML = (
           result += generateHashAndFetchUrl(useCase, svgs, modulePath);
         }
         return result;
+      } else if (node.type === NodeType.GUIDELINE) {
+        return createGuideline(node as IGuideline);
       }
       return null;
     });
@@ -129,6 +136,7 @@ export const createHTML = (
     <title></title>
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
     <link rel="stylesheet" href="./../style.css">
+    <style>${highlightStyle}</style>
   </head>
   <body>
 
@@ -155,7 +163,6 @@ export const createHTML = (
     ${moduleName ? `<div class="image-container"><img src="${moduleName}.svg" /></div>` : ""}
     <h1>Appendix: Entities</h1>
     ${purge(tables).join("\n")}
-
   </body>
 </html>
   `

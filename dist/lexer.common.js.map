@@ -1,1 +1,0 @@
-{"version":3,"file":"lexer.common.js","sourceRoot":"","sources":["../src/lexer.common.ts"],"names":[],"mappings":";;AAAA,2CAAgD;AAEnC,QAAA,QAAQ,GAAG,wBAAW,CAAC;IAClC,IAAI,EAAE,UAAU;IAChB,OAAO,EAAE,kBAAkB;IAC3B,SAAS,EAAE,MAAM;IACjB,KAAK,EAAE,kBAAK,CAAC,OAAO;CACrB,CAAC,CAAC"}

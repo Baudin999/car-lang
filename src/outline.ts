@@ -93,6 +93,11 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
         ...this.visit(ctx.MAP[0]),
         ignore
       };
+    } else if (ctx.GUIDELINE) {
+      return {
+        annotations,
+        ...this.visit(ctx.GUIDELINE[0])
+      };
     } else if (ctx.MARKDOWN_CHAPTER) {
       return this.visit(ctx.MARKDOWN_CHAPTER[0]);
     } else if (ctx.MARKDOWN_IMAGE) {
@@ -206,6 +211,34 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
       directives: parseDirectives(ctx),
       annotations: []
     };
+  }
+
+  GUIDELINE(ctx: any): IGuideline {
+    const directives = parseDirectives(ctx);
+    const markdown = ctx.MARKDOWN.map(m => this.visit(m));
+    let result = {
+      type: NodeType.GUIDELINE,
+      markdown,
+      directives
+    };
+    directives.map(d => (result[d.key] = d.value));
+    return result;
+  }
+
+  MARKDOWN(ctx: any): IMarkdown | null {
+    if (ctx.MARKDOWN_CHAPTER) {
+      return this.visit(ctx.MARKDOWN_CHAPTER[0]);
+    } else if (ctx.MARKDOWN_PARAGRAPH) {
+      return this.visit(ctx.MARKDOWN_PARAGRAPH[0]);
+    } else if (ctx.MARKDOWN_IMAGE) {
+      return this.visit(ctx.MARKDOWN_IMAGE[0]);
+    } else if (ctx.MARKDOWN_CODE) {
+      return this.visit(ctx.MARKDOWN_CODE[0]);
+    } else if (ctx.MARKDOWN_LIST) {
+      return this.visit(ctx.MARKDOWN_LIST[0]);
+    } else {
+      return null;
+    }
   }
 
   FLOW(ctx: any): IFlow {
@@ -676,6 +709,15 @@ export interface IPluckedField {
   parts_start: ITokenStart[];
 }
 
+export interface IGuideline {
+  type: NodeType;
+  markdown: IMarkdown[];
+  directives: IDirective[];
+  title?: string;
+  version?: string;
+  subject?: string;
+}
+
 export interface IFlow {
   type: NodeType;
   directives: IDirective[];
@@ -887,6 +929,13 @@ export interface IMarkdownList {
   items: string[];
 }
 
+export type IMarkdown =
+  | IMarkdownChapter
+  | IMarkdownCode
+  | IMarkdownImage
+  | IMarkdownList
+  | IMarkdownCode;
+
 export type IExpression =
   | IType
   | IAlias
@@ -897,6 +946,7 @@ export type IExpression =
   | IFlow
   | IView
   | IMap
+  | IGuideline
   | IMarkdownChapter
   | IMarkdownCode
   | IMarkdownImage
@@ -932,7 +982,8 @@ export enum NodeType {
   PUB = "PUB",
   SUB = "SUB",
   FIRE_FORGET = "FIRE_FORGET",
-  FLOW_FUNCTION = "FLOW_FUNCTION"
+  FLOW_FUNCTION = "FLOW_FUNCTION",
+  GUIDELINE = "GUIDELINE"
 }
 
 const defaultStart: ITokenStart = {

@@ -7,7 +7,7 @@ const program = require("commander");
 const path_1 = require("path");
 const opn = require("open");
 const Project_1 = require("./Project");
-let projectPath = path_1.resolve(".");
+let projectPath = path_1.resolve("./");
 let moduleName = null;
 function id(val) {
     return val;
@@ -110,7 +110,7 @@ if (program.open) {
         if (!version.startsWith("v")) {
             version = "v" + version;
         }
-        let versionPath = path_1.join(projectPath, ".out", version);
+        let versionPath = path_1.join(projectPath, config.outPath || ".out", version);
         if (moduleName === null) {
             const indexPath = path_1.join(versionPath, "index.html");
             opn(indexPath);

@@ -59,6 +59,9 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
         else if (ctx.MAP) {
             return Object.assign({ annotations }, this.visit(ctx.MAP[0]), { ignore });
         }
+        else if (ctx.GUIDELINE) {
+            return Object.assign({ annotations }, this.visit(ctx.GUIDELINE[0]));
+        }
         else if (ctx.MARKDOWN_CHAPTER) {
             return this.visit(ctx.MARKDOWN_CHAPTER[0]);
         }
@@ -143,6 +146,37 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
             directives: parseDirectives(ctx),
             annotations: []
         };
+    }
+    GUIDELINE(ctx) {
+        const directives = parseDirectives(ctx);
+        const markdown = ctx.MARKDOWN.map(m => this.visit(m));
+        let result = {
+            type: NodeType.GUIDELINE,
+            markdown,
+            directives
+        };
+        directives.map(d => (result[d.key] = d.value));
+        return result;
+    }
+    MARKDOWN(ctx) {
+        if (ctx.MARKDOWN_CHAPTER) {
+            return this.visit(ctx.MARKDOWN_CHAPTER[0]);
+        }
+        else if (ctx.MARKDOWN_PARAGRAPH) {
+            return this.visit(ctx.MARKDOWN_PARAGRAPH[0]);
+        }
+        else if (ctx.MARKDOWN_IMAGE) {
+            return this.visit(ctx.MARKDOWN_IMAGE[0]);
+        }
+        else if (ctx.MARKDOWN_CODE) {
+            return this.visit(ctx.MARKDOWN_CODE[0]);
+        }
+        else if (ctx.MARKDOWN_LIST) {
+            return this.visit(ctx.MARKDOWN_LIST[0]);
+        }
+        else {
+            return null;
+        }
     }
     FLOW(ctx) {
         return {
@@ -553,6 +587,7 @@ var NodeType;
     NodeType["SUB"] = "SUB";
     NodeType["FIRE_FORGET"] = "FIRE_FORGET";
     NodeType["FLOW_FUNCTION"] = "FLOW_FUNCTION";
+    NodeType["GUIDELINE"] = "GUIDELINE";
 })(NodeType = exports.NodeType || (exports.NodeType = {}));
 const defaultStart = {
     startLineNumber: 0,

@@ -23,6 +23,7 @@ class DomainParser extends Parser {
   OPEN: any;
   IMPORTING: any;
   AGGREGATE: any;
+  GUIDELINE: any;
   FLOW: any;
   FLOW_FUNCTION: any;
   FLOW_SYSTEM: any;
@@ -52,6 +53,8 @@ class DomainParser extends Parser {
   MARKDOWN_CODE: any;
   MARKDOWN_LIST: any;
 
+  MARKDOWN: any;
+
   constructor() {
     super(tokenLookup);
 
@@ -72,6 +75,7 @@ class DomainParser extends Parser {
         { ALT: () => $.SUBRULE($.CHOICE) },
         { ALT: () => $.SUBRULE($.OPEN) },
         { ALT: () => $.SUBRULE($.AGGREGATE) },
+        { ALT: () => $.SUBRULE($.GUIDELINE) },
         { ALT: () => $.SUBRULE($.MAP) },
         { ALT: () => $.SUBRULE($.FLOW) },
         { ALT: () => $.SUBRULE($.MARKDOWN_CHAPTER) },
@@ -219,6 +223,28 @@ class DomainParser extends Parser {
       $.CONSUME(tokenLookup.SIGN_close);
     });
 
+    $.RULE("GUIDELINE", () => {
+      $.CONSUME(tokenLookup.KW_guideline);
+      $.CONSUME(tokenLookup.SIGN_open);
+      $.MANY(() => {
+        $.CONSUME(tokenLookup.DirectiveLiteral);
+      });
+      $.MANY1(() => {
+        $.SUBRULE($.MARKDOWN);
+      });
+      $.CONSUME(tokenLookup.SIGN_close);
+    });
+
+    $.RULE("MARKDOWN", () => {
+      $.OR([
+        { ALT: () => $.SUBRULE($.MARKDOWN_CHAPTER) },
+        { ALT: () => $.SUBRULE($.MARKDOWN_PARAGRAPH) },
+        { ALT: () => $.SUBRULE($.MARKDOWN_IMAGE) },
+        { ALT: () => $.SUBRULE($.MARKDOWN_CODE) },
+        { ALT: () => $.SUBRULE($.MARKDOWN_LIST) }
+      ]);
+    });
+
     $.RULE("FLOW", () => {
       $.CONSUME(tokenLookup.KW_flow);
       $.CONSUME(tokenLookup.SIGN_open);
@@ -324,21 +350,6 @@ class DomainParser extends Parser {
     $.RULE("OPERATION_PARAMETER_TYPE", () => {
       $.SUBRULE($.TYPE_IDENTIFIER);
     });
-
-    // $.RULE("OPERATION_RESULT", () => {
-    //     $.OR([
-    //         {
-    //             ALT: () => {
-    //                 $.CONSUME(tokenLookup.SIGN_wrapOpen);
-    //                 $.CONSUME(tokenLookup.GenericParameter);
-    //                 $.CONSUME(tokenLookup.SIGN_TypeDefStart);
-    //                 $.SUBRULE($.TYPE_IDENTIFIER);
-    //                 $.CONSUME(tokenLookup.SIGN_wrapClose);
-    //             }
-    //         },
-    //         { ALT: () => $.SUBRULE1($.TYPE_IDENTIFIER) }
-    //     ]);
-    // });
 
     $.RULE("ID_OR_STRING", () => {
       $.OR([

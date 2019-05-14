@@ -20,6 +20,7 @@ class DomainParser extends chevrotain_1.Parser {
                 { ALT: () => $.SUBRULE($.CHOICE) },
                 { ALT: () => $.SUBRULE($.OPEN) },
                 { ALT: () => $.SUBRULE($.AGGREGATE) },
+                { ALT: () => $.SUBRULE($.GUIDELINE) },
                 { ALT: () => $.SUBRULE($.MAP) },
                 { ALT: () => $.SUBRULE($.FLOW) },
                 { ALT: () => $.SUBRULE($.MARKDOWN_CHAPTER) },
@@ -150,6 +151,26 @@ class DomainParser extends chevrotain_1.Parser {
             });
             $.CONSUME(lexer_1.tokenLookup.SIGN_close);
         });
+        $.RULE("GUIDELINE", () => {
+            $.CONSUME(lexer_1.tokenLookup.KW_guideline);
+            $.CONSUME(lexer_1.tokenLookup.SIGN_open);
+            $.MANY(() => {
+                $.CONSUME(lexer_1.tokenLookup.DirectiveLiteral);
+            });
+            $.MANY1(() => {
+                $.SUBRULE($.MARKDOWN);
+            });
+            $.CONSUME(lexer_1.tokenLookup.SIGN_close);
+        });
+        $.RULE("MARKDOWN", () => {
+            $.OR([
+                { ALT: () => $.SUBRULE($.MARKDOWN_CHAPTER) },
+                { ALT: () => $.SUBRULE($.MARKDOWN_PARAGRAPH) },
+                { ALT: () => $.SUBRULE($.MARKDOWN_IMAGE) },
+                { ALT: () => $.SUBRULE($.MARKDOWN_CODE) },
+                { ALT: () => $.SUBRULE($.MARKDOWN_LIST) }
+            ]);
+        });
         $.RULE("FLOW", () => {
             $.CONSUME(lexer_1.tokenLookup.KW_flow);
             $.CONSUME(lexer_1.tokenLookup.SIGN_open);
@@ -240,20 +261,6 @@ class DomainParser extends chevrotain_1.Parser {
         $.RULE("OPERATION_PARAMETER_TYPE", () => {
             $.SUBRULE($.TYPE_IDENTIFIER);
         });
-        // $.RULE("OPERATION_RESULT", () => {
-        //     $.OR([
-        //         {
-        //             ALT: () => {
-        //                 $.CONSUME(tokenLookup.SIGN_wrapOpen);
-        //                 $.CONSUME(tokenLookup.GenericParameter);
-        //                 $.CONSUME(tokenLookup.SIGN_TypeDefStart);
-        //                 $.SUBRULE($.TYPE_IDENTIFIER);
-        //                 $.CONSUME(tokenLookup.SIGN_wrapClose);
-        //             }
-        //         },
-        //         { ALT: () => $.SUBRULE1($.TYPE_IDENTIFIER) }
-        //     ]);
-        // });
         $.RULE("ID_OR_STRING", () => {
             $.OR([
                 { ALT: () => $.CONSUME(lexer_1.tokenLookup.GenericIdentifier) },

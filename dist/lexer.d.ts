@@ -11,6 +11,7 @@ export declare const tokenLookup: {
     KW_open: import("chevrotain").TokenType;
     KW_importing: import("chevrotain").TokenType;
     KW_aggregate: import("chevrotain").TokenType;
+    KW_guideline: import("chevrotain").TokenType;
     KW_flow: import("chevrotain").TokenType;
     KW_map: import("chevrotain").TokenType;
     KW_sub: import("chevrotain").TokenType;

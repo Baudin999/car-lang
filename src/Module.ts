@@ -137,7 +137,8 @@ export class Module implements IModule {
           delete this.svgs[hash];
         }
       });
-      outputFile(join(modulePath, "svgs.json"), JSON.stringify(svgs, null, 4));
+      this.svgs.hashes = [];
+      outputFile(join(modulePath, "svgs.json"), JSON.stringify(this.svgs, null, 4));
 
       //
       // JSON SCHEMAS

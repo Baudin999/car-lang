@@ -1,12 +1,6 @@
-<html>
-  <head>
-    <title></title>
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-      <link rel="stylesheet" href="./../style.css">
-        <style>/*
+/*
 
-XCode style (c) Angel Garcia 
-          <angelgarcia.mail@gmail.com>
+XCode style (c) Angel Garcia <angelgarcia.mail@gmail.com>
 
 */
 
@@ -97,25 +91,3 @@ XCode style (c) Angel Garcia
 .hljs-emphasis {
   font-style: italic;
 }
-
-          </style>
-        </head>
-        <body>
-          <h1>Index</h1>
-          <ul></ul>
-          <h1>Links</h1>
-          <ul>
-            <li>
-              <a href="undefined.xsd">XSD</a>
-            </li>
-            <li>
-              <a href="undefined.json">JSON schema</a>
-            </li>
-            <li>
-              <a href="undefined.svg">ERD</a>
-            </li>
-          </ul>
-          <h1>ERD</h1>
-          <h1>Appendix: Entities</h1>
-        </body>
-      </html>

@@ -13,9 +13,12 @@ const createERD_1 = require("../erd/createERD");
 const createFlow_1 = require("../flows/createFlow");
 const createMap_1 = require("../maps/createMap");
 const createAggregate_1 = require("../aggregates/createAggregate");
+const createGuideline_1 = require("./createGuideline");
 const pretty_data_1 = require("pretty-data");
 const path_1 = require("path");
 const fs_extra_1 = require("fs-extra");
+const fs_1 = require("fs");
+const highlightStyle = fs_1.readFileSync(path_1.join(__dirname, "./hljs.xcode.css"), "utf8");
 const types = [outline_1.NodeType.TYPE, outline_1.NodeType.ALIAS, outline_1.NodeType.DATA, outline_1.NodeType.CHOICE];
 exports.createHTML = (ast, modulePath, svgs, moduleName) => {
     const tables = [];
@@ -106,6 +109,9 @@ exports.createHTML = (ast, modulePath, svgs, moduleName) => {
             }
             return result;
         }
+        else if (node.type === outline_1.NodeType.GUIDELINE) {
+            return createGuideline_1.createGuideline(node);
+        }
         return null;
     });
     if (currentChapter) {
@@ -118,6 +124,7 @@ exports.createHTML = (ast, modulePath, svgs, moduleName) => {
     <title></title>
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
     <link rel="stylesheet" href="./../style.css">
+    <style>${highlightStyle}</style>
   </head>
   <body>
 
@@ -144,7 +151,6 @@ exports.createHTML = (ast, modulePath, svgs, moduleName) => {
     ${moduleName ? `<div class="image-container"><img src="${moduleName}.svg" /></div>` : ""}
     <h1>Appendix: Entities</h1>
     ${helpers_1.purge(tables).join("\n")}
-
   </body>
 </html>
   `)
