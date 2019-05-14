@@ -1,6 +1,6 @@
 
 /*
-GENERATED ON: 1557864503717
+GENERATED ON: 1557864880630
 */ 
 
 
@@ -19,14 +19,6 @@ class Just<T> {
 class Nothing<T> {}
 
 // IMPLEMENTATION
-
-
-
-interface ICreditCard {
-    Number: string;
-    ExpirationDate: Date;
-}
-  
 
 type Id = string;
 

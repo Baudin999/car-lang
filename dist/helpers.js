@@ -66,7 +66,6 @@ function foldText(s, n = 40, split = "\n", useSpaces = true, a = []) {
 }
 exports.foldText = foldText;
 exports.fetchImage = url => {
-    console.log("Fetching image: " + url);
     return new Promise((resolve, reject) => {
         fetch(url)
             .then(r => r.text())
