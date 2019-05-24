@@ -1,6 +1,6 @@
 
 /*
-GENERATED ON: 1557864792239
+GENERATED ON: 1558680844838
 */ 
 
 
@@ -21,9 +21,4 @@ class Nothing<T> {}
 // IMPLEMENTATION
 
 
-
-interface IList {
-
-}
-  
     

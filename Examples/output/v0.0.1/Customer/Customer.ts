@@ -1,6 +1,6 @@
 
 /*
-GENERATED ON: 1557864880630
+GENERATED ON: 1558680844836
 */ 
 
 
@@ -20,14 +20,18 @@ class Nothing<T> {}
 
 // IMPLEMENTATION
 
-type Id = string;
 
+interface ICreditCard {
+    Number: string;
+    ExpirationDate: Date;
+}
+  
+type Id = string;
 enum Gender {
     Male = "Male",
     Female = "Female",
     Other = "Other"
 }
-
 
 /**
 The address of a person. This is the functional location of where a person
@@ -45,7 +49,6 @@ interface IAddress {
   
 
 
-
 interface IPerson {
     FirstName: Maybe<string>;
     LastName: string;
@@ -57,13 +60,11 @@ interface IPerson {
   
 
 
-
 interface IPaymentMethod {
     Customer: ICustomer;
     CreditCard: ICreditCard;
 }
   
-
 
 
 interface ICompany {
@@ -72,7 +73,6 @@ interface ICompany {
     VATNumber: string;
 }
   
-
 
 /**
 Someone or some company who buys things

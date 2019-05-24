@@ -17,8 +17,7 @@ const createGuideline_1 = require("./createGuideline");
 const pretty_data_1 = require("pretty-data");
 const path_1 = require("path");
 const fs_extra_1 = require("fs-extra");
-const fs_1 = require("fs");
-const highlightStyle = fs_1.readFileSync(path_1.join(__dirname, "./hljs.xcode.css"), "utf8");
+const highlightStyle = ""; //readFileSync(join(__dirname, "./hljs.xcode.css"), "utf8");
 const types = [outline_1.NodeType.TYPE, outline_1.NodeType.ALIAS, outline_1.NodeType.DATA, outline_1.NodeType.CHOICE];
 exports.createHTML = (ast, modulePath, svgs, moduleName) => {
     const tables = [];

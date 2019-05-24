@@ -33,7 +33,7 @@ import { join } from "path";
 import { outputFile } from "fs-extra";
 import { readFileSync } from "fs";
 
-const highlightStyle = readFileSync(join(__dirname, "./hljs.xcode.css"), "utf8");
+const highlightStyle = ""; //readFileSync(join(__dirname, "./hljs.xcode.css"), "utf8");
 
 const types = [NodeType.TYPE, NodeType.ALIAS, NodeType.DATA, NodeType.CHOICE];
 

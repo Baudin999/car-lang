@@ -1,6 +1,6 @@
 
 /*
-GENERATED ON: 1557864792233
+GENERATED ON: 1558680844833
 */ 
 
 
@@ -20,31 +20,20 @@ class Nothing<T> {}
 
 // IMPLEMENTATION
 
-
-
-interface IList {
-
-}
-  
-
 type XP = number;
-
 enum BoughtFrom {
-    Racial Package = "Racial Package",
-    Professional Package = "Professional Package",
+    Racial_Package = "Racial Package",
+    Professional_Package = "Professional Package",
     XP = "XP",
     Gift = "Gift",
     Other = "Other"
 }
-
-
-
+type IStat = Strength | Agility | Intuition | Perception | Charisma | None;
 interface INamable {
     Name: string;
     Description: string;
 }
   
-
 
 
 interface IBuyable {
@@ -56,7 +45,6 @@ interface IBuyable {
     Master: boolean;
 }
   
-
 
 /**
 A skill is something a character can do
@@ -74,7 +62,6 @@ interface ISkill {
   
 
 
-
 interface IResistance {
     Name: string;
     Description: string;
@@ -86,7 +73,6 @@ interface IResistance {
     Master: boolean;
 }
   
-
 
 
 interface ISpecial {
@@ -102,7 +88,6 @@ interface ISpecial {
   
 
 
-
 interface IFeat {
     Rank: number;
     XP: number;
@@ -111,7 +96,6 @@ interface IFeat {
     Description: string;
 }
   
-
 
 /**
 A statistic is a base value for a character's potential Statistics serve as a
@@ -124,7 +108,6 @@ interface IStatistic {
     Value: number;
 }
   
-
 
 
 interface ICharacter {

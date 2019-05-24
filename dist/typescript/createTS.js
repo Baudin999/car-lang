@@ -6,7 +6,9 @@ exports.createTS = (ast) => {
     let choiceIds = ast
         .filter(n => n.type === outline_1.NodeType.CHOICE || n.type === outline_1.NodeType.ALIAS)
         .map((n) => n.id);
-    const interfaces = helpers_1.purge(ast.map(n => {
+    const interfaces = helpers_1.purge(ast
+        .filter(n => !n.ignore)
+        .map(n => {
         if (n.type === outline_1.NodeType.TYPE) {
             return createTSType(n, choiceIds);
         }
@@ -15,6 +17,9 @@ exports.createTS = (ast) => {
         }
         else if (n.type === outline_1.NodeType.ALIAS) {
             return createTSAlias(n, choiceIds);
+        }
+        else if (n.type === outline_1.NodeType.DATA) {
+            return createTSData(n);
         }
         else {
             return null;
@@ -42,7 +47,7 @@ class Nothing<T> {}
 
 // IMPLEMENTATION
 
-${interfaces.join("\n\n")}
+${interfaces.join("\n").replace(/\n\n+/, "\n")}
     `;
 };
 const createTSType = (node, choices) => {
@@ -74,7 +79,7 @@ ${fields.join("\n")}
 };
 const createTSChoice = (node) => {
     return `enum ${node.id} {
-${node.options.map(o => `    ${o.id} = "${o.id}"`).join(",\n")}
+${node.options.map(o => `    ${o.id.toString().replace(/ /, "_")} = "${o.id}"`).join(",\n")}
 }`;
 };
 const createTSAlias = (node, choices) => {
@@ -90,5 +95,8 @@ const createTSAlias = (node, choices) => {
     else {
         return `type ${node.id} = ${_type};`;
     }
+};
+const createTSData = (node) => {
+    return `type I${node.id} = ${node.options.map(o => o.id).join(" | ")};`;
 };
 //# sourceMappingURL=createTS.js.map

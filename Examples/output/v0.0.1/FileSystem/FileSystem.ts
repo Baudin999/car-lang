@@ -1,6 +1,6 @@
 
 /*
-GENERATED ON: 1557864792237
+GENERATED ON: 1558680844836
 */ 
 
 
@@ -20,17 +20,7 @@ class Nothing<T> {}
 
 // IMPLEMENTATION
 
-
-
-interface IList {
-
-}
-  
-
 type Author = string;
-
-
-
 interface IFileInfo {
     Size: number;
     LastModified: string;
@@ -41,9 +31,9 @@ interface IFileInfo {
   
 
 
-
 interface IDirectoryInfo {
     Children: IFileSystemInfo[];
 }
   
+type IFileSystemInfo = FileInfo | DirectoryInfo;
     

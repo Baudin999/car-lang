@@ -1,4 +1,4 @@
-import { IExpression, IType, NodeType, IChoice, IAlias } from "./../outline";
+import { IExpression, IType, NodeType, IChoice, IAlias, IData } from "./../outline";
 import { baseTypeToTypeScriptType, purge, foldText } from "../helpers";
 
 export const createTS = (ast: IExpression[]) => {
@@ -7,17 +7,21 @@ export const createTS = (ast: IExpression[]) => {
     .map((n: any) => n.id);
 
   const interfaces = purge(
-    ast.map(n => {
-      if (n.type === NodeType.TYPE) {
-        return createTSType(n as IType, choiceIds);
-      } else if (n.type === NodeType.CHOICE) {
-        return createTSChoice(n as IChoice);
-      } else if (n.type === NodeType.ALIAS) {
-        return createTSAlias(n as IAlias, choiceIds);
-      } else {
-        return null;
-      }
-    })
+    ast
+      .filter(n => !(n as any).ignore)
+      .map(n => {
+        if (n.type === NodeType.TYPE) {
+          return createTSType(n as IType, choiceIds);
+        } else if (n.type === NodeType.CHOICE) {
+          return createTSChoice(n as IChoice);
+        } else if (n.type === NodeType.ALIAS) {
+          return createTSAlias(n as IAlias, choiceIds);
+        } else if (n.type === NodeType.DATA) {
+          return createTSData(n as IData);
+        } else {
+          return null;
+        }
+      })
   );
 
   return `
@@ -42,7 +46,7 @@ class Nothing<T> {}
 
 // IMPLEMENTATION
 
-${interfaces.join("\n\n")}
+${interfaces.join("\n").replace(/\n\n+/, "\n")}
     `;
 };
 
@@ -78,7 +82,7 @@ ${fields.join("\n")}
 
 const createTSChoice = (node: IChoice) => {
   return `enum ${node.id} {
-${node.options.map(o => `    ${o.id} = "${o.id}"`).join(",\n")}
+${node.options.map(o => `    ${o.id.toString().replace(/ /, "_")} = "${o.id}"`).join(",\n")}
 }`;
 };
 
@@ -94,4 +98,8 @@ const createTSAlias = (node: IAlias, choices) => {
   } else {
     return `type ${node.id} = ${_type};`;
   }
+};
+
+const createTSData = (node: IData) => {
+  return `type I${node.id} = ${node.options.map(o => o.id).join(" | ")};`;
 };

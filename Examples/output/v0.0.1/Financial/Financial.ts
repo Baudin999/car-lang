@@ -1,6 +1,6 @@
 
 /*
-GENERATED ON: 1557864792240
+GENERATED ON: 1558680844837
 */ 
 
 
@@ -21,13 +21,11 @@ class Nothing<T> {}
 // IMPLEMENTATION
 
 
-
 interface ICurrency {
     Sign: string;
     Value: number;
 }
   
-
 
 
 interface ICreditCard {
@@ -36,7 +34,6 @@ interface ICreditCard {
 }
   
 
-
 /**
 Pay from a debit account
  */
@@ -44,4 +41,5 @@ interface IDirectDebit {
     BankAccountNumber: string;
 }
   
+type IPaymentMethod = CreditCard | DirectDebit;
     
