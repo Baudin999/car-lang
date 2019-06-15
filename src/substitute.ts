@@ -20,9 +20,7 @@ export const substituteAliases = (
 ): { newAST: IExpression[]; errors: IError[] } => {
   const errors: IError[] = [];
   const newAST = ast.map((node: any) => {
-
     if (node.type !== NodeType.ALIAS) return node;
-
     else if (baseTypes.indexOf(node.ofType) > -1) {
       // now we know it's a "simple type" a String or a Number,
       // something we don't really have to substitute, so we can
@@ -48,17 +46,16 @@ export const substituteAliases = (
           field.ofType = node.ofType_params[fieldIndex];
           field.ofType_start = node.ofType_params_start[fieldIndex];
           return field;
-        } 
+        }
 
         // else we'll check if the field is a type itself...
-        const ref:any = getNodeById(ast, [], field.id);
+        const ref: any = getNodeById(ast, [], field.id);
         if (ref && ref.params && ref.params.length === 0) {
           // no paramters means a plane type, something we can just
           // return without doing extra work.
           return field;
-        }
-        else if (ref && ref.params && ref.params.length > 0) {
-          // here we're in the situation where we're passing a 
+        } else if (ref && ref.params && ref.params.length > 0) {
+          // here we're in the situation where we're passing a
           // parameter through to another type.
           // Example:
           /* 
@@ -74,16 +71,14 @@ export const substituteAliases = (
           node.ofType_params.forEach((p, i) => {
             field.params[i] = p;
           });
-          
-          return field;
-        }
-        else {
-          return field;
-        }
 
+          return field;
+        } else {
+          return field;
+        }
       });
       if (_node.options) _node.options = newChildren;
-      else if(_node.fields) _node.fields = newChildren;
+      else if (_node.fields) _node.fields = newChildren;
       _node.params = [];
       _node.id = node.id;
       _node.source = `${node.ofType}`;
@@ -96,21 +91,65 @@ export const substituteAliases = (
 export const substitutePluckedFields = (
   ast: IExpression[] = []
 ): { newAST: IExpression[]; errors: IError[] } => {
-
   const errors: IError[] = [];
   const newAST = ast.map((node: IType) => {
     if (node.type !== NodeType.TYPE) return node;
     else {
       let newNode = node as IType;
-      newNode.fields = node.fields
-        .map((field: any) => {
-          if (field.type !== NodeType.PLUCKED_FIELD) return field;
-          let [ofType, fieldName] = field.parts;
-          let targetNode = getNodeById(ast, [], ofType) as any;
-          if (!targetNode) return field;
-          let targetField = (targetNode.fields || []).find(f => f.id === fieldName);
-          return clone(targetField) ;
-        });
+
+      // Manage the plucked fields
+      newNode.fields = node.fields.map((field: any) => {
+        if (field.type !== NodeType.PLUCKED_FIELD) return field;
+        let [ofType, fieldName] = field.parts;
+        let targetNode = getNodeById(ast, [], ofType) as any;
+        if (!targetNode) return field;
+        let targetField = (targetNode.fields || []).find(f => f.id === fieldName);
+        return clone(targetField);
+      });
+
+      // Manage and substitute the fields which take the type from
+      // another field in the application.
+      newNode.fields = node.fields.map((field: any) => {
+        if (!field.field) return field;
+        else {
+          let targetNode = getNodeById(ast, [], field.ofType) as IType;
+          if (!targetNode) {
+            errors.push({
+              message: `Type ${field.ofType} cannot be found to grab the field ${
+                field.field
+              } from.`,
+              ...field.ofType_start
+            });
+            return field;
+          }
+          let targetField = (targetNode.fields || []).find((f: any) => f.id === field.field) as any;
+          if (!targetField) {
+            errors.push({
+              message: `Type ${field.ofType} does not contain field ${field.field}.`,
+              ...field.fieldStart
+            });
+            return field;
+          }
+
+          let result = {
+            ...clone(targetField),
+            id: field.id,
+            id_start: field.id_start,
+            ofType_start: field.fieldStart,
+            annotations: field.annotations
+          };
+
+          let restrictions = targetField.restrictions;
+          field.restrictions.forEach(r => {
+            let or = restrictions.find(_r => _r.key === r.key);
+            if (!or) restrictions.push(r);
+            else or.value = r.value;
+          });
+
+          result.restrictions = restrictions;
+          return result;
+        }
+      });
 
       return newNode;
     }
@@ -118,7 +157,6 @@ export const substitutePluckedFields = (
 
   return { newAST, errors };
 };
-
 
 export const substituteExtensions = (
   ast: IExpression[] = []
@@ -132,7 +170,7 @@ export const substituteExtensions = (
         let extension = getNodeById(ast, [], e) as IExpression;
         if (!extension) {
           errors.push({
-            message: `Could not find type ${e} to extends from`,
+            message: `Could not find type ${e} to extend from`,
             ...node.extends_start[i]
           });
         } else if (extension.type !== NodeType.TYPE) {

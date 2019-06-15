@@ -503,6 +503,15 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
         ofType_params: [],
         ofType_params_start: []
       };
+    } else if (ctx.SIGN_dot) {
+      return {
+        ofType: ctx.Identifier[0].image,
+        ofType_start: getStartToken(ctx.Identifier[0]),
+        ofType_params: [],
+        ofType_params_start: [],
+        field: ctx.Identifier[1].image,
+        fieldStart: getStartToken(ctx.Identifier[1])
+      };
     } else {
       let [ofType, ...ofType_params] = ctx.Identifier.map(i => i.image);
       let [ofType_start, ...ofType_params_start] = ctx.Identifier.map(getStartToken);
@@ -698,6 +707,8 @@ export interface ITypeField {
   ofType_start: ITokenStart;
   ofType_params: string[];
   ofType_params_start: ITokenStart[];
+  field?: string;
+  fieldStart?: ITokenStart;
   annotations: IAnnotation[];
   source?: string;
   restrictions: IRestriction[];

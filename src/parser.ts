@@ -410,6 +410,18 @@ class DomainParser extends Parser {
         },
         {
           ALT: () => {
+            $.CONSUME1(tokenLookup.Identifier);
+            $.CONSUME(tokenLookup.SIGN_dot);
+            $.AT_LEAST_ONE_SEP({
+              SEP: tokenLookup.SIGN_dot,
+              DEF: () => {
+                $.CONSUME2(tokenLookup.Identifier);
+              }
+            });
+          }
+        },
+        {
+          ALT: () => {
             $.AT_LEAST_ONE1(() => {
               $.CONSUME(tokenLookup.Identifier);
             });

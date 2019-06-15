@@ -1,0 +1,11 @@
+class "Human" as Human  {
+	FirstName: Maybe String
+	LastName: String 
+	MiddleNames: List String
+	DateOfBirth: Date 
+}
+class "Person" as Person  {
+	FuurstName: Maybe String
+	LastName: String 
+	CallingName: String 
+}

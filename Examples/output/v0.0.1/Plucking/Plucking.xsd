@@ -1,0 +1,87 @@
+
+
+<xsd:schema 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+  
+  xmlns:self="http://something.com"
+  targetNamespace="http://something.com">
+  <!-- VERSION: 0.0.0 -->
+  <xsd:element name="Human_FirstName" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:minLength value="12" />
+        <xsd:maxLength value="90" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Human_LastName" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Human_MiddleNames" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="self:String" minOccurs="0" maxOccurs="unbound" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="Human_DateOfBirth" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:date"></xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:complexType name="Human">
+    <xsd:all>
+      <xsd:element ref="self:Human_FirstName" minOccurs="0"/>
+      <xsd:element ref="self:Human_LastName" minOccurs="1"/>
+      <xsd:element ref="self:Human_MiddleNames" minOccurs="1"/>
+      <xsd:element ref="self:Human_DateOfBirth" minOccurs="1"/>
+    </xsd:all>
+  </xsd:complexType>
+  <xsd:element name="Person_FuurstName" nillable="false">
+    <xsd:annotation>
+      <xsd:documentation>This is an annotation for the FuurstName The FuurstName comes from the "Human" type</xsd:documentation>
+    </xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:minLength value="12" />
+        <xsd:maxLength value="90" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Person_LastName" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Person_CallingName" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:complexType name="Person">
+    <xsd:all>
+      <xsd:element ref="self:Person_FuurstName" minOccurs="0"/>
+      <xsd:element ref="self:Person_LastName" minOccurs="1"/>
+      <xsd:element ref="self:Person_CallingName" minOccurs="1"/>
+    </xsd:all>
+  </xsd:complexType>
+</xsd:schema>
+  
+  

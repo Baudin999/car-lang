@@ -1,0 +1,197 @@
+<html>
+  <head>
+    <title></title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+      <link rel="stylesheet" href="./../style.css">
+        <style></style>
+      </head>
+      <body>
+        <h1>Index</h1>
+        <ul></ul>
+        <h1>Links</h1>
+        <ul>
+          <li>
+            <a href="Recursion.xsd">XSD</a>
+          </li>
+          <li>
+            <a href="Recursion.json">JSON schema</a>
+          </li>
+          <li>
+            <a href="Recursion.svg">ERD</a>
+          </li>
+        </ul>
+        <h1>ERD</h1>
+        <div class="image-container">
+          <img src="Recursion.svg" />
+        </div>
+        <h1>Appendix: Entities</h1>
+        <table>
+          <thead>
+            <tr>
+              <th colSpan="4">
+                <h2>Author</h2>
+              </th>
+            </tr>
+            <tr>
+              <th colSpan="4">
+        No description
+      </th>
+            </tr>
+            <tr>
+              <th>Restriction</th>
+              <th>Value</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>pattern</td>
+              <td>/[A-Z][a-z]* [[A-Z][a-z]*]/</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>min</td>
+              <td>1</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>max</td>
+              <td>100</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+        <table>
+          <thead>
+            <tr>
+              <th colSpan="4">
+                <h2>FileInfo</h2>
+              </th>
+            </tr>
+            <tr>
+              <th colSpan="4">
+        No description
+      </th>
+            </tr>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Restrictions</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Size</td>
+              <td>Number </td>
+              <td>
+                <div>
+                  <b>min</b>: 1
+                </div>
+                <div>
+                  <b>max</b>: 9999
+                </div>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>LastModified</td>
+              <td>String </td>
+              <td>
+                <div>
+                  <b>min</b>: 1
+                </div>
+                <div>
+                  <b>max</b>: 100
+                </div>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>FullPath</td>
+              <td>String </td>
+              <td>
+                <div>
+                  <b>min</b>: 1
+                </div>
+                <div>
+                  <b>max</b>: 100
+                </div>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>CreatedBy</td>
+              <td>Author </td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>ModifiedBy</td>
+              <td>Author </td>
+              <td></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+        <table>
+          <thead>
+            <tr>
+              <th colSpan="4">
+                <h2>DirectoryInfo</h2>
+              </th>
+            </tr>
+            <tr>
+              <th colSpan="4">
+        No description
+      </th>
+            </tr>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Restrictions</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Children</td>
+              <td>List FileSystemInfo</td>
+              <td></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+        <table>
+          <thead>
+            <tr>
+              <th colSpan="4">
+                <h2>FileSystemInfo</h2>
+              </th>
+            </tr>
+            <tr>
+              <th colSpan="4">
+        No description
+      </th>
+            </tr>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>FileInfo</td>
+              <td>FileInfo </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>DirectoryInfo</td>
+              <td>DirectoryInfo </td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </body>
+    </html>

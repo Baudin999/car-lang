@@ -1,0 +1,16 @@
+type Human =
+    FirstName: Maybe String
+        | min 10
+        | max 90
+    LastName: String
+    MiddleNames: List String
+    DateOfBirth: Date
+
+type Person =
+    @ This is an annotation for the FuurstName
+    @ The FuurstName comes from the "Human" type
+    FuurstName: Human.FirstName
+        | min 12
+        | other "foo"
+    pluck Human.LastName
+    CallingName: String

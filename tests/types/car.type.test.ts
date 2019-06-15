@@ -1,45 +1,9 @@
 import { transpile } from "../../src/transpiler";
-import { IType } from "../../src/outline";
+import { IType, ITypeField } from "../../src/outline";
 
 const log = source => {
   console.log(JSON.stringify(source, null, 4));
 };
-
-/**
-
-# Empty Types
-
-An empty type is a type which only has a name. This means that
-the type has no fields but it does have meaning.
-
-```
-type Person
-```
-
-If we want to take it one step further and also define a few value 
-objects for this type we can go ahead and define them. The `car-lang`
-had a few base types you can use:
-
- * "String"
- * "Char"
- * "Integer"
- * "Number"
- * "Decimal"
- * "Double"
- * "Boolean"
- * "Date"
- * "Time"
- * "DateTime"
-
-
-```
-type Person =
-    FirstName: String
-```
-
-Remember to always use 4 spaces or a single tab to indent. 
-
- */
 
 describe("Define an empty type", () => {
   const source = `
@@ -140,8 +104,9 @@ type Person =
   });
 });
 
-describe("We can pluck fields from types", () => {
-  const source = `
+describe("We can extend types", () => {
+  it("Should just work", () => {
+    const source = `
 
 type Human =
     FirstName: Maybe String
@@ -154,15 +119,130 @@ type Person extends Human =
 
       `;
 
+    const { cst, errors, ast, tokens } = transpile(source);
+
+    expect(cst).toBeDefined();
+    expect(ast).toBeDefined();
+    expect(tokens).toBeDefined();
+    expect(errors).toBeDefined();
+    expect(errors.length).toEqual(0);
+    expect(ast.length).toEqual(2);
+
+    expect((ast[0] as IType).fields.length).toEqual(4);
+    expect((ast[1] as IType).fields.length).toEqual(5);
+  });
+
+  it("We can't extend if the type does not exist", () => {
+    const source = `
+
+type Human =
+    FirstName: Maybe String
+    LastName: String
+    MiddleNames: List String
+    DateOfBirth: Date
+
+type Person extends Human, Ironman, Hulk =
+    CallingName: String
+
+      `;
+
+    const { cst, errors, ast, tokens } = transpile(source);
+
+    expect(errors.length).toEqual(2);
+  });
+});
+
+describe("We can pluck fields from types", () => {
+  const source = `
+
+type Human =
+    FirstName: Maybe String
+    LastName: String
+    MiddleNames: List String
+    DateOfBirth: Date
+
+type Person =
+    pluck Human.FirstName
+    CallingName: String
+
+      `;
+
   const { cst, errors, ast, tokens } = transpile(source);
 
   expect(cst).toBeDefined();
   expect(ast).toBeDefined();
   expect(tokens).toBeDefined();
   expect(errors).toBeDefined();
-  expect(errors.length).toEqual(0);
-  expect(ast.length).toEqual(2);
+});
 
-  expect((ast[0] as IType).fields.length).toEqual(4);
-  expect((ast[1] as IType).fields.length).toEqual(5);
+describe("We can pluck and rename fields from types", () => {
+  const source = `
+
+type Human =
+    FirstName: Maybe String
+        | min 10
+        | max 90
+    LastName: String
+    MiddleNames: List String
+    DateOfBirth: Date
+
+type Person =
+    @ This is an annotation for the FuurstName
+    @ The FuurstName comes from the "Human" type
+    FuurstName: Human.FirstName
+        | min 12
+        | other "foo"
+    CallingName: String
+
+      `;
+
+  const { cst, errors, ast, tokens } = transpile(source);
+
+  expect(cst).toBeDefined();
+  expect(ast).toBeDefined();
+  expect(tokens).toBeDefined();
+  expect(errors).toBeDefined();
+
+  log(ast[1]);
+
+  let personType = ast[1] as IType;
+  let fuurstNameField = personType.fields[0] as ITypeField;
+  expect(fuurstNameField.id).toEqual("FuurstName");
+  expect(fuurstNameField.ofType).toEqual("Maybe");
+  expect(fuurstNameField.ofType_params[0]).toEqual("String");
+});
+
+/* RECURSION */
+
+describe("A complex recursive example", () => {
+  const source = `
+
+alias Author = String
+    | pattern /[A-Z][a-z]* [[A-Z][a-z]*]/
+
+type FileInfo =
+    Name: String
+    Size: Number
+    LastModified: String
+    FullPath: String
+    CreatedBy: Author
+    ModifiedBy: Author
+
+type DirectoryInfo =
+    Name: String
+    Children: List FileSystemInfo
+    CreatedBy: Author
+
+data FileSystemInfo =
+    | FileInfo
+    | DirectoryInfo
+
+      `;
+
+  const { cst, errors, ast, tokens } = transpile(source);
+
+  expect(cst).toBeDefined();
+  expect(ast).toBeDefined();
+  expect(tokens).toBeDefined();
+  expect(errors).toBeDefined();
 });

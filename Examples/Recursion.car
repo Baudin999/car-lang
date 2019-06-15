@@ -1,0 +1,18 @@
+open Prelude importing (List, Maybe)
+
+alias Author = String
+    | pattern /[A-Z][a-z]* [[A-Z][a-z]*]/
+
+type FileInfo =
+    Size: Number
+    LastModified: String
+    FullPath: String
+    CreatedBy: Author
+    ModifiedBy: Author
+
+type DirectoryInfo =
+    Children: List FileSystemInfo
+
+data FileSystemInfo =
+    | FileInfo
+    | DirectoryInfo
