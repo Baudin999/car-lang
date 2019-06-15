@@ -231,7 +231,7 @@ const NewLine = createToken({
 });
 
 const Indent = createToken({
-  pattern: /( {4})/,
+  pattern: /( {4})|\t/,
   name: "Indent"
 });
 

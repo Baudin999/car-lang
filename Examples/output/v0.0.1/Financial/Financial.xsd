@@ -3,9 +3,9 @@
 <xsd:schema 
   xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
   
-  xmlns:self="http://foo.bar/"
-  targetNamespace="http://foo.bar/">
-  <!-- VERSION: 0.0.1 -->
+  xmlns:self="http://something.com"
+  targetNamespace="http://something.com">
+  <!-- VERSION: 0.0.0 -->
   <xsd:element name="Currency_Sign" nillable="false">
     <xsd:annotation></xsd:annotation>
     <xsd:simpleType>

@@ -1,6 +1,6 @@
 
 /*
-GENERATED ON: 1558680844839
+GENERATED ON: 1559829469724
 */ 
 
 
@@ -21,18 +21,8 @@ class Nothing<T> {}
 // IMPLEMENTATION
 
 
-/**
-Een item is iets wat we kunnen gebruiken
- */
-interface IItem {
-    Key: string;
-    Value: string;
-}
-  
 interface IPerson {
-    Name: string;
-    Something: IItem;
-    Items: IItem[];
+    FirstName: string;
 }
   
     

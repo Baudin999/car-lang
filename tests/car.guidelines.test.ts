@@ -23,7 +23,7 @@ guideline {
 
   const { cst, ast, errors } = transpile(source);
 
-  log(ast);
+  //log(ast);
 
   it("We should be able to tokenize", () => {
     expect(ast).toBeDefined();

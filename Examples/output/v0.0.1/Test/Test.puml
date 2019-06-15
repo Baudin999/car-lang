@@ -1,18 +1,5 @@
-class "Item" as Item  {
-	Key: String 
-	Value: String 
-===
-  <b>description</b>: Een item is iets
- wat we kunnen gebruiken
-<b>name</b>: Item
-<b>value</b>: Niet nodig
-}
 class "Person" as Person  {
-	Name: String 
-	Something: Item 
-	Items: List Item
+	FirstName: String 
 ===
-  <b>api</b>: Dit is ook een API
+  <b>api</b>: domthing
 }
-Item --> Person : Something
-Item "0" --> "*" Person : List Item

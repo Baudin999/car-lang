@@ -13,25 +13,42 @@ import { ifError } from "assert";
 // Modules is the associated hash for looking up module references
 // in the other modules (the imports).
 
+const sanitizeSouce = (source: string): string => {
+  return source.trimRight();
+};
+
 export const transpile = (source: string): ITranspilationResult => {
+  // clean up the source
+  source = sanitizeSouce(source);
+
+  // first run, create the AST from the source
   const { ast, cst, tokens, errors: astErrors } = createAST(source);
 
+  // now do another pass to update the plucked fields
   let pluckResult = substitutePluckedFields(ast);
   let pluckAST = pluckResult.newAST;
 
+  // substitute the references to the aliasses with the actual aliasses
   let rwAlias = substituteAliases(pluckAST);
   let rwAliasAST = rwAlias.newAST;
   let rwAliasErrors = rwAlias.errors;
 
+  // substitute the extensions, here we add the fields which
+  // are added due to the extensions
   var { newAST, errors } = substituteExtensions(rwAliasAST);
 
+  // type check the whole kaboodle.
   const checkASTs = typeChecker(newAST) || [];
 
+  // generate the errors
+  let fullErrors = [...(astErrors || []), ...rwAliasErrors, ...errors, ...checkASTs];
+
+  // return the result.
   return {
     tokens,
     cst,
     ast: newAST,
-    errors: [...(astErrors || []), ...rwAliasErrors, ...errors, ...checkASTs]
+    errors: fullErrors
   };
 };
 
@@ -49,9 +66,9 @@ export const createAST = (source: string) => {
 
   //   // We've removed this in favour of our custom error messages. But
   //   // uncomment if you want to debug something.
-  //   if (parser.errors && parser.errors.length > 0) {
-  //     console.log(JSON.stringify(parser.errors, null, 4));
-  //   }
+  // if (parser.errors && parser.errors.length > 0) {
+  //   console.log(JSON.stringify(parser.errors, null, 4));
+  // }
 
   const visitor = new OutlineVisitor();
   const ast = visitor.visit(cst);

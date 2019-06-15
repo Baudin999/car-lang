@@ -1,25 +1,14 @@
 {
     "$id": "https://schemas.com/Person",
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "description": "Dit is ook een API",
+    "description": "domthing",
     "type": "object",
     "required": [
-        "Name",
-        "Something",
-        "Item"
+        "FirstName"
     ],
     "properties": {
-        "Name": {
+        "FirstName": {
             "type": "string"
-        },
-        "Something": {
-            "$ref": "#/definitions/Item"
-        },
-        "Items": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/Item"
-            }
         }
     }
 }
