@@ -203,8 +203,6 @@ type Person =
   expect(tokens).toBeDefined();
   expect(errors).toBeDefined();
 
-  log(ast[1]);
-
   let personType = ast[1] as IType;
   let fuurstNameField = personType.fields[0] as ITypeField;
   expect(fuurstNameField.id).toEqual("FuurstName");

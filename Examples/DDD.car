@@ -1,0 +1,19 @@
+# Domain Driven Design 
+
+This example focusses on how to do Domain Driven Design throught the `z-dragon` tool.
+
+
+type Person =
+    Address: Address
+
+type Address
+
+
+aggregate Person {
+    Address
+}
+
+view {
+    Person 
+    Address
+}

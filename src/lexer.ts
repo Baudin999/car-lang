@@ -269,7 +269,7 @@ const PragmaLiteral = createToken({
 });
 const AnnotationLiteral = createToken({
   name: "AnnotationLiteral",
-  pattern: / *@.*\n/
+  pattern: /\w*@.*\n/
 });
 const Operator = createToken({
   name: "Operator",
@@ -444,13 +444,19 @@ const multiModeLexerDefinition = {
       KW_data,
       KW_choice,
       KW_pluck,
-      StringLiteral,
       KW_as,
       SIGN_open,
       SIGN_close,
+      SIGN_wrapOpen,
+      SIGN_wrapClose,
+      SIGN_TypeDefStart,
+      SIGN_arrow,
+      AnnotationLiteral,
+      StringLiteral,
       DirectiveLiteral,
       ViewIdentifier,
       Identifier,
+      GenericParameter,
       NewLine,
       Indent,
       WhiteSpace,

@@ -220,6 +220,13 @@ class DomainParser extends Parser {
         $.CONSUME1(tokenLookup.Indent);
         $.CONSUME(tokenLookup.Identifier);
       });
+
+      $.MANY2(() => {
+        //$.OPTION1(() => tokenLookup.AnnotationLiteral);
+        $.CONSUME2(tokenLookup.Indent);
+        $.SUBRULE($.FLOW_FUNCTION);
+      });
+
       $.CONSUME(tokenLookup.SIGN_close);
     });
 
@@ -265,6 +272,8 @@ class DomainParser extends Parser {
     });
 
     $.RULE("FLOW_FUNCTION", () => {
+      // length :: String -> Number
+
       $.CONSUME(tokenLookup.GenericParameter);
       $.CONSUME(tokenLookup.SIGN_TypeDefStart);
       $.CONSUME1(tokenLookup.SIGN_TypeDefStart);

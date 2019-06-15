@@ -1,6 +1,6 @@
 
 /*
-GENERATED ON: 1560591986289
+GENERATED ON: 1560592113807
 */ 
 
 
@@ -20,20 +20,15 @@ class Nothing<T> {}
 
 // IMPLEMENTATION
 
-type Author = string;
-interface IFileInfo {
-    Size: number;
-    LastModified: string;
-    FullPath: string;
-    CreatedBy: Author;
-    ModifiedBy: Author;
+
+interface IPerson {
+    Address: IAddress;
 }
   
 
 
-interface IDirectoryInfo {
-    Children: IFileSystemInfo[];
+interface IAddress {
+
 }
   
-type IFileSystemInfo = FileInfo | DirectoryInfo;
     

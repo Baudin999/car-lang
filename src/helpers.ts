@@ -204,6 +204,21 @@ export const mapRestrictionToXSD = (baseType: string, restriction: IRestriction)
   }
 };
 
+export const last = <T>(array: T[]): T => {
+  return array[array.length - 1];
+};
+
+export const splitFrom = <T>(array: T[], index: number): { start: T[]; end: T[] } => {
+  let start = array.slice(0, index);
+  let end = array.slice(index, array.length - 1);
+  return { start, end };
+};
+
+export const splitFromLast = <T>(array: T[]): { items: T[]; last: T } => {
+  let { start } = splitFrom(array, array.length - 1);
+  return { items: start, last: last(array) };
+};
+
 export const baseTypeToJSONType = (b: string): string | null => {
   switch (b) {
     case "String":

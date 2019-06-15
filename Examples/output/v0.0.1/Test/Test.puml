@@ -1,5 +1,3 @@
 class "Person" as Person  {
 	FirstName: String 
-===
-  <b>api</b>: domthing
 }

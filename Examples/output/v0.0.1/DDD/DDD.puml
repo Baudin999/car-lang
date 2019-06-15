@@ -1,0 +1,6 @@
+class "Person" as Person  {
+	Address: Address 
+}
+Address --> Person : Address
+class "Address" as Address  {
+}

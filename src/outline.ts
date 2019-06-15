@@ -1,5 +1,5 @@
 import { parser } from "./parser";
-import { purge, getStartToken, ITokenStart } from "./helpers";
+import { purge, getStartToken, ITokenStart, splitFromLast } from "./helpers";
 import { resolve } from "path";
 import { nullLiteral, isTSTypeOperator } from "@babel/types";
 import add from "ramda/es/add";
@@ -202,6 +202,22 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
   }
 
   AGGREGATE(ctx: any): IAggregate {
+    let operations = purge(ctx.FLOW_FUNCTION.map(f => this.visit(f))).map((operation: any) => {
+      return {
+        type: NodeType.OPERATION,
+        id: operation.id,
+        id_start: operation.id_start,
+        result_id: operation.ofType,
+        result_ofType: operation.ofType,
+        result_start: operation.ofType_start,
+        params: operation.params.map(({ id, ofType }) => {
+          return { id, ofType };
+        }),
+        params_start: []
+        // annotations: IAnnotation[];
+      };
+    }) as any[];
+
     return {
       type: NodeType.AGGREGATE,
       root: ctx.ViewIdentifier ? ctx.ViewIdentifier[0].image : "",
@@ -209,6 +225,7 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
       valueObjects: (ctx.Identifier || []).map(i => i.image),
       valueObjects_start: (ctx.Identifier || []).map(i => getStartToken(i)),
       directives: parseDirectives(ctx),
+      operations: operations,
       annotations: []
     };
   }
@@ -832,6 +849,7 @@ export interface IAggregate {
   valueObjects: string[];
   valueObjects_start: ITokenStart[];
   directives: IDirective[];
+  operations: IFlowFunction[];
   annotations: IAnnotation[];
 }
 

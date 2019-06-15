@@ -255,3 +255,25 @@ type Person =
 
 Use this sparingly because renaming fields but keeping the type intact can be really, really
 dangerous.
+
+Preserving annotations and other things we apply to the plucked fields is really important. This
+keeps the documentation in line and allows you to evolve your data models into more advanced sets of
+descriptions. You can of course annotate everything and keep it preserved:
+
+```
+type Human =
+    FirstName: Maybe String
+        | min 10
+        | max 90
+    LastName: String
+    MiddleNames: List String
+    DateOfBirth: Date
+
+type Person =
+    @ This is an annotation for the FuurstName
+    @ The FuurstName comes from the "Human" type
+    FuurstName: Human.FirstName
+        | min 12
+        | other "foo"
+    CallingName: String
+```

@@ -92,6 +92,7 @@ export const substitutePluckedFields = (
   ast: IExpression[] = []
 ): { newAST: IExpression[]; errors: IError[] } => {
   const errors: IError[] = [];
+  if (!Array.isArray(ast)) return { newAST: [], errors: [] };
   const newAST = ast.map((node: IType) => {
     if (node.type !== NodeType.TYPE) return node;
     else {
@@ -162,7 +163,7 @@ export const substituteExtensions = (
   ast: IExpression[] = []
 ): { newAST: IExpression[]; errors: IError[] } => {
   const errors: IError[] = [];
-  const newAST = ast.map((node: IType) => {
+  const newAST = (ast || []).map((node: IType) => {
     if (node.type !== NodeType.TYPE) return node;
     else {
       let newNode = node as IType;
