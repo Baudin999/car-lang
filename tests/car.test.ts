@@ -41,7 +41,9 @@ type Person =
     FirstName: String
 
 `;
-  const { cst, ast } = transpile(source);
+  const { cst, ast, errors } = transpile(source);
+
+  if (errors && errors.length) log(errors);
 
   it("CST should be defined", () => {
     expect(cst).toBeDefined();

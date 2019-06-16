@@ -1,4 +1,5 @@
 import { transpile } from "../../src/transpiler";
+import { IAggregate, IOperation } from "../../src/outline";
 
 const log = source => {
   console.log(JSON.stringify(source, null, 4));
@@ -18,6 +19,7 @@ aggregate Person {
     Address
     Food
 
+    @ getPerson returns the Person Aggregate
     getPerson :: (id: Number) -> Something -> Self
     
     setAddress :: Address -> Self
@@ -27,10 +29,10 @@ aggregate Person {
 
   const { ast, cst, tokens, errors } = transpile(source);
 
-  log(ast);
-  //log(errors);
+  //log(ast);
+  if (errors && errors.length > 0) log(errors);
 
-  it("should have a test", () => {
+  it("Should result in valid elements", () => {
     expect(cst).toBeDefined();
     expect(ast).toBeDefined();
     expect(tokens).toBeDefined();
@@ -38,6 +40,20 @@ aggregate Person {
   });
 
   it("Should not contain errors", () => {
-    //expect(errors.length).toEqual(0);
+    expect(errors.length).toEqual(0);
+  });
+
+  it("Should have two operations and the operations should be correct", () => {
+    let aggreagte = ast[3] as IAggregate;
+    expect(aggreagte.operations.length).toEqual(2);
+    let operation1 = aggreagte.operations[0];
+    expect(operation1.id).toEqual("getPerson");
+    expect(operation1.params[0].id).toEqual("id");
+    expect(operation1.params[0].ofType).toEqual("Number");
+    expect(operation1.params[1].id).toEqual("Something");
+    expect(operation1.params[1].ofType).toEqual("Something");
+
+    let operation2 = aggreagte.operations[1];
+    expect(operation2.id).toEqual("setAddress");
   });
 });

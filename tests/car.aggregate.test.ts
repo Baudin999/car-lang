@@ -68,11 +68,11 @@ automatically get the Contracts in your result.
 */
 
 const log = source => {
-    console.log(JSON.stringify(source, null, 4));
+  console.log(JSON.stringify(source, null, 4));
 };
 
 describe("Should be able to define an aggregate", () => {
-    const source = `
+  const source = `
 
 aggregate Person {
     % title: Person Aggregate
@@ -91,20 +91,15 @@ type Foo =
 
 `;
 
-    const tokenStream = DomainLexer.tokenize(source);
-    parser.input = tokenStream.tokens;
-    const cst = parser.START();
-    const visitor = new OutlineVisitor();
-    const ast = visitor.visit(cst);
-    const errors = typeChecker(ast);
+  const { ast, cst, tokens, errors } = transpile(source);
 
-    it("CST should be defined", () => {
-        expect(cst).toBeDefined();
-    });
+  it("CST should be defined", () => {
+    expect(cst).toBeDefined();
+  });
 });
 
 describe("The Aggregate root should be a known type", () => {
-    const source = `
+  const source = `
 
 aggregate Person {
     % title: Person Aggregate
@@ -117,20 +112,15 @@ type Address
 
 `;
 
-    const tokenStream = DomainLexer.tokenize(source);
-    parser.input = tokenStream.tokens;
-    const cst = parser.START();
-    const visitor = new OutlineVisitor();
-    const ast = visitor.visit(cst);
-    const errors = typeChecker(ast);
+  const { ast, cst, tokens, errors } = transpile(source);
 
-    it("Errors should be of length 1", () => {
-        expect(errors.length).toEqual(1);
-    });
+  it("Errors should be of length 1", () => {
+    expect(errors.length).toEqual(1);
+  });
 });
 
 describe("The Aggregate contains an unknown Value Object known type", () => {
-    const source = `
+  const source = `
 
 aggregate Person {
     % title: Person Aggregate
@@ -143,14 +133,9 @@ type Person
 
 `;
 
-    const tokenStream = DomainLexer.tokenize(source);
-    parser.input = tokenStream.tokens;
-    const cst = parser.START();
-    const visitor = new OutlineVisitor();
-    const ast = visitor.visit(cst);
-    const errors = typeChecker(ast);
+  const { ast, cst, tokens, errors } = transpile(source);
 
-    it("Errors should be of length 1", () => {
-        expect(errors.length).toEqual(1);
-    });
+  it("Errors should be of length 1", () => {
+    expect(errors.length).toEqual(1);
+  });
 });

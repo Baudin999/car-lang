@@ -65,7 +65,7 @@ type Person =
     expect(errors).toBeDefined();
     expect(errors.length).toEqual(1);
     expect(errors[0].message).toEqual(
-      "Expecting token of type --> SIGN_TypeDefStart <-- but found --> '\n\n' <--\nPrevious token was: FirstName"
+      "Expecting token of type --> SIGN_TypeDefStart <-- but found --> '' <--\nPrevious token was: FirstName"
     );
   });
 });
@@ -218,13 +218,6 @@ type Person =
 `;
   const errorResults = [
     {
-      message: 'Cannot find type "Maybe" of field "FirstName" of type "Person"',
-      startLineNumber: 4,
-      endLineNumber: 4,
-      startColumn: 16,
-      endColumn: 21
-    },
-    {
       message: 'Cannot find type "Foo" of field "LastName" of type "Person"',
       startLineNumber: 5,
       endLineNumber: 5,
@@ -252,7 +245,7 @@ type Person =
   it("We should be able to tokenize", () => {
     expect(ast).toBeDefined();
     expect(errors).toBeDefined();
-    expect(errors.length).toEqual(4);
+    expect(errors.length).toEqual(3);
     errors.forEach((error, i) => {
       for (var key in error) {
         expect(errors[i][key]).toEqual(errorResults[i][key]);

@@ -1,5 +1,6 @@
 import { Parser, IToken } from "chevrotain";
 import { tokenLookup } from "./lexer";
+import { purge } from "./helpers";
 
 class DomainParser extends Parser {
   START: any;
@@ -221,11 +222,7 @@ class DomainParser extends Parser {
         $.CONSUME(tokenLookup.Identifier);
       });
 
-      $.MANY2(() => {
-        //$.OPTION1(() => tokenLookup.AnnotationLiteral);
-        $.CONSUME2(tokenLookup.Indent);
-        $.SUBRULE($.FLOW_FUNCTION);
-      });
+      $.MANY2(() => $.SUBRULE($.OPERATION));
 
       $.CONSUME(tokenLookup.SIGN_close);
     });
@@ -261,8 +258,11 @@ class DomainParser extends Parser {
     });
 
     $.RULE("OPERATION", () => {
-      $.MANY(() => $.CONSUME(tokenLookup.AnnotationLiteral));
-      $.AT_LEAST_ONE(() => $.CONSUME(tokenLookup.Indent));
+      $.MANY(() => {
+        $.OPTION(() => $.CONSUME(tokenLookup.Indent));
+        $.CONSUME(tokenLookup.AnnotationLiteral);
+      });
+      $.AT_LEAST_ONE(() => $.CONSUME1(tokenLookup.Indent));
       $.OR([
         { GATE: $.isSub, ALT: () => $.SUBRULE($.FLOW_SUB) },
         { GATE: $.isPub, ALT: () => $.SUBRULE($.FLOW_PUB) },
@@ -475,7 +475,10 @@ class DomainParser extends Parser {
     $.RULE("ANNOTATIONS", () => {
       $.MANY({
         GATE: $.isAnnotation as any,
-        DEF: () => $.CONSUME(tokenLookup.AnnotationLiteral)
+        DEF: () => {
+          $.OPTION(() => $.CONSUME(tokenLookup.Indent));
+          $.CONSUME(tokenLookup.AnnotationLiteral);
+        }
       });
     });
 

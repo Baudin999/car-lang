@@ -24,11 +24,11 @@ certain patterns.
 */
 
 const log = source => {
-    console.log(JSON.stringify(source, null, 4));
+  console.log(JSON.stringify(source, null, 4));
 };
 
 describe("Annotations should be possible on a type and the fields", () => {
-    const source = `
+  const source = `
 
 @ This is a multiline annotation
 @ Which should just work
@@ -64,22 +64,24 @@ choice Gender =
     | "Female"
 `;
 
-    const { tokens, errors, ast } = transpile(source);
+  const { tokens, errors, ast } = transpile(source);
 
-    it("AST should be defined", () => {
-        expect(ast).toBeDefined();
-        expect(errors.length).toEqual(0);
-    });
+  if (errors && errors.length) log(errors);
 
-    it("Should have one annotation with the key 'description'", () => {
-        expect((ast[0] as IType).annotations.length).toEqual(1);
-        expect((ast[1] as IData).annotations.length).toEqual(1);
-    });
+  it("AST should be defined", () => {
+    expect(ast).toBeDefined();
+    expect(errors.length).toEqual(0);
+  });
 
-    it("Should be possible for fields to contain annotations", () => {
-        expect(((ast[0] as IType).fields[0] as ITypeField).annotations.length).toEqual(0);
-        expect(((ast[0] as IType).fields[1] as ITypeField).annotations.length).toEqual(2);
-        expect(((ast[1] as IData).options[0] as IDataOption).annotations.length).toEqual(2);
-        expect(((ast[1] as IData).options[1] as IDataOption).annotations.length).toEqual(1);
-    });
+  it("Should have one annotation with the key 'description'", () => {
+    expect((ast[0] as IType).annotations.length).toEqual(1);
+    expect((ast[1] as IData).annotations.length).toEqual(1);
+  });
+
+  it("Should be possible for fields to contain annotations", () => {
+    expect(((ast[0] as IType).fields[0] as ITypeField).annotations.length).toEqual(0);
+    expect(((ast[0] as IType).fields[1] as ITypeField).annotations.length).toEqual(2);
+    expect(((ast[1] as IData).options[0] as IDataOption).annotations.length).toEqual(2);
+    expect(((ast[1] as IData).options[1] as IDataOption).annotations.length).toEqual(1);
+  });
 });
