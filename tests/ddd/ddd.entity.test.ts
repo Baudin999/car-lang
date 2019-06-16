@@ -95,7 +95,7 @@ aggregate Person {
   });
 
   it("Should have two operations and the operations should be correct", () => {
-    let aggreagte = ast[3] as IAggregate;
+    let aggreagte = ast[2] as IAggregate;
     expect(aggreagte.operations.length).toEqual(4);
   });
 });
