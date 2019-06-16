@@ -1,6 +1,6 @@
 
 /*
-GENERATED ON: 1560603016484
+GENERATED ON: 1560678260172
 */ 
 
 
@@ -22,12 +22,19 @@ class Nothing<T> {}
 
 
 interface IPerson {
+    Name: string;
     Address: IAddress;
 }
   
 
 
 interface IAddress {
+
+}
+  
+
+
+interface IFood {
 
 }
   

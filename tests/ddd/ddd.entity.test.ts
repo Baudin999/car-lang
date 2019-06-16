@@ -57,3 +57,45 @@ aggregate Person {
     expect(operation2.id).toEqual("setAddress");
   });
 });
+
+describe("We can create an Entity", () => {
+  const source = `
+
+type Person =
+    Name: String
+    Address: Address
+
+type Address
+
+aggregate Person {
+    Address
+
+    getPerson :: (id: String) -> PersonAggregate
+    updatePerson :: PersonAggregate -> PersonAggregate
+    updatePersonAddress :: Address -> PersonAggregate
+    deletePersonAggregate :: (id: String) -> Boolean
+}
+
+`;
+
+  const { ast, cst, tokens, errors } = transpile(source);
+
+  //log(ast);
+  if (errors && errors.length > 0) log(errors);
+
+  it("Should result in valid elements", () => {
+    expect(cst).toBeDefined();
+    expect(ast).toBeDefined();
+    expect(tokens).toBeDefined();
+    expect(errors).toBeDefined();
+  });
+
+  it("Should not contain errors", () => {
+    expect(errors.length).toEqual(0);
+  });
+
+  it("Should have two operations and the operations should be correct", () => {
+    let aggreagte = ast[3] as IAggregate;
+    expect(aggreagte.operations.length).toEqual(4);
+  });
+});

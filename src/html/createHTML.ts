@@ -103,8 +103,14 @@ export const createHTML = (
         let plantSource = createMap(node as IMap);
         return generateHashAndFetchUrl(plantSource, svgs, modulePath);
       } else if (node.type === NodeType.AGGREGATE) {
-        let plantSource = createAggregate(node as IAggregate, ast);
-        return generateHashAndFetchUrl(plantSource, svgs, modulePath);
+        let aggregate = node as IAggregate;
+        let { plantSource, operations } = createAggregate(node as IAggregate, ast);
+        return (
+          `<h2>${aggregate.root} Aggregate</h2>\n` +
+          generateHashAndFetchUrl(plantSource, svgs, modulePath) +
+          `<p>Operation on the ${aggregate.root} aggregate:</p>` +
+          operations
+        );
       } else if (node.type === NodeType.FLOW) {
         let result = "";
         const { state, sequence, useCase } = createFlow(node as any);

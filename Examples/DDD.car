@@ -1,19 +1,26 @@
 # Domain Driven Design 
 
-This example focusses on how to do Domain Driven Design throught the `z-dragon` tool.
-
+This example focusses on how to do Domain Driven Design throught the `z-dragon` tool. Types
+are simple definitions of the "shape" of data. An aggregate is something which is where 
+everything comes together. Here we can define the shape but also the behavior of the types.
 
 type Person =
+    Name: String
     Address: Address
 
 type Address
 
+type Food
 
 aggregate Person {
     Address
-}
+    Food
 
-view {
-    Person 
-    Address
+    getPerson :: (id: String) -> PersonAggregate
+    updatePerson :: PersonAggregate -> PersonAggregate
+    updatePersonAddress :: Address -> PersonAggregate
+
+    @ Purge a person from the repository.
+    deletePersonAggregate :: (id: String) -> Boolean
+
 }
