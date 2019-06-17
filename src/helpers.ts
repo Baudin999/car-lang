@@ -152,6 +152,7 @@ export const baseTypes = [
 export const baseTypeToXSDType = (b: string) => {
   switch (b) {
     case "String":
+    case "Char":
       return "xsd:string";
     case "Number":
       return "xsd:integer";

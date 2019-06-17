@@ -1,0 +1,87 @@
+<xsd:schema
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:self="http://something.com"
+    targetNamespace="http://something.com">
+    <!-- VERSION: 0.0.0 -->
+    <xsd:element name="Person_Id" type="self:Identifier" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    </xsd:element>
+    <xsd:element name="Person_FirstName" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+        </xsd:restriction>
+    </xsd:simpleType>
+    </xsd:element>
+    <xsd:element name="Person_Addresses" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:complexType>
+        <xsd:sequence>
+        <xsd:element ref="self:Address" minOccurs="0" maxOccurs="unbound" />
+        </xsd:sequence>
+    </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="Person_Gender" type="self:Gender" nillable="false">
+    <xsd:annotation>
+        <xsd:documentation>The Gender of a Person, this can be either Male, Female of Other</xsd:documentation>
+    </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="Person">
+    <xsd:all>
+        <xsd:element ref="self:Person_Id" minOccurs="1"/>
+        <xsd:element ref="self:Person_FirstName" minOccurs="1"/>
+        <xsd:element ref="self:Person_Addresses" minOccurs="1"/>
+        <xsd:element ref="self:Person_Gender" minOccurs="1"/>
+    </xsd:all>
+    </xsd:complexType>
+    <xsd:simpleType name="AddressStreet">
+    <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+    </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:element name="Address_Street" type="self:AddressStreet" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="Address">
+    <xsd:all>
+        <xsd:element ref="self:Address_Street" minOccurs="1"/>
+    </xsd:all>
+    </xsd:complexType>
+    <xsd:complexType name="Gender">
+    <xsd:choice>
+        <xsd:element name="Male"/>
+        <xsd:element name="Female"/>
+        <xsd:element name="Other"/>
+    </xsd:choice>
+    </xsd:complexType>
+    <xsd:element name="KvK_Number" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+        </xsd:restriction>
+    </xsd:simpleType>
+    </xsd:element>
+    <xsd:element name="KvK_MembershipDate" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+        <xsd:restriction base="xsd:date"></xsd:restriction>
+    </xsd:simpleType>
+    </xsd:element>
+    <xsd:complexType name="KvK">
+    <xsd:all>
+        <xsd:element ref="self:KvK_Number" minOccurs="1"/>
+        <xsd:element ref="self:KvK_MembershipDate" minOccurs="1"/>
+    </xsd:all>
+    </xsd:complexType>
+    <xsd:simpleType name="CustomerNumber">
+    <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+    </xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>

@@ -1,6 +1,7 @@
 import { transpile } from "../../src/transpiler";
 import { IAggregate, IOperation } from "../../src/outline";
 import { createJsonSchema } from "../../src/jsonSchema/createJsonSchema";
+import { createXSD } from "../../src/xsd/createXSD";
 
 const log = source => {
   console.log(JSON.stringify(source, null, 4));
@@ -44,8 +45,10 @@ data Identifier =
 
   const { ast, cst, tokens, errors } = transpile(source);
   const schema = createJsonSchema(ast);
+  const xsd = createXSD(ast);
 
-  log(schema);
+  //log(schema);
+  //console.log(xsd);
 
   //log(ast);
   if (errors && errors.length > 0) log(errors);
