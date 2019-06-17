@@ -1,0 +1,86 @@
+{
+  "$id": "https://schemas.com/Person",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "person",
+  "type": "object",
+  "required": ["Id", "FirstName", "Address", "Gender"],
+  "properties": {
+    "Id": {
+      "$ref": "#/definitions/Identifier",
+      "description": ""
+    },
+    "FirstName": {
+      "type": "string",
+      "description": ""
+    },
+    "Addresses": {
+      "type": "array",
+      "description": "",
+      "items": {
+        "$ref": "#/definitions/Address"
+      }
+    },
+    "Gender": {
+      "$ref": "#/definitions/Gender",
+      "description": "The Gender of a Person, this can be either Male, Female of Other"
+    }
+  },
+  "definitions": {
+    "KvK": {
+      "$id": "#/KvK",
+      "type": "object",
+      "properties": {
+        "Number": {
+          "type": "string",
+          "description": ""
+        },
+        "MembershipDate": {
+          "type": "string",
+          "description": ""
+        }
+      },
+      "description": "",
+      "required": ["Number", "MembershipDate"]
+    },
+    "CustomerNumber": {
+      "$id": "#/CustomerNumber",
+      "description": "",
+      "type": "string"
+    },
+    "Identifier": {
+      "$id": "#/Identifier",
+      "description": "",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/KvK"
+        },
+        {
+          "$ref": "#/definitions/CustomerNumber"
+        }
+      ]
+    },
+    "AddressStreet": {
+      "$id": "#/AddressStreet",
+      "description": "This is an alias for String, DDD defines that you will write every Value Object (in this case a property) into it's own type.",
+      "type": "string"
+    },
+    "Address": {
+      "$id": "#/Address",
+      "type": "object",
+      "properties": {
+        "Street": {
+          "$ref": "#/definitions/AddressStreet",
+          "description": ""
+        }
+      },
+      "description": "",
+      "required": ["Street"]
+    },
+    "Gender": {
+      "$id": "#/Gender",
+      "type": "string",
+      "description": "",
+      "enum": ["Male", "Female", "Other"]
+    }
+  }
+}

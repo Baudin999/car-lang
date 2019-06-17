@@ -52,6 +52,7 @@ aggregate Person {
     expect(operation1.params[0].ofType).toEqual("Number");
     expect(operation1.params[1].id).toEqual("Something");
     expect(operation1.params[1].ofType).toEqual("Something");
+    expect(operation1.annotations.length).toEqual(1);
 
     let operation2 = aggreagte.operations[1];
     expect(operation2.id).toEqual("setAddress");

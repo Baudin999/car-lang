@@ -222,17 +222,14 @@ export const splitFromLast = <T>(array: T[]): { items: T[]; last: T } => {
 export const baseTypeToJSONType = (b: string): string | null => {
   switch (b) {
     case "String":
+    case "Date":
+    case "DateTime":
+    case "Time":
       return "string";
     case "Number":
       return "number";
     case "Boolean":
       return "boolean";
-    case "Date":
-      return "date";
-    case "DateTime":
-      return "dateTime";
-    case "Time":
-      return "time";
     default:
       return null;
   }
