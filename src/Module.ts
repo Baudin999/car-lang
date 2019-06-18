@@ -145,7 +145,7 @@ export class Module implements IModule {
       //
       const schemas = createJsonSchema(this.ast);
       schemas.map(schema => {
-        const schemaPath = join(modulePath, this.name + "_" + schema.name + ".json");
+        const schemaPath = join(modulePath, schema.name + ".json");
         outputFile(schemaPath, JSON.stringify(schema.schema, null, 4));
       });
 

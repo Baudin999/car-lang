@@ -39,6 +39,7 @@ type Klas =
         | min 7
         | max 25
 
+@api: student
 type Student extends Persoon =
     Nummer: String
     HeeftVakken: List Vak

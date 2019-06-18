@@ -51,10 +51,21 @@ export const createHTML = (
   // We will remove the hashes
   svgs.hashes = [];
 
+  let jsonSchemas: string[] = [];
+
   const transformedNodes = ast
     .filter((node: any) => !!!node.ignore)
     .filter(node => node.type)
     .map((node, index) => {
+      // test to see if the node is an API
+      (() => {
+        let _node = node as any;
+        let isAPI = !!(_node.annotations || []).find(a => a.key === "api");
+        if (isAPI) {
+          jsonSchemas.push(`${_node.id}.json`);
+        }
+      })();
+
       if (node.type === NodeType.MARKDOWN_CHAPTER) {
         let chapter = node as IMarkdownChapter;
         if (chapter.depth === 1) {
@@ -162,7 +173,7 @@ export const createHTML = (
     <h1>Links</h1>
     <ul>
         <li><a href="${moduleName}.xsd">XSD</a></li>
-        <li><a href="${moduleName}.json">JSON schema</a></li>
+        ${jsonSchemas.map(s => `<li><a href="./${s}">${s}</a></li>`).join("\n")}
         <li><a href="${moduleName}.svg">ERD</a></li>
     </ul>
 
