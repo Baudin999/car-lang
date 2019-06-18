@@ -26,8 +26,8 @@
   </xsd:element>
   <xsd:complexType name="Currency">
     <xsd:all>
-      <xsd:element ref="self:Currency_Sign" minOccurs="1"/>
-      <xsd:element ref="self:Currency_Value" minOccurs="1"/>
+      <xsd:element ref="self:Currency_Sign" minOccurs="1" />
+      <xsd:element ref="self:Currency_Value" minOccurs="1" />
     </xsd:all>
   </xsd:complexType>
   <xsd:element name="CreditCard_Number" nillable="false">
@@ -47,8 +47,8 @@
   </xsd:element>
   <xsd:complexType name="CreditCard">
     <xsd:all>
-      <xsd:element ref="self:CreditCard_Number" minOccurs="1"/>
-      <xsd:element ref="self:CreditCard_ExpirationDate" minOccurs="1"/>
+      <xsd:element ref="self:CreditCard_Number" minOccurs="1" />
+      <xsd:element ref="self:CreditCard_ExpirationDate" minOccurs="1" />
     </xsd:all>
   </xsd:complexType>
   <xsd:element name="DirectDebit_BankAccountNumber" nillable="false">
@@ -62,8 +62,14 @@
   </xsd:element>
   <xsd:complexType name="DirectDebit">
     <xsd:all>
-      <xsd:element ref="self:DirectDebit_BankAccountNumber" minOccurs="1"/>
+      <xsd:element ref="self:DirectDebit_BankAccountNumber" minOccurs="1" />
     </xsd:all>
+  </xsd:complexType>
+  <xsd:complexType name="PaymentMethod">
+    <xsd:choice>
+      <xsd:element type="self:CreditCard" name="PaymentMethod_CreditCard" />
+      <xsd:element type="self:DirectDebit" name="PaymentMethod_DirectDebit" />
+    </xsd:choice>
   </xsd:complexType>
 </xsd:schema>
   

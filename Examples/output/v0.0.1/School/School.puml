@@ -1,0 +1,32 @@
+class "Klas" as Klas  {
+	Studenten: List Student
+===
+  <b>api</b>: klas
+}
+Student "1" --> "32" Klas : List Student
+class "Student " as Student <Persoon> {
+	Nummer: String 
+	Voornaam: String  <i>from Persoon</i>
+	Achternaam: String  <i>from Persoon</i>
+	ActiefAdres: Adres  <i>from Persoon</i>
+}
+Adres --> Student : ActiefAdres
+Persoon --|> Student
+class "Docent " as Docent <Persoon> {
+	DocentenNummer: String 
+	Voornaam: String  <i>from Persoon</i>
+	Achternaam: String  <i>from Persoon</i>
+	ActiefAdres: Adres  <i>from Persoon</i>
+}
+Adres --> Docent : ActiefAdres
+Persoon --|> Docent
+class "Persoon" as Persoon  {
+	Voornaam: String 
+	Achternaam: String 
+	ActiefAdres: Adres 
+}
+Adres --> Persoon : ActiefAdres
+class "Adres" as Adres  {
+	Straat: String 
+	Huisnummer: String 
+}

@@ -190,7 +190,7 @@ const NewLine = chevrotain_1.createToken({
     group: chevrotain_1.Lexer.SKIPPED
 });
 const Indent = chevrotain_1.createToken({
-    pattern: /( {4})/,
+    pattern: /( {4})|\t/,
     name: "Indent"
 });
 const WhiteSpace = chevrotain_1.createToken({
@@ -225,7 +225,7 @@ const PragmaLiteral = chevrotain_1.createToken({
 });
 const AnnotationLiteral = chevrotain_1.createToken({
     name: "AnnotationLiteral",
-    pattern: / *@.*\n/
+    pattern: /\w*@.*\n/
 });
 const Operator = chevrotain_1.createToken({
     name: "Operator",
@@ -391,13 +391,21 @@ const multiModeLexerDefinition = {
             KW_data,
             KW_choice,
             KW_pluck,
-            StringLiteral,
             KW_as,
             SIGN_open,
             SIGN_close,
+            SIGN_wrapOpen,
+            SIGN_wrapClose,
+            SIGN_TypeDefStart,
+            SIGN_arrow,
+            SIGN_fireAndForget,
+            AnnotationLiteral,
+            StringLiteral,
             DirectiveLiteral,
             ViewIdentifier,
             Identifier,
+            GenericIdentifier,
+            GenericParameter,
             NewLine,
             Indent,
             WhiteSpace,

@@ -48,25 +48,31 @@
   </xsd:element>
   <xsd:complexType name="FileInfo">
     <xsd:all>
-      <xsd:element ref="self:FileInfo_Size" minOccurs="1"/>
-      <xsd:element ref="self:FileInfo_LastModified" minOccurs="1"/>
-      <xsd:element ref="self:FileInfo_FullPath" minOccurs="1"/>
-      <xsd:element ref="self:FileInfo_CreatedBy" minOccurs="1"/>
-      <xsd:element ref="self:FileInfo_ModifiedBy" minOccurs="1"/>
+      <xsd:element ref="self:FileInfo_Size" minOccurs="1" />
+      <xsd:element ref="self:FileInfo_LastModified" minOccurs="1" />
+      <xsd:element ref="self:FileInfo_FullPath" minOccurs="1" />
+      <xsd:element ref="self:FileInfo_CreatedBy" minOccurs="1" />
+      <xsd:element ref="self:FileInfo_ModifiedBy" minOccurs="1" />
     </xsd:all>
   </xsd:complexType>
   <xsd:element name="DirectoryInfo_Children" nillable="false">
     <xsd:annotation></xsd:annotation>
     <xsd:complexType>
       <xsd:sequence>
-        <xsd:element ref="self:FileSystemInfo" minOccurs="0" maxOccurs="unbound" />
+        <xsd:element type="self:FileSystemInfo" name="foo" minOccurs="0" maxOccurs="100" />
       </xsd:sequence>
     </xsd:complexType>
   </xsd:element>
   <xsd:complexType name="DirectoryInfo">
     <xsd:all>
-      <xsd:element ref="self:DirectoryInfo_Children" minOccurs="1"/>
+      <xsd:element ref="self:DirectoryInfo_Children" minOccurs="1" />
     </xsd:all>
+  </xsd:complexType>
+  <xsd:complexType name="FileSystemInfo">
+    <xsd:choice>
+      <xsd:element type="self:FileInfo" name="FileSystemInfo_FileInfo" />
+      <xsd:element type="self:DirectoryInfo" name="FileSystemInfo_DirectoryInfo" />
+    </xsd:choice>
   </xsd:complexType>
 </xsd:schema>
   

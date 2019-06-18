@@ -1,0 +1,68 @@
+{
+    "$id": "https://schemas.com/Klas",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "description": "klas",
+    "type": "object",
+    "required": [
+        "Student"
+    ],
+    "properties": {
+        "Studenten": {
+            "type": "array",
+            "description": "",
+            "items": {
+                "$ref": "#/definitions/Student"
+            }
+        }
+    },
+    "definitions": {
+        "Adres": {
+            "$id": "#/Adres",
+            "type": "object",
+            "properties": {
+                "Straat": {
+                    "type": "string",
+                    "description": ""
+                },
+                "Huisnummer": {
+                    "type": "string",
+                    "description": ""
+                }
+            },
+            "description": "",
+            "required": [
+                "Straat",
+                "Huisnummer"
+            ]
+        },
+        "Student": {
+            "$id": "#/Student",
+            "type": "object",
+            "properties": {
+                "Nummer": {
+                    "type": "string",
+                    "description": ""
+                },
+                "Voornaam": {
+                    "type": "string",
+                    "description": ""
+                },
+                "Achternaam": {
+                    "type": "string",
+                    "description": ""
+                },
+                "ActiefAdres": {
+                    "$ref": "#/definitions/Adres",
+                    "description": ""
+                }
+            },
+            "description": "",
+            "required": [
+                "Nummer",
+                "Voornaam",
+                "Achternaam",
+                "ActiefAdres"
+            ]
+        }
+    }
+}

@@ -405,7 +405,7 @@
             "name": "Indent",
             "label": "Indent",
             "idx": 0,
-            "pattern": "( {4})"
+            "pattern": "( {4})|\\t"
           }
         ]
       },
@@ -576,7 +576,7 @@
         "name": "Indent",
         "label": "Indent",
         "idx": 0,
-        "pattern": "( {4})"
+        "pattern": "( {4})|\\t"
       },
       {
         "type": "Terminal",
@@ -644,7 +644,7 @@
         "name": "Indent",
         "label": "Indent",
         "idx": 0,
-        "pattern": "( {4})"
+        "pattern": "( {4})|\\t"
       },
       {
         "type": "Terminal",
@@ -743,7 +743,7 @@
                 "name": "Indent",
                 "label": "Indent",
                 "idx": 1,
-                "pattern": "( {4})"
+                "pattern": "( {4})|\\t"
               }
             ]
           },
@@ -768,7 +768,7 @@
   {
     "type": "Rule",
     "name": "AGGREGATE",
-    "orgText": "() => {\n            $.CONSUME(lexer_1.tokenLookup.KW_aggregate);\n            $.OPTION(() => $.CONSUME(lexer_1.tokenLookup.ViewIdentifier));\n            $.CONSUME(lexer_1.tokenLookup.SIGN_open);\n            $.MANY(() => {\n                $.CONSUME(lexer_1.tokenLookup.DirectiveLiteral);\n            });\n            $.MANY1(() => {\n                $.CONSUME1(lexer_1.tokenLookup.Indent);\n                $.CONSUME(lexer_1.tokenLookup.Identifier);\n            });\n            $.CONSUME(lexer_1.tokenLookup.SIGN_close);\n        }",
+    "orgText": "() => {\n            $.CONSUME(lexer_1.tokenLookup.KW_aggregate);\n            $.OPTION(() => $.CONSUME(lexer_1.tokenLookup.ViewIdentifier));\n            $.CONSUME(lexer_1.tokenLookup.SIGN_open);\n            $.MANY(() => {\n                $.CONSUME(lexer_1.tokenLookup.DirectiveLiteral);\n            });\n            $.MANY1(() => {\n                $.CONSUME1(lexer_1.tokenLookup.Indent);\n                $.CONSUME(lexer_1.tokenLookup.Identifier);\n            });\n            $.MANY2(() => $.SUBRULE($.OPERATION));\n            $.CONSUME(lexer_1.tokenLookup.SIGN_close);\n        }",
     "definition": [
       {
         "type": "Terminal",
@@ -819,7 +819,7 @@
             "name": "Indent",
             "label": "Indent",
             "idx": 1,
-            "pattern": "( {4})"
+            "pattern": "( {4})|\\t"
           },
           {
             "type": "Terminal",
@@ -827,6 +827,17 @@
             "label": "Identifier",
             "idx": 0,
             "pattern": "[A-Z][a-zA-Z0-9_]*"
+          }
+        ]
+      },
+      {
+        "type": "Repetition",
+        "idx": 2,
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "OPERATION",
+            "idx": 0
           }
         ]
       },
@@ -1009,18 +1020,31 @@
   {
     "type": "Rule",
     "name": "OPERATION",
-    "orgText": "() => {\n            $.MANY(() => $.CONSUME(lexer_1.tokenLookup.AnnotationLiteral));\n            $.AT_LEAST_ONE(() => $.CONSUME(lexer_1.tokenLookup.Indent));\n            $.OR([\n                { GATE: $.isSub, ALT: () => $.SUBRULE($.FLOW_SUB) },\n                { GATE: $.isPub, ALT: () => $.SUBRULE($.FLOW_PUB) },\n                { ALT: () => $.SUBRULE($.FLOW_SYSTEM) },\n                { ALT: () => $.SUBRULE($.FLOW_FUNCTION) }\n            ]);\n        }",
+    "orgText": "() => {\n            $.MANY(() => {\n                $.OPTION(() => $.CONSUME(lexer_1.tokenLookup.Indent));\n                $.CONSUME(lexer_1.tokenLookup.AnnotationLiteral);\n            });\n            $.AT_LEAST_ONE(() => $.CONSUME1(lexer_1.tokenLookup.Indent));\n            $.OR([\n                { GATE: $.isSub, ALT: () => $.SUBRULE($.FLOW_SUB) },\n                { GATE: $.isPub, ALT: () => $.SUBRULE($.FLOW_PUB) },\n                { ALT: () => $.SUBRULE($.FLOW_SYSTEM) },\n                { ALT: () => $.SUBRULE($.FLOW_FUNCTION) }\n            ]);\n        }",
     "definition": [
       {
         "type": "Repetition",
         "idx": 0,
         "definition": [
           {
+            "type": "Option",
+            "idx": 0,
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Indent",
+                "label": "Indent",
+                "idx": 0,
+                "pattern": "( {4})|\\t"
+              }
+            ]
+          },
+          {
             "type": "Terminal",
             "name": "AnnotationLiteral",
             "label": "AnnotationLiteral",
             "idx": 0,
-            "pattern": " *@.*\\n"
+            "pattern": "\\w*@.*\\n"
           }
         ]
       },
@@ -1032,8 +1056,8 @@
             "type": "Terminal",
             "name": "Indent",
             "label": "Indent",
-            "idx": 0,
-            "pattern": "( {4})"
+            "idx": 1,
+            "pattern": "( {4})|\\t"
           }
         ]
       },
@@ -1088,7 +1112,7 @@
   {
     "type": "Rule",
     "name": "FLOW_FUNCTION",
-    "orgText": "() => {\n            $.CONSUME(lexer_1.tokenLookup.GenericParameter);\n            $.CONSUME(lexer_1.tokenLookup.SIGN_TypeDefStart);\n            $.CONSUME1(lexer_1.tokenLookup.SIGN_TypeDefStart);\n            // the parameters\n            $.AT_LEAST_ONE_SEP({\n                SEP: lexer_1.tokenLookup.SIGN_arrow,\n                DEF: () => $.SUBRULE($.OPERATION_PARAMETER)\n            });\n        }",
+    "orgText": "() => {\n            // length :: String -> Number\n            $.CONSUME(lexer_1.tokenLookup.GenericParameter);\n            $.CONSUME(lexer_1.tokenLookup.SIGN_TypeDefStart);\n            $.CONSUME1(lexer_1.tokenLookup.SIGN_TypeDefStart);\n            // the parameters\n            $.AT_LEAST_ONE_SEP({\n                SEP: lexer_1.tokenLookup.SIGN_arrow,\n                DEF: () => $.SUBRULE($.OPERATION_PARAMETER)\n            });\n        }",
     "definition": [
       {
         "type": "Terminal",
@@ -1474,7 +1498,7 @@
             "name": "Indent",
             "label": "Indent",
             "idx": 0,
-            "pattern": "( {4})"
+            "pattern": "( {4})|\\t"
           }
         ]
       },
@@ -1657,7 +1681,7 @@
   {
     "type": "Rule",
     "name": "TYPE_IDENTIFIER",
-    "orgText": "() => {\n            $.OR([\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.GenericParameter) },\n                {\n                    ALT: () => {\n                        $.CONSUME(lexer_1.tokenLookup.GenericIdentifier);\n                        $.AT_LEAST_ONE(() => {\n                            $.CONSUME1(lexer_1.tokenLookup.GenericParameter);\n                        });\n                    }\n                },\n                {\n                    ALT: () => {\n                        $.AT_LEAST_ONE1(() => {\n                            $.CONSUME(lexer_1.tokenLookup.Identifier);\n                        });\n                    }\n                }\n            ]);\n        }",
+    "orgText": "() => {\n            $.OR([\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.GenericParameter) },\n                {\n                    ALT: () => {\n                        $.CONSUME(lexer_1.tokenLookup.GenericIdentifier);\n                        $.AT_LEAST_ONE(() => {\n                            $.CONSUME1(lexer_1.tokenLookup.GenericParameter);\n                        });\n                    }\n                },\n                {\n                    ALT: () => {\n                        $.CONSUME1(lexer_1.tokenLookup.Identifier);\n                        $.CONSUME(lexer_1.tokenLookup.SIGN_dot);\n                        $.AT_LEAST_ONE_SEP({\n                            SEP: lexer_1.tokenLookup.SIGN_dot,\n                            DEF: () => {\n                                $.CONSUME2(lexer_1.tokenLookup.Identifier);\n                            }\n                        });\n                    }\n                },\n                {\n                    ALT: () => {\n                        $.AT_LEAST_ONE1(() => {\n                            $.CONSUME(lexer_1.tokenLookup.Identifier);\n                        });\n                    }\n                }\n            ]);\n        }",
     "definition": [
       {
         "type": "Alternation",
@@ -1695,6 +1719,45 @@
                     "label": "GenericParameter",
                     "idx": 1,
                     "pattern": "[a-z][a-zA-Z0-9_]*"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Identifier",
+                "label": "Identifier",
+                "idx": 1,
+                "pattern": "[A-Z][a-zA-Z0-9_]*"
+              },
+              {
+                "type": "Terminal",
+                "name": "SIGN_dot",
+                "label": "SIGN_dot",
+                "idx": 0,
+                "pattern": "\\."
+              },
+              {
+                "type": "RepetitionMandatoryWithSeparator",
+                "idx": 0,
+                "separator": {
+                  "type": "Terminal",
+                  "name": "SIGN_dot",
+                  "label": "SIGN_dot",
+                  "idx": 1,
+                  "pattern": "\\."
+                },
+                "definition": [
+                  {
+                    "type": "Terminal",
+                    "name": "Identifier",
+                    "label": "Identifier",
+                    "idx": 2,
+                    "pattern": "[A-Z][a-zA-Z0-9_]*"
                   }
                 ]
               }
@@ -1793,18 +1856,31 @@
   {
     "type": "Rule",
     "name": "ANNOTATIONS",
-    "orgText": "() => {\n            $.MANY({\n                GATE: $.isAnnotation,\n                DEF: () => $.CONSUME(lexer_1.tokenLookup.AnnotationLiteral)\n            });\n        }",
+    "orgText": "() => {\n            $.MANY({\n                GATE: $.isAnnotation,\n                DEF: () => {\n                    $.OPTION(() => $.CONSUME(lexer_1.tokenLookup.Indent));\n                    $.CONSUME(lexer_1.tokenLookup.AnnotationLiteral);\n                }\n            });\n        }",
     "definition": [
       {
         "type": "Repetition",
         "idx": 0,
         "definition": [
           {
+            "type": "Option",
+            "idx": 0,
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Indent",
+                "label": "Indent",
+                "idx": 0,
+                "pattern": "( {4})|\\t"
+              }
+            ]
+          },
+          {
             "type": "Terminal",
             "name": "AnnotationLiteral",
             "label": "AnnotationLiteral",
             "idx": 0,
-            "pattern": " *@.*\\n"
+            "pattern": "\\w*@.*\\n"
           }
         ]
       }
@@ -1824,7 +1900,7 @@
             "name": "AnnotationLiteral",
             "label": "AnnotationLiteral",
             "idx": 0,
-            "pattern": " *@.*\\n"
+            "pattern": "\\w*@.*\\n"
           }
         ]
       }

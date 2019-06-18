@@ -8,20 +8,34 @@ const tchecker_1 = require("./tchecker");
 const helpers_1 = require("./helpers");
 // Modules is the associated hash for looking up module references
 // in the other modules (the imports).
+const sanitizeSouce = (source) => {
+    return source.trimRight();
+};
 exports.transpile = (source) => {
+    // clean up the source
+    source = sanitizeSouce(source);
+    // first run, create the AST from the source
     const { ast, cst, tokens, errors: astErrors } = exports.createAST(source);
+    // now do another pass to update the plucked fields
     let pluckResult = substitute_1.substitutePluckedFields(ast);
     let pluckAST = pluckResult.newAST;
+    // substitute the references to the aliasses with the actual aliasses
     let rwAlias = substitute_1.substituteAliases(pluckAST);
     let rwAliasAST = rwAlias.newAST;
     let rwAliasErrors = rwAlias.errors;
+    // substitute the extensions, here we add the fields which
+    // are added due to the extensions
     var { newAST, errors } = substitute_1.substituteExtensions(rwAliasAST);
+    // type check the whole kaboodle.
     const checkASTs = tchecker_1.typeChecker(newAST) || [];
+    // generate the errors
+    let fullErrors = [...(astErrors || []), ...rwAliasErrors, ...errors, ...checkASTs];
+    // return the result.
     return {
         tokens,
         cst,
         ast: newAST,
-        errors: [...(astErrors || []), ...rwAliasErrors, ...errors, ...checkASTs]
+        errors: fullErrors
     };
 };
 exports.createAST = (source) => {
@@ -37,9 +51,9 @@ exports.createAST = (source) => {
     const cst = parser_1.parser.START();
     //   // We've removed this in favour of our custom error messages. But
     //   // uncomment if you want to debug something.
-    //   if (parser.errors && parser.errors.length > 0) {
-    //     console.log(JSON.stringify(parser.errors, null, 4));
-    //   }
+    // if (parser.errors && parser.errors.length > 0) {
+    //   console.log(JSON.stringify(parser.errors, null, 4));
+    // }
     const visitor = new outline_1.OutlineVisitor();
     const ast = visitor.visit(cst);
     let errors = parser_1.parser.errors.map(error => {

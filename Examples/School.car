@@ -1,0 +1,33 @@
+# Hoi Erwin
+
+En hier is meer, misschien een paragraaf!!
+
+## Dit is de Klas
+
+Hier komt de beschrijving van een Klas
+
+view {
+    Klas
+}
+
+@ api: klas
+type Klas =
+    Studenten: List Student
+        | min 1
+        | max 32
+
+type Student extends Persoon =
+    Nummer: String
+
+type Docent extends Persoon =
+    DocentenNummer: String
+
+type Persoon =
+    Voornaam: String
+    Achternaam: String
+    ActiefAdres: Adres
+
+type Adres =
+    Straat: String
+    Huisnummer: String
+

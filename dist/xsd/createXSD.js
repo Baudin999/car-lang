@@ -5,6 +5,7 @@ const helpers_1 = require("../helpers");
 const xsdClass_1 = require("./xsdClass");
 const xsdChoice_1 = require("./xsdChoice");
 const xsdAlias_1 = require("./xsdAlias");
+const xsdData_1 = require("./xsdData");
 const pretty_data_1 = require("pretty-data");
 const types = [outline_1.NodeType.TYPE, outline_1.NodeType.ALIAS, outline_1.NodeType.DATA, outline_1.NodeType.CHOICE];
 /*
@@ -28,9 +29,7 @@ exports.createXSD = (ast, config = defaultConfig) => {
         enums: ast
             .filter((node) => node.type && node.type === outline_1.NodeType.CHOICE)
             .map((n) => n.id),
-        data: ast
-            .filter((node) => node.type && node.type === outline_1.NodeType.DATA)
-            .map((n) => n.id)
+        data: ast.filter((node) => node.type && node.type === outline_1.NodeType.DATA).map((n) => n.id)
     };
     const transformedNodes = ast
         .filter((n) => !n.ignore)
@@ -45,7 +44,7 @@ exports.createXSD = (ast, config = defaultConfig) => {
             return new xsdAlias_1.XsdAlias(node).toString();
         }
         else if (node.type && node.type === outline_1.NodeType.DATA) {
-            //return new PlantData(node as any, lookup).toString();
+            return new xsdData_1.XsdData(node).toString();
         }
         return null;
     });

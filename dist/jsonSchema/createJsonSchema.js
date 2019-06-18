@@ -14,19 +14,69 @@ const getDescription = (node) => {
 };
 exports.createJsonSchema = (ast) => {
     // First we'll need to grab the APIs from this ast...
-    const apis = ast.filter(isAPI);
+    const apiRootNodes = ast.filter(isAPI);
     //console.log(apis);
-    const schemas = apis.map((api) => {
-        let fields = {};
+    const createInnerSchema = (typeName, definitions) => {
+        let node = ast.find((n) => n.id && n.id === typeName);
+        if (!node)
+            return definitions;
+        let description = (node.annotations || []).find(a => a.key === "description");
+        if (node.type === outline_1.NodeType.CHOICE) {
+            definitions[typeName] = {
+                $id: "#/" + typeName,
+                type: "string",
+                description: description ? description.value : "",
+                enum: node.options.map(o => o.id)
+            };
+        }
+        if (node.type === outline_1.NodeType.DATA) {
+            definitions[typeName] = {
+                $id: "#/" + typeName,
+                description: description ? description.value : "",
+                oneOf: node.options.map(o => {
+                    createInnerSchema(o.id, definitions);
+                    return { $ref: "#/definitions/" + o.id };
+                })
+            };
+        }
+        if (node.type === outline_1.NodeType.ALIAS) {
+            definitions[typeName] = {
+                $id: "#/" + typeName,
+                description: description ? description.value : "",
+                type: helpers_1.baseTypeToJSONType(node.ofType)
+            };
+            return definitions;
+        }
+        if (node.type === outline_1.NodeType.TYPE) {
+            let fields = {};
+            // side effect!!
+            mapFields(node, fields, definitions);
+            let requiredFields = helpers_1.purge(node.fields.map((f) => {
+                return f.ofType !== "Maybe" ? f.id : null;
+            }));
+            definitions[typeName] = {
+                $id: "#/" + typeName,
+                type: "object",
+                properties: fields,
+                description: description ? description.value : "",
+                required: requiredFields
+            };
+            return definitions;
+        }
+        return definitions;
+    };
+    function mapFields(api, fields, definitions) {
         (api.fields || []).map(field => {
             let isList = field.ofType === "List";
             let isMaybe = field.ofType === "Maybe";
             let $type = isMaybe || isList ? field.ofType_params[0] : field.ofType;
             let resultType = helpers_1.baseTypeToJSONType($type);
+            let description = field.annotations.find(a => a.key === "description");
             if (resultType) {
                 if (!isList) {
                     fields[field.id] = {
-                        type: resultType
+                        type: resultType,
+                        description: description ? description.value : ""
                     };
                 }
                 else {
@@ -34,26 +84,37 @@ exports.createJsonSchema = (ast) => {
                         type: "array",
                         items: {
                             $ref: "#/definitions/" + $type
-                        }
+                        },
+                        description: description ? description.value : ""
                     };
+                    createInnerSchema($type, definitions);
                 }
             }
             else {
                 if (!isList) {
                     fields[field.id] = {
-                        $ref: "#/definitions/" + $type
+                        $ref: "#/definitions/" + $type,
+                        description: description ? description.value : ""
                     };
+                    createInnerSchema($type, definitions);
                 }
                 else {
                     fields[field.id] = {
                         type: "array",
+                        description: description ? description.value : "",
                         items: {
                             $ref: "#/definitions/" + $type
                         }
                     };
+                    createInnerSchema($type, definitions);
                 }
             }
         });
+    }
+    const schemas = apiRootNodes.map((api) => {
+        let fields = {};
+        let definitions = {};
+        mapFields(api, fields, definitions);
         let requiredFields = helpers_1.purge((api.fields || []).map(field => {
             if (field.ofType === "Maybe")
                 return null;
@@ -68,7 +129,8 @@ exports.createJsonSchema = (ast) => {
             description: getDescription(api).value,
             type: "object",
             required: requiredFields,
-            properties: fields
+            properties: fields,
+            definitions
         };
         return { name: api.id, schema };
     });

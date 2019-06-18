@@ -50,9 +50,18 @@ export declare class OutlineVisitor extends BaseCstVisitorWithDefaults {
     IDENTIFIER(ctx: any): IIdentity;
     TYPE_IDENTIFIER(ctx: any): {
         ofType: any;
+        ofType_start: ITokenStart;
+        ofType_params: never[];
+        ofType_params_start: never[];
+        field: any;
+        fieldStart: ITokenStart;
+    } | {
+        ofType: any;
         ofType_start: any;
         ofType_params: any;
         ofType_params_start: any;
+        field?: undefined;
+        fieldStart?: undefined;
     };
     RESTRICTION(ctx: any): IRestriction;
     MARKDOWN_CHAPTER(ctx: any): IMarkdownChapter;
@@ -92,6 +101,8 @@ export interface ITypeField {
     ofType_start: ITokenStart;
     ofType_params: string[];
     ofType_params_start: ITokenStart[];
+    field?: string;
+    fieldStart?: ITokenStart;
     annotations: IAnnotation[];
     source?: string;
     restrictions: IRestriction[];
@@ -203,6 +214,7 @@ export interface IAggregate {
     valueObjects: string[];
     valueObjects_start: ITokenStart[];
     directives: IDirective[];
+    operations: IOperation[];
     annotations: IAnnotation[];
 }
 export interface IAlias {

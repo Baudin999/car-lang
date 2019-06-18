@@ -91,8 +91,12 @@ exports.createHTML = (ast, modulePath, svgs, moduleName) => {
             return generateHashAndFetchUrl(plantSource, svgs, modulePath);
         }
         else if (node.type === outline_1.NodeType.AGGREGATE) {
-            let plantSource = createAggregate_1.createAggregate(node, ast);
-            return generateHashAndFetchUrl(plantSource, svgs, modulePath);
+            let aggregate = node;
+            let { plantSource, operations } = createAggregate_1.createAggregate(node, ast);
+            return (`<h2>${aggregate.root} Aggregate</h2>\n` +
+                generateHashAndFetchUrl(plantSource, svgs, modulePath) +
+                `<p>Operation on the ${aggregate.root} aggregate:</p>` +
+                operations);
         }
         else if (node.type === outline_1.NodeType.FLOW) {
             let result = "";

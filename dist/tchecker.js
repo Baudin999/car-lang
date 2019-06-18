@@ -21,13 +21,17 @@ const getNodeById = (ast, params = [], id) => {
 };
 exports.typeChecker = (ast = []) => {
     let errors = [];
-    ast.filter(node => node.type === outline_1.NodeType.TYPE && !node.imported).forEach((node) => {
+    ast
+        .filter(node => node.type === outline_1.NodeType.TYPE && !node.imported)
+        .forEach((node) => {
         // check the normal fields for errors
         node.fields
             .filter(field => field.type == outline_1.NodeType.TYPE_FIELD)
             .forEach((field) => {
             // the id of the field
-            let typeId = field.ofType;
+            let typeId = field.ofType === "Maybe" || field.ofType === "List"
+                ? field.ofType_params[0]
+                : field.ofType;
             let ref = getNodeById(ast, node.params, typeId);
             if (!ref) {
                 errors.push(Object.assign({ message: `Cannot find type "${typeId}" of field "${field.id}" of type "${node.id}"` }, field.ofType_start));
@@ -58,8 +62,7 @@ exports.typeChecker = (ast = []) => {
             if (ref.type !== outline_1.NodeType.TYPE) {
                 errors.push(Object.assign({ message: `Can only pluck from a type` }, field.parts_start[0]));
             }
-            let refField = ref.fields.find(f => f.type === outline_1.NodeType.TYPE_FIELD &&
-                f.id === field.parts[1]);
+            let refField = ref.fields.find(f => f.type === outline_1.NodeType.TYPE_FIELD && f.id === field.parts[1]);
             if (!refField) {
                 errors.push(Object.assign({ message: `Cannot find field "${field.parts[1]}" of type "${typeId}" to pluck` }, field.parts_start[1]));
             }
@@ -68,7 +71,9 @@ exports.typeChecker = (ast = []) => {
     /**
      * Type Check the AGGREGATES
      */
-    ast.filter(node => node.type === outline_1.NodeType.AGGREGATE).forEach((aggregate) => {
+    ast
+        .filter(node => node.type === outline_1.NodeType.AGGREGATE)
+        .forEach((aggregate) => {
         // test if the root exists
         let root = getNodeById(ast, [], aggregate.root);
         if (!root) {
@@ -84,12 +89,13 @@ exports.typeChecker = (ast = []) => {
     /**
      * Type Check the VIEWS
      */
-    ast.filter(node => node.type === outline_1.NodeType.VIEW).forEach((view) => {
+    ast
+        .filter(node => node.type === outline_1.NodeType.VIEW)
+        .forEach((view) => {
         view.nodes.forEach((v, i) => {
             let valueObject = getNodeById(ast, [], v);
             if (!valueObject) {
-                errors.push(Object.assign({ message: `Cannot find the Node "${v}" on View "${view.id ||
-                        "Unnamed view"}"` }, view.nodes_start[i]));
+                errors.push(Object.assign({ message: `Cannot find the Node "${v}" on View "${view.id || "Unnamed view"}"` }, view.nodes_start[i]));
             }
         });
     });

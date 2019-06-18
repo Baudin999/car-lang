@@ -14,7 +14,7 @@ class XsdClass {
                 return;
             let tf = field;
             let optional = tf.ofType === "Maybe" ? ` minOccurs="0"` : ` minOccurs="1"`;
-            return `<xsd:element ref="self:${this.node.id}_${tf.id}"${optional}/>`;
+            return `<xsd:element ref="self:${this.node.id}_${tf.id}"${optional} />`;
         })).join("\n");
         return `
     <xsd:complexType name="${this.node.id}">
@@ -69,11 +69,24 @@ class XsdClass {
         <xsd:annotation>${annotations}</xsd:annotation>
         <xsd:complexType>
         <xsd:sequence>
-        <xsd:element ref="self:${fieldType}" minOccurs="0" maxOccurs="unbound" />
+        <xsd:element type="${xsdType}" name="foo" minOccurs="0" maxOccurs="100" />
         </xsd:sequence>
         </xsd:complexType>
     </xsd:element>
             `.trim();
+            }
+            else if (fieldType === "Char") {
+                return `
+          <xsd:element name="${this.node.id}_${tf.id}" nillable="false">
+              <xsd:annotation>${annotations}</xsd:annotation>
+              <xsd:simpleType>
+          <xsd:restriction base="xsd:string">
+            <xsd:minLength value="1" />
+            <xsd:maxLength value="1" />
+          </xsd:restriction>
+        </xsd:simpleType>
+          </xsd:element>
+                  `.trim();
             }
             else if (xsdType.startsWith("xsd:")) {
                 return `

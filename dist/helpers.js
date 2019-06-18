@@ -89,6 +89,7 @@ exports.baseTypes = [
 exports.baseTypeToXSDType = (b) => {
     switch (b) {
         case "String":
+        case "Char":
             return "xsd:string";
         case "Number":
             return "xsd:integer";
@@ -139,20 +140,29 @@ exports.mapRestrictionToXSD = (baseType, restriction) => {
             return "";
     }
 };
+exports.last = (array) => {
+    return array[array.length - 1];
+};
+exports.splitFrom = (array, index) => {
+    let start = array.slice(0, index);
+    let end = array.slice(index, array.length - 1);
+    return { start, end };
+};
+exports.splitFromLast = (array) => {
+    let { start } = exports.splitFrom(array, array.length - 1);
+    return { items: start, last: exports.last(array) };
+};
 exports.baseTypeToJSONType = (b) => {
     switch (b) {
         case "String":
+        case "Date":
+        case "DateTime":
+        case "Time":
             return "string";
         case "Number":
             return "number";
         case "Boolean":
             return "boolean";
-        case "Date":
-            return "date";
-        case "DateTime":
-            return "dateTime";
-        case "Time":
-            return "time";
         default:
             return null;
     }

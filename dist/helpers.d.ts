@@ -67,6 +67,15 @@ export declare const fetchImage: (url: any) => Promise<{}>;
 export declare const baseTypes: string[];
 export declare const baseTypeToXSDType: (b: string) => string;
 export declare const mapRestrictionToXSD: (baseType: string, restriction: IRestriction) => string;
+export declare const last: <T>(array: T[]) => T;
+export declare const splitFrom: <T>(array: T[], index: number) => {
+    start: T[];
+    end: T[];
+};
+export declare const splitFromLast: <T>(array: T[]) => {
+    items: T[];
+    last: T;
+};
 export declare const baseTypeToJSONType: (b: string) => string | null;
 export declare const baseTypeToTypeScriptType: (b: string) => string | null;
 export interface IConfiguration {

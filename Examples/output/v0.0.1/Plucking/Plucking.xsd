@@ -28,7 +28,7 @@
     <xsd:annotation></xsd:annotation>
     <xsd:complexType>
       <xsd:sequence>
-        <xsd:element ref="self:String" minOccurs="0" maxOccurs="unbound" />
+        <xsd:element type="xsd:string" name="foo" minOccurs="0" maxOccurs="100" />
       </xsd:sequence>
     </xsd:complexType>
   </xsd:element>
@@ -40,10 +40,10 @@
   </xsd:element>
   <xsd:complexType name="Human">
     <xsd:all>
-      <xsd:element ref="self:Human_FirstName" minOccurs="0"/>
-      <xsd:element ref="self:Human_LastName" minOccurs="1"/>
-      <xsd:element ref="self:Human_MiddleNames" minOccurs="1"/>
-      <xsd:element ref="self:Human_DateOfBirth" minOccurs="1"/>
+      <xsd:element ref="self:Human_FirstName" minOccurs="0" />
+      <xsd:element ref="self:Human_LastName" minOccurs="1" />
+      <xsd:element ref="self:Human_MiddleNames" minOccurs="1" />
+      <xsd:element ref="self:Human_DateOfBirth" minOccurs="1" />
     </xsd:all>
   </xsd:complexType>
   <xsd:element name="Person_FuurstName" nillable="false">
@@ -77,9 +77,9 @@
   </xsd:element>
   <xsd:complexType name="Person">
     <xsd:all>
-      <xsd:element ref="self:Person_FuurstName" minOccurs="0"/>
-      <xsd:element ref="self:Person_LastName" minOccurs="1"/>
-      <xsd:element ref="self:Person_CallingName" minOccurs="1"/>
+      <xsd:element ref="self:Person_FuurstName" minOccurs="0" />
+      <xsd:element ref="self:Person_LastName" minOccurs="1" />
+      <xsd:element ref="self:Person_CallingName" minOccurs="1" />
     </xsd:all>
   </xsd:complexType>
 </xsd:schema>

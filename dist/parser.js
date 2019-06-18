@@ -149,6 +149,7 @@ class DomainParser extends chevrotain_1.Parser {
                 $.CONSUME1(lexer_1.tokenLookup.Indent);
                 $.CONSUME(lexer_1.tokenLookup.Identifier);
             });
+            $.MANY2(() => $.SUBRULE($.OPERATION));
             $.CONSUME(lexer_1.tokenLookup.SIGN_close);
         });
         $.RULE("GUIDELINE", () => {
@@ -179,8 +180,11 @@ class DomainParser extends chevrotain_1.Parser {
             $.CONSUME(lexer_1.tokenLookup.SIGN_close);
         });
         $.RULE("OPERATION", () => {
-            $.MANY(() => $.CONSUME(lexer_1.tokenLookup.AnnotationLiteral));
-            $.AT_LEAST_ONE(() => $.CONSUME(lexer_1.tokenLookup.Indent));
+            $.MANY(() => {
+                $.OPTION(() => $.CONSUME(lexer_1.tokenLookup.Indent));
+                $.CONSUME(lexer_1.tokenLookup.AnnotationLiteral);
+            });
+            $.AT_LEAST_ONE(() => $.CONSUME1(lexer_1.tokenLookup.Indent));
             $.OR([
                 { GATE: $.isSub, ALT: () => $.SUBRULE($.FLOW_SUB) },
                 { GATE: $.isPub, ALT: () => $.SUBRULE($.FLOW_PUB) },
@@ -189,6 +193,7 @@ class DomainParser extends chevrotain_1.Parser {
             ]);
         });
         $.RULE("FLOW_FUNCTION", () => {
+            // length :: String -> Number
             $.CONSUME(lexer_1.tokenLookup.GenericParameter);
             $.CONSUME(lexer_1.tokenLookup.SIGN_TypeDefStart);
             $.CONSUME1(lexer_1.tokenLookup.SIGN_TypeDefStart);
@@ -315,6 +320,18 @@ class DomainParser extends chevrotain_1.Parser {
                 },
                 {
                     ALT: () => {
+                        $.CONSUME1(lexer_1.tokenLookup.Identifier);
+                        $.CONSUME(lexer_1.tokenLookup.SIGN_dot);
+                        $.AT_LEAST_ONE_SEP({
+                            SEP: lexer_1.tokenLookup.SIGN_dot,
+                            DEF: () => {
+                                $.CONSUME2(lexer_1.tokenLookup.Identifier);
+                            }
+                        });
+                    }
+                },
+                {
+                    ALT: () => {
                         $.AT_LEAST_ONE1(() => {
                             $.CONSUME(lexer_1.tokenLookup.Identifier);
                         });
@@ -357,7 +374,10 @@ class DomainParser extends chevrotain_1.Parser {
         $.RULE("ANNOTATIONS", () => {
             $.MANY({
                 GATE: $.isAnnotation,
-                DEF: () => $.CONSUME(lexer_1.tokenLookup.AnnotationLiteral)
+                DEF: () => {
+                    $.OPTION(() => $.CONSUME(lexer_1.tokenLookup.Indent));
+                    $.CONSUME(lexer_1.tokenLookup.AnnotationLiteral);
+                }
             });
         });
         $.RULE("CHOICE_ANNOTATION", () => {

@@ -48,7 +48,7 @@ exports.substituteAliases = (ast = []) => {
                     return field;
                 }
                 else if (ref && ref.params && ref.params.length > 0) {
-                    // here we're in the situation where we're passing a 
+                    // here we're in the situation where we're passing a
                     // parameter through to another type.
                     // Example:
                     /*
@@ -83,13 +83,15 @@ exports.substituteAliases = (ast = []) => {
 };
 exports.substitutePluckedFields = (ast = []) => {
     const errors = [];
+    if (!Array.isArray(ast))
+        return { newAST: [], errors: [] };
     const newAST = ast.map((node) => {
         if (node.type !== outline_1.NodeType.TYPE)
             return node;
         else {
             let newNode = node;
-            newNode.fields = node.fields
-                .map((field) => {
+            // Manage the plucked fields
+            newNode.fields = node.fields.map((field) => {
                 if (field.type !== outline_1.NodeType.PLUCKED_FIELD)
                     return field;
                 let [ofType, fieldName] = field.parts;
@@ -99,6 +101,35 @@ exports.substitutePluckedFields = (ast = []) => {
                 let targetField = (targetNode.fields || []).find(f => f.id === fieldName);
                 return helpers_1.clone(targetField);
             });
+            // Manage and substitute the fields which take the type from
+            // another field in the application.
+            newNode.fields = node.fields.map((field) => {
+                if (!field.field)
+                    return field;
+                else {
+                    let targetNode = getNodeById(ast, [], field.ofType);
+                    if (!targetNode) {
+                        errors.push(Object.assign({ message: `Type ${field.ofType} cannot be found to grab the field ${field.field} from.` }, field.ofType_start));
+                        return field;
+                    }
+                    let targetField = (targetNode.fields || []).find((f) => f.id === field.field);
+                    if (!targetField) {
+                        errors.push(Object.assign({ message: `Type ${field.ofType} does not contain field ${field.field}.` }, field.fieldStart));
+                        return field;
+                    }
+                    let result = Object.assign({}, helpers_1.clone(targetField), { id: field.id, id_start: field.id_start, ofType_start: field.fieldStart, annotations: field.annotations });
+                    let restrictions = targetField.restrictions;
+                    field.restrictions.forEach(r => {
+                        let or = restrictions.find(_r => _r.key === r.key);
+                        if (!or)
+                            restrictions.push(r);
+                        else
+                            or.value = r.value;
+                    });
+                    result.restrictions = restrictions;
+                    return result;
+                }
+            });
             return newNode;
         }
     });
@@ -106,7 +137,7 @@ exports.substitutePluckedFields = (ast = []) => {
 };
 exports.substituteExtensions = (ast = []) => {
     const errors = [];
-    const newAST = ast.map((node) => {
+    const newAST = (ast || []).map((node) => {
         if (node.type !== outline_1.NodeType.TYPE)
             return node;
         else {
@@ -114,7 +145,7 @@ exports.substituteExtensions = (ast = []) => {
             newNode.extends.forEach((e, i) => {
                 let extension = getNodeById(ast, [], e);
                 if (!extension) {
-                    errors.push(Object.assign({ message: `Could not find type ${e} to extends from` }, node.extends_start[i]));
+                    errors.push(Object.assign({ message: `Could not find type ${e} to extend from` }, node.extends_start[i]));
                 }
                 else if (extension.type !== outline_1.NodeType.TYPE) {
                     errors.push(Object.assign({ message: `Type ${e} is not a "type" and as such cannot be extended from.` }, node.extends_start[i]));

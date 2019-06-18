@@ -144,6 +144,7 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
             valueObjects: (ctx.Identifier || []).map(i => i.image),
             valueObjects_start: (ctx.Identifier || []).map(i => helpers_1.getStartToken(i)),
             directives: parseDirectives(ctx),
+            operations: (ctx.OPERATION || []).map(o => this.visit(o)),
             annotations: []
         };
     }
@@ -407,6 +408,16 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
                 ofType_start: helpers_1.getStartToken(ctx.GenericParameter[0]),
                 ofType_params: [],
                 ofType_params_start: []
+            };
+        }
+        else if (ctx.SIGN_dot) {
+            return {
+                ofType: ctx.Identifier[0].image,
+                ofType_start: helpers_1.getStartToken(ctx.Identifier[0]),
+                ofType_params: [],
+                ofType_params_start: [],
+                field: ctx.Identifier[1].image,
+                fieldStart: helpers_1.getStartToken(ctx.Identifier[1])
             };
         }
         else {

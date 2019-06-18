@@ -17,7 +17,7 @@
   </xsd:element>
   <xsd:complexType name="Person">
     <xsd:all>
-      <xsd:element ref="self:Person_FirstName" minOccurs="1"/>
+      <xsd:element ref="self:Person_FirstName" minOccurs="1" />
     </xsd:all>
   </xsd:complexType>
 </xsd:schema>
