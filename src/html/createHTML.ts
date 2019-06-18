@@ -146,6 +146,8 @@ export const createHTML = (
   </head>
   <body>
 
+      <a href="./../index.html">Index</a>
+
     <h1>Index</h1>
     <ul>
     ${chapters

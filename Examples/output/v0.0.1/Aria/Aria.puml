@@ -43,8 +43,8 @@ class "Skill " as Skill <Namable,Buyable> {
 }
 BoughtFrom --> Skill : Source
 Stat --> Skill : Stat
-Namable --|> Skill
-Buyable --|> Skill
+Namable <|-- Skill
+Buyable <|-- Skill
 class "Resistance " as Resistance <Namable,Buyable> {
 	Name: String  <i>from Namable</i>
 	Description: String  <i>from Namable</i>
@@ -57,8 +57,8 @@ class "Resistance " as Resistance <Namable,Buyable> {
 }
 BoughtFrom --> Resistance : Source
 Stat --> Resistance : Stat
-Namable --|> Resistance
-Buyable --|> Resistance
+Namable <|-- Resistance
+Buyable <|-- Resistance
 class "Special " as Special <Namable,Buyable> {
 	Name: String  <i>from Namable</i>
 	Description: String  <i>from Namable</i>
@@ -71,8 +71,8 @@ class "Special " as Special <Namable,Buyable> {
 }
 BoughtFrom --> Special : Source
 Stat --> Special : Stat
-Namable --|> Special
-Buyable --|> Special
+Namable <|-- Special
+Buyable <|-- Special
 class "Feat " as Feat <Namable> {
 	Rank: Number 
 	XP: Number 
@@ -81,7 +81,7 @@ class "Feat " as Feat <Namable> {
 	Description: String  <i>from Namable</i>
 }
 Stat --> Feat : Stat
-Namable --|> Feat
+Namable <|-- Feat
 class "Statistic" as Statistic  {
 	Stat: Stat 
 	Description: String 
@@ -110,6 +110,6 @@ Statistic --> Character : Agility
 Statistic --> Character : Intuition
 Statistic --> Character : Perception
 Statistic --> Character : Charisma
-Skill "0" --> "*" Character : List Skill
-Special "0" --> "*" Character : List Special
-Feat "0" --> "*" Character : List Feat
+Skill "0..*" --> "1" Character : List Skill
+Special "0..*" --> "1" Character : List Special
+Feat "0..*" --> "1" Character : List Feat

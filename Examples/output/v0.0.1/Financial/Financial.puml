@@ -1,4 +1,4 @@
-class "Currency sign value" as Currency << (T,orchid) >> {
+class "Currency" as Currency  {
 	Sign: String 
 	Value: Number 
 ===
@@ -19,5 +19,5 @@ abstract "PaymentMethod" as PaymentMethod {
 	CreditCard 
 	DirectDebit 
 }
-CreditCard --> PaymentMethod : CreditCard
-DirectDebit --> PaymentMethod : DirectDebit
+CreditCard --* PaymentMethod : CreditCard
+DirectDebit --* PaymentMethod : DirectDebit

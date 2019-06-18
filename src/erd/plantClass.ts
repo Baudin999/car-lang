@@ -50,7 +50,7 @@ export class PlantClass {
       .map((field: any) => {
         let min = field.restrictions.find(a => a.key === "min") || { value: 0 };
         let max = field.restrictions.find(a => a.key === "max");
-        return `${field.ofType_params[0]} "${min.value}" --> "${max ? max.value : "*"}" ${
+        return `${field.ofType_params[0]} "${min.value}..${max ? max.value : "*"}" --> "1" ${
           this.node.id
         } : List ${field.ofType_params[0]}`;
       });
@@ -61,7 +61,7 @@ export class PlantClass {
   extensions() {
     return this.node.extends
       .filter((extension: any) => this.lookup.types.indexOf(extension) > -1)
-      .map((extension: any) => `${extension} --|> ${this.node.id}`)
+      .map((extension: any) => `${extension} <|-- ${this.node.id}`)
       .join("\n");
   }
 

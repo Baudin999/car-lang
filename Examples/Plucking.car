@@ -1,8 +1,12 @@
+
+@ erd: full
 type Human =
     FirstName: Maybe String
         | min 10
         | max 90
+    @ Original Description
     LastName: String
+        | max 90
     MiddleNames: List String
     DateOfBirth: Date
 
@@ -12,5 +16,6 @@ type Person =
     FuurstName: Human.FirstName
         | min 12
         | other "foo"
+    @ Maybe we'd like to add more description to this field...
     pluck Human.LastName
     CallingName: String

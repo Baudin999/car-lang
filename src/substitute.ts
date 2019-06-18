@@ -105,7 +105,31 @@ export const substitutePluckedFields = (
         let targetNode = getNodeById(ast, [], ofType) as any;
         if (!targetNode) return field;
         let targetField = (targetNode.fields || []).find(f => f.id === fieldName);
-        return clone(targetField);
+        let result = clone(targetField);
+
+        // Here we manipulate the annotations of the result in order to get
+        // everything we need to this new field.
+        result.annotations = result.annotations.map(a => {
+          if (a.key !== "description") return a;
+          else return { key: "original description", value: a.value };
+        });
+        result.annotations.push({
+          key: "plucked from",
+          value: `${ofType}.${fieldName}`
+        });
+        Array.prototype.push.apply(result.annotations, field.annotations);
+
+        // We should also manipulate the restrictions of the new fields
+        // we might override the previous restrictions when plucking.
+        let restrictions = targetField.restrictions || [];
+        (field.restrictions || []).forEach(r => {
+          let or = restrictions.find(_r => _r.key === r.key);
+          if (!or) restrictions.push(r);
+          else or.value = r.value;
+        });
+
+        result.restrictions = restrictions;
+        return result;
       });
 
       // Manage and substitute the fields which take the type from

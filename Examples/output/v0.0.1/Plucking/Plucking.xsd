@@ -16,11 +16,13 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:element name="Human_LastName" nillable="false">
-    <xsd:annotation></xsd:annotation>
+    <xsd:annotation>
+      <xsd:documentation>Original Description</xsd:documentation>
+    </xsd:annotation>
     <xsd:simpleType>
       <xsd:restriction base="xsd:string">
+        <xsd:maxLength value="90" />
         <xsd:minLength value="1" />
-        <xsd:maxLength value="100" />
       </xsd:restriction>
     </xsd:simpleType>
   </xsd:element>
@@ -58,11 +60,21 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:element name="Person_LastName" nillable="false">
-    <xsd:annotation></xsd:annotation>
+    <xsd:annotation>
+      <xsd:appinfo>
+        <key>original description</key>
+        <value>Original Description</value>
+      </xsd:appinfo>
+      <xsd:appinfo>
+        <key>plucked from</key>
+        <value>Human.LastName</value>
+      </xsd:appinfo>
+      <xsd:documentation>Maybe we'd like to add more description to this field...</xsd:documentation>
+    </xsd:annotation>
     <xsd:simpleType>
       <xsd:restriction base="xsd:string">
+        <xsd:maxLength value="90" />
         <xsd:minLength value="1" />
-        <xsd:maxLength value="100" />
       </xsd:restriction>
     </xsd:simpleType>
   </xsd:element>

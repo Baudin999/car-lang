@@ -2,7 +2,7 @@
 # Financial Models
 
 @ Currency is expressen like: $12,00
-type Currency sign value =
+type Currency =
     Sign: String
         | min 1
         | max 25
