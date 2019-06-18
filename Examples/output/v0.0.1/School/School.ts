@@ -1,6 +1,6 @@
 
 /*
-GENERATED ON: 1560833466451
+GENERATED ON: 1560833885139
 */ 
 
 
@@ -23,12 +23,14 @@ class Nothing<T> {}
 
 interface IKlas {
     Studenten: IStudent[];
+    Docenten: IDocent[];
 }
   
 
 
 interface IStudent {
     Nummer: string;
+    HeeftVakken: IVak[];
     Voornaam: string;
     Achternaam: string;
     ActiefAdres: IAdres;
@@ -38,6 +40,7 @@ interface IStudent {
 
 interface IDocent {
     DocentenNummer: string;
+    BevoegdVoor: IVak[];
     Voornaam: string;
     Achternaam: string;
     ActiefAdres: IAdres;
@@ -56,6 +59,13 @@ interface IPersoon {
 interface IAdres {
     Straat: string;
     Huisnummer: string;
+}
+  
+
+
+interface IVak {
+    Naam: string;
+    IsBelangrijk: boolean;
 }
   
     

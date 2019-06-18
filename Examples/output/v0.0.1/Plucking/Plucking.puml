@@ -3,6 +3,8 @@ class "Human" as Human  {
 	LastName: String 
 	MiddleNames: List String
 	DateOfBirth: Date 
+===
+  <b>erd</b>: full
 }
 class "Person" as Person  {
 	FuurstName: Maybe String

@@ -1,24 +1,30 @@
 class "Klas" as Klas  {
 	Studenten: List Student
+	Docenten: List Docent
 ===
   <b>api</b>: klas
 }
 Student "1..32" --> "1" Klas : List Student
+Docent "7..25" --> "1" Klas : List Docent
 class "Student " as Student <Persoon> {
 	Nummer: String 
+	HeeftVakken: List Vak
 	Voornaam: String  <i>from Persoon</i>
 	Achternaam: String  <i>from Persoon</i>
 	ActiefAdres: Adres  <i>from Persoon</i>
 }
 Adres --> Student : ActiefAdres
+Vak "7..13" --> "1" Student : List Vak
 Persoon <|-- Student
 class "Docent " as Docent <Persoon> {
 	DocentenNummer: String 
+	BevoegdVoor: List Vak
 	Voornaam: String  <i>from Persoon</i>
 	Achternaam: String  <i>from Persoon</i>
 	ActiefAdres: Adres  <i>from Persoon</i>
 }
 Adres --> Docent : ActiefAdres
+Vak "1..20" --> "1" Docent : List Vak
 Persoon <|-- Docent
 class "Persoon" as Persoon  {
 	Voornaam: String 
@@ -29,4 +35,8 @@ Adres --> Persoon : ActiefAdres
 class "Adres" as Adres  {
 	Straat: String 
 	Huisnummer: String 
+}
+class "Vak" as Vak  {
+	Naam: String 
+	IsBelangrijk: Boolean 
 }

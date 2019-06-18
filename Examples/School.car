@@ -1,13 +1,33 @@
-# Hoi Erwin
+# Hoi Middlebare School
 
 En hier is meer, misschien een paragraaf!!
 
 ## Dit is de Klas
 
-Hier komt de beschrijving van een Klas
+In een klas zitten leerlingen, een klas volgt vakken en een vak wordt gegeven door een docent. 
 
 view {
     Klas
+    Student
+    Docent
+}
+
+## Docent
+
+Een Docent geeft één of meerdere vakken.
+
+view {
+    Docent
+    Vak
+}
+
+## Student
+
+Een Student (Leerling) heeft één of meerdere vakken
+
+view {
+    Student
+    Vak
 }
 
 @ api: klas
@@ -15,12 +35,21 @@ type Klas =
     Studenten: List Student
         | min 1
         | max 32
+    Docenten: List Docent
+        | min 7
+        | max 25
 
 type Student extends Persoon =
     Nummer: String
+    HeeftVakken: List Vak
+        | min 7
+        | max 13
 
 type Docent extends Persoon =
     DocentenNummer: String
+    BevoegdVoor: List Vak
+        | min 1
+        | max 20
 
 type Persoon =
     Voornaam: String
@@ -30,4 +59,9 @@ type Persoon =
 type Adres =
     Straat: String
     Huisnummer: String
+
+type Vak =
+    Naam: String
+    IsBelangrijk: Boolean
+
 

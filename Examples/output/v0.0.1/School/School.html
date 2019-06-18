@@ -10,10 +10,16 @@
         <h1>Index</h1>
         <ul>
           <li>
-            <a href="#0"> Hoi Erwin</a>
+            <a href="#0"> Hoi Middlebare School</a>
             <ul>
               <li>
                 <a href="#2"> Dit is de Klas</a>
+              </li>
+              <li>
+                <a href="#5"> Docent</a>
+              </li>
+              <li>
+                <a href="#8"> Student</a>
               </li>
             </ul>
           </li>
@@ -30,12 +36,22 @@
             <a href="School.svg">ERD</a>
           </li>
         </ul>
-        <h1 id="0"> Hoi Erwin</h1>
+        <h1 id="0"> Hoi Middlebare School</h1>
         <p>En hier is meer, misschien een paragraaf!!</p>
         <h2 id="2"> Dit is de Klas</h2>
-        <p>Hier komt de beschrijving van een Klas</p>
+        <p>In een klas zitten leerlingen, een klas volgt vakken en een vak wordt gegeven door een docent. </p>
         <div class="image-container">
-          <img src="./2313592920.svg" />
+          <img src="./3561230990.svg" />
+        </div>
+        <h2 id="5"> Docent</h2>
+        <p>Een Docent geeft één of meerdere vakken.</p>
+        <div class="image-container">
+          <img src="./4084156979.svg" />
+        </div>
+        <h2 id="8"> Student</h2>
+        <p>Een Student (Leerling) heeft één of meerdere vakken</p>
+        <div class="image-container">
+          <img src="./2789743629.svg" />
         </div>
         <h1>ERD</h1>
         <div class="image-container">
@@ -75,6 +91,19 @@
               </td>
               <td></td>
             </tr>
+            <tr>
+              <td>Docenten</td>
+              <td>List Docent</td>
+              <td>
+                <div>
+                  <b>min</b>: 7
+                </div>
+                <div>
+                  <b>max</b>: 25
+                </div>
+              </td>
+              <td></td>
+            </tr>
           </tbody>
         </table>
         <table>
@@ -106,6 +135,19 @@
                 </div>
                 <div>
                   <b>max</b>: 100
+                </div>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>HeeftVakken</td>
+              <td>List Vak</td>
+              <td>
+                <div>
+                  <b>min</b>: 7
+                </div>
+                <div>
+                  <b>max</b>: 13
                 </div>
               </td>
               <td></td>
@@ -173,6 +215,19 @@
                 </div>
                 <div>
                   <b>max</b>: 100
+                </div>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>BevoegdVoor</td>
+              <td>List Vak</td>
+              <td>
+                <div>
+                  <b>min</b>: 1
+                </div>
+                <div>
+                  <b>max</b>: 20
                 </div>
               </td>
               <td></td>
@@ -309,6 +364,47 @@
                   <b>max</b>: 100
                 </div>
               </td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+        <table>
+          <thead>
+            <tr>
+              <th colSpan="4">
+                <h2>Vak</h2>
+              </th>
+            </tr>
+            <tr>
+              <th colSpan="4">
+        No description
+      </th>
+            </tr>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Restrictions</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Naam</td>
+              <td>String </td>
+              <td>
+                <div>
+                  <b>min</b>: 1
+                </div>
+                <div>
+                  <b>max</b>: 100
+                </div>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>IsBelangrijk</td>
+              <td>Boolean </td>
+              <td></td>
               <td></td>
             </tr>
           </tbody>

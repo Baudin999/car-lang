@@ -4,7 +4,8 @@
     "description": "klas",
     "type": "object",
     "required": [
-        "Student"
+        "Student",
+        "Docent"
     ],
     "properties": {
         "Studenten": {
@@ -13,9 +14,35 @@
             "items": {
                 "$ref": "#/definitions/Student"
             }
+        },
+        "Docenten": {
+            "type": "array",
+            "description": "",
+            "items": {
+                "$ref": "#/definitions/Docent"
+            }
         }
     },
     "definitions": {
+        "Vak": {
+            "$id": "#/Vak",
+            "type": "object",
+            "properties": {
+                "Naam": {
+                    "type": "string",
+                    "description": ""
+                },
+                "IsBelangrijk": {
+                    "type": "boolean",
+                    "description": ""
+                }
+            },
+            "description": "",
+            "required": [
+                "Naam",
+                "IsBelangrijk"
+            ]
+        },
         "Adres": {
             "$id": "#/Adres",
             "type": "object",
@@ -43,6 +70,13 @@
                     "type": "string",
                     "description": ""
                 },
+                "HeeftVakken": {
+                    "type": "array",
+                    "description": "",
+                    "items": {
+                        "$ref": "#/definitions/Vak"
+                    }
+                },
                 "Voornaam": {
                     "type": "string",
                     "description": ""
@@ -59,6 +93,44 @@
             "description": "",
             "required": [
                 "Nummer",
+                "HeeftVakken",
+                "Voornaam",
+                "Achternaam",
+                "ActiefAdres"
+            ]
+        },
+        "Docent": {
+            "$id": "#/Docent",
+            "type": "object",
+            "properties": {
+                "DocentenNummer": {
+                    "type": "string",
+                    "description": ""
+                },
+                "BevoegdVoor": {
+                    "type": "array",
+                    "description": "",
+                    "items": {
+                        "$ref": "#/definitions/Vak"
+                    }
+                },
+                "Voornaam": {
+                    "type": "string",
+                    "description": ""
+                },
+                "Achternaam": {
+                    "type": "string",
+                    "description": ""
+                },
+                "ActiefAdres": {
+                    "$ref": "#/definitions/Adres",
+                    "description": ""
+                }
+            },
+            "description": "",
+            "required": [
+                "DocentenNummer",
+                "BevoegdVoor",
                 "Voornaam",
                 "Achternaam",
                 "ActiefAdres"

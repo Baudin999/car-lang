@@ -14,9 +14,18 @@
       </xsd:sequence>
     </xsd:complexType>
   </xsd:element>
+  <xsd:element name="Klas_Docenten" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element type="self:Docent" name="foo" minOccurs="0" maxOccurs="100" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
   <xsd:complexType name="Klas">
     <xsd:all>
       <xsd:element ref="self:Klas_Studenten" minOccurs="1" />
+      <xsd:element ref="self:Klas_Docenten" minOccurs="1" />
     </xsd:all>
   </xsd:complexType>
   <xsd:element name="Student_Nummer" nillable="false">
@@ -27,6 +36,14 @@
         <xsd:maxLength value="100" />
       </xsd:restriction>
     </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Student_HeeftVakken" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element type="self:Vak" name="foo" minOccurs="0" maxOccurs="100" />
+      </xsd:sequence>
+    </xsd:complexType>
   </xsd:element>
   <xsd:element name="Student_Voornaam" nillable="false">
     <xsd:annotation></xsd:annotation>
@@ -52,6 +69,7 @@
   <xsd:complexType name="Student">
     <xsd:all>
       <xsd:element ref="self:Student_Nummer" minOccurs="1" />
+      <xsd:element ref="self:Student_HeeftVakken" minOccurs="1" />
       <xsd:element ref="self:Student_Voornaam" minOccurs="1" />
       <xsd:element ref="self:Student_Achternaam" minOccurs="1" />
       <xsd:element ref="self:Student_ActiefAdres" minOccurs="1" />
@@ -65,6 +83,14 @@
         <xsd:maxLength value="100" />
       </xsd:restriction>
     </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Docent_BevoegdVoor" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element type="self:Vak" name="foo" minOccurs="0" maxOccurs="100" />
+      </xsd:sequence>
+    </xsd:complexType>
   </xsd:element>
   <xsd:element name="Docent_Voornaam" nillable="false">
     <xsd:annotation></xsd:annotation>
@@ -90,6 +116,7 @@
   <xsd:complexType name="Docent">
     <xsd:all>
       <xsd:element ref="self:Docent_DocentenNummer" minOccurs="1" />
+      <xsd:element ref="self:Docent_BevoegdVoor" minOccurs="1" />
       <xsd:element ref="self:Docent_Voornaam" minOccurs="1" />
       <xsd:element ref="self:Docent_Achternaam" minOccurs="1" />
       <xsd:element ref="self:Docent_ActiefAdres" minOccurs="1" />
@@ -145,6 +172,27 @@
     <xsd:all>
       <xsd:element ref="self:Adres_Straat" minOccurs="1" />
       <xsd:element ref="self:Adres_Huisnummer" minOccurs="1" />
+    </xsd:all>
+  </xsd:complexType>
+  <xsd:element name="Vak_Naam" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Vak_IsBelangrijk" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:boolean"></xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:complexType name="Vak">
+    <xsd:all>
+      <xsd:element ref="self:Vak_Naam" minOccurs="1" />
+      <xsd:element ref="self:Vak_IsBelangrijk" minOccurs="1" />
     </xsd:all>
   </xsd:complexType>
 </xsd:schema>
