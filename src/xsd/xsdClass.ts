@@ -18,8 +18,21 @@ export class XsdClass {
       })
     ).join("\n");
 
+    let annotations = this.node.annotations
+      .map(a => {
+        if (a.key === "description") {
+          return `<xsd:documentation>${a.value}</xsd:documentation>`;
+        } else {
+          return `<xsd:appinfo><key>${a.key}</key><value>${a.value}</value></xsd:appinfo>`;
+        }
+      })
+      .join("\n");
+
     return `
     <xsd:complexType name="${this.node.id}">
+        <xsd:annotation>
+          ${annotations}
+        </xsd:annotation>
         <xsd:all>
         ${fields}
         </xsd:all>
