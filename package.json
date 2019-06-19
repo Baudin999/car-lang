@@ -18,7 +18,8 @@
     "move": "cp ./lib/car-lang-macos /usr/local/bin/ckc",
     "clean": "rm -rf ./dist; rm -rf ./lib",
     "go": "yarn clean; yarn build; yarn railroad; yarn package; yarn move",
-    "open": "ts-node ./src/ckc.ts -p ./Examples -o"
+    "open": "ts-node ./src/ckc.ts -p ./Examples -o",
+    "ci:build": "yarn clean; yarn build; yarn railroad; yarn package"
   },
   "dependencies": {
     "@types/jest": "^24.0.11",
