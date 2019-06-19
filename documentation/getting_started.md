@@ -2,7 +2,7 @@
 
 This document will describe how to get started with ZDragon
 
-## Download teh Compiler
+## Download the Compiler
 
 - [osx](https://github.com/Baudin999/car-lang/releases/download/v0.1.1-beta/ckc)
 - [Windows](https://github.com/Baudin999/car-lang/releases/download/v0.1.1-beta/ckc.exe)

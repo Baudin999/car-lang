@@ -1,3 +1,5 @@
+[read the docs](https://baudin999.github.io/car-lang/)
+
 # ZDragon
 
 ZDragon is the toolset around the `CAR` language. The `CAR language is a descriptive languages, not
