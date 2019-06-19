@@ -24,4 +24,4 @@ tutorial on how to do that [here](https://www.computerhope.com/issues/ch000549.h
 Now that you've downloaded the compiler and set up your local path variable so that you can call the
 compiler from every location we can start building our first project.
 
-![Getting Started Video](https://github.com/Baudin999/car-lang/blob/master/documentation/getting_started.mp4?raw=true)
+![Getting Started Video](https://www.youtube.com/watch?v=fNRTuN14tyc&feature=youtu.be)
