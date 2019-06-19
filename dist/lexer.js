@@ -238,7 +238,7 @@ const MarkdownImageLiteral = chevrotain_1.createToken({
 });
 const MarkdownCodeLiteral = chevrotain_1.createToken({
     name: "MarkdownCodeLiteral",
-    pattern: /(`{3})([^`]*)(`{3})(?= *\n)/
+    pattern: /(`{3})([^`{3}]*)(`{3})(?= *\n)/
 });
 const MarkdownChapterLiteral = chevrotain_1.createToken({
     name: "MarkdownChapterLiteral",

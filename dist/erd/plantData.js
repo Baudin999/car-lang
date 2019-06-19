@@ -17,7 +17,7 @@ class PlantData {
     associations() {
         return this.node.options
             .filter(field => this.lookupValues.indexOf(field.id) > -1)
-            .map((field) => `${field.id} --> ${this.node.id} : ${field.id}`)
+            .map((field) => `${field.id} --* ${this.node.id} : ${field.id}`)
             .join("\n");
     }
     annotations() {

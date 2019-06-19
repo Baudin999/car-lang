@@ -25,10 +25,19 @@ exports.createHTML = (ast, modulePath, svgs, moduleName) => {
     let chapters = [];
     // We will remove the hashes
     svgs.hashes = [];
+    let jsonSchemas = [];
     const transformedNodes = ast
         .filter((node) => !!!node.ignore)
         .filter(node => node.type)
         .map((node, index) => {
+        // test to see if the node is an API
+        (() => {
+            let _node = node;
+            let isAPI = !!(_node.annotations || []).find(a => a.key === "api");
+            if (isAPI) {
+                jsonSchemas.push(`${_node.id}.json`);
+            }
+        })();
         if (node.type === outline_1.NodeType.MARKDOWN_CHAPTER) {
             let chapter = node;
             if (chapter.depth === 1) {
@@ -68,7 +77,8 @@ exports.createHTML = (ast, modulePath, svgs, moduleName) => {
         }
         else if (node.type === outline_1.NodeType.MARKDOWN_CODE) {
             let code = node;
-            return `<pre><code>${code.content}</code></pre>`;
+            console.log(code);
+            return `<pre><code class="${code.lang || "hs"}">\n${code.source}\n</code></pre>`;
         }
         else if (node.type === outline_1.NodeType.TYPE) {
             tables.push(tableTYPE_1.createTableTYPE(node));
@@ -127,9 +137,13 @@ exports.createHTML = (ast, modulePath, svgs, moduleName) => {
     <title></title>
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
     <link rel="stylesheet" href="./../style.css">
-    <style>${highlightStyle}</style>
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/highlight.min.js"></script>
   </head>
   <body>
+
+      <a href="./../index.html">Index</a>
 
     <h1>Index</h1>
     <ul>
@@ -145,7 +159,7 @@ exports.createHTML = (ast, modulePath, svgs, moduleName) => {
     <h1>Links</h1>
     <ul>
         <li><a href="${moduleName}.xsd">XSD</a></li>
-        <li><a href="${moduleName}.json">JSON schema</a></li>
+        ${jsonSchemas.map(s => `<li><a href="./${s}">${s}</a></li>`).join("\n")}
         <li><a href="${moduleName}.svg">ERD</a></li>
     </ul>
 
@@ -154,6 +168,8 @@ exports.createHTML = (ast, modulePath, svgs, moduleName) => {
     ${moduleName ? `<div class="image-container"><img src="${moduleName}.svg" /></div>` : ""}
     <h1>Appendix: Entities</h1>
     ${helpers_1.purge(tables).join("\n")}
+
+    <script>hljs.initHighlightingOnLoad();</script>
   </body>
 </html>
   `)

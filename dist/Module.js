@@ -114,7 +114,7 @@ class Module {
             //
             const schemas = createJsonSchema_1.createJsonSchema(this.ast);
             schemas.map(schema => {
-                const schemaPath = path_1.join(modulePath, this.name + "_" + schema.name + ".json");
+                const schemaPath = path_1.join(modulePath, schema.name + ".json");
                 fs_extra_1.outputFile(schemaPath, JSON.stringify(schema.schema, null, 4));
             });
             //

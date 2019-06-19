@@ -5,6 +5,10 @@ type Person =
     Name: String
 ```
 
+```xml
+<root></root>
+```
+
 
 type Person =
     Name: String

@@ -26,7 +26,7 @@ data FooBar =
   } as any);
 
   if (errors && errors.length > 0) log(errors);
-  console.log(xsd);
+  //console.log(xsd);
 
   it("Should not contain errors", () => {
     expect(errors.length).toEqual(0);

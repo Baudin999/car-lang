@@ -588,12 +588,16 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
   MARKDOWN_CODE(ctx: any): IMarkdownCode {
     const pattern = /(`{3})(\w*(?=\n))?([^`]*)(`{3})/;
     const segments = pattern.exec(ctx.MarkdownCodeLiteral[0].image) || [];
+    const source = (segments[3] || "")
+      .trim()
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
 
     return {
       type: NodeType.MARKDOWN_CODE,
       content: ctx.MarkdownCodeLiteral[0].image,
       lang: segments[2],
-      source: (segments[3] || "").trim()
+      source: source
     };
   }
 
