@@ -1,4 +1,10 @@
-[read the docs](https://baudin999.github.io/car-lang/)
+[read the docs](zdragon.nl)
+
+# Downloads
+
+- [osx](https://github.com/Baudin999/car-lang/releases/download/v0.1.1-beta/ckc)
+- [Windows](https://github.com/Baudin999/car-lang/releases/download/v0.1.1-beta/ckc.exe)
+- [Linux](https://github.com/Baudin999/car-lang/releases/download/v0.1.1-beta/ckc-linux)
 
 # ZDragon
 
