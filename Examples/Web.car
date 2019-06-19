@@ -1,0 +1,24 @@
+# Web Example
+
+type Response a =
+    Body: a
+
+type Customer =
+    Name: String
+    Number: String
+
+alias CustomerResponse = Response Customer
+
+type Error =
+    Code: String
+    Message: String
+
+type NotFound extends Error
+
+type OtherError extends Error
+
+
+data ApiResponse =
+    | CustomerResponse
+    | NotFound
+    | OtherError

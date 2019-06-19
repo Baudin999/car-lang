@@ -1,6 +1,6 @@
 
 /*
-GENERATED ON: 1560926900071
+GENERATED ON: 1560926900078
 */ 
 
 
@@ -21,19 +21,8 @@ class Nothing<T> {}
 // IMPLEMENTATION
 
 
-interface IHuman {
-    FirstName: Maybe<string>;
-    LastName: string;
-    MiddleNames: string[];
-    DateOfBirth: Date;
-}
-  
-
-
 interface IPerson {
-    FuurstName: Maybe<string>;
-    LastName: string;
-    CallingName: string;
+    Name: string;
 }
   
     

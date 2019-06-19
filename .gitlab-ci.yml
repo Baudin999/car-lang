@@ -1,0 +1,50 @@
+image: node:8-alpine
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  policy: pull
+  paths:
+    - node_modules/
+
+stages:
+  - preparation
+  - test
+  - build
+  - release
+
+.yarn_before_script:
+  before_script:
+    - ./ci_scripts/gitlab/before-script.sh
+
+install_node_modules:
+  extends: .yarn_before_script
+  stage: preparation
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    policy: pull-push
+    paths:
+      - node_modules/
+  script:
+    - ./ci_scripts/gitlab/before-script.sh
+
+run_unit_test:
+  extends: .yarn_before_script
+  stage: test
+  tags:
+    - shared
+  script:
+    - ./ci_scripts/gitlab/run-unit-tests.sh
+  artifacts:
+    reports:
+      junit: ./reports/junit_jest.xml
+
+build_lib:
+  extends: .yarn_before_script
+  stage: build
+  artifacts:
+    paths:
+      - lib/
+  tags:
+    - shared
+  script:
+    - ./ci_scripts/gitlab/build-lib.sh

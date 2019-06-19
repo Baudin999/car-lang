@@ -98,7 +98,8 @@ export const createHTML = (
         return `<ul>${list_items}</ul>`;
       } else if (node.type === NodeType.MARKDOWN_CODE) {
         let code = node as IMarkdownCode;
-        return `<pre><code>${code.content}</code></pre>`;
+        console.log(code);
+        return `<pre><code class="${code.lang || "hs"}">\n${code.source}\n</code></pre>`;
       } else if (node.type === NodeType.TYPE) {
         tables.push(createTableTYPE(node as IType));
       } else if (node.type === NodeType.DATA) {
@@ -153,7 +154,9 @@ export const createHTML = (
     <title></title>
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
     <link rel="stylesheet" href="./../style.css">
-    <style>${highlightStyle}</style>
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/highlight.min.js"></script>
   </head>
   <body>
 
@@ -182,6 +185,8 @@ export const createHTML = (
     ${moduleName ? `<div class="image-container"><img src="${moduleName}.svg" /></div>` : ""}
     <h1>Appendix: Entities</h1>
     ${purge(tables).join("\n")}
+
+    <script>hljs.initHighlightingOnLoad();</script>
   </body>
 </html>
   `

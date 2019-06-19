@@ -285,7 +285,7 @@ const MarkdownImageLiteral = createToken({
 
 const MarkdownCodeLiteral = createToken({
   name: "MarkdownCodeLiteral",
-  pattern: /(`{3})([^`]*)(`{3})(?= *\n)/
+  pattern: /(`{3})([^`{3}]*)(`{3})(?= *\n)/
 });
 
 const MarkdownChapterLiteral = createToken({

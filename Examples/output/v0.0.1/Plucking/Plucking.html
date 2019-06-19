@@ -3,177 +3,180 @@
     <title></title>
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
       <link rel="stylesheet" href="./../style.css">
-        <style></style>
-      </head>
-      <body>
-        <a href="./../index.html">Index</a>
-        <h1>Index</h1>
-        <ul></ul>
-        <h1>Links</h1>
-        <ul>
-          <li>
-            <a href="Plucking.xsd">XSD</a>
-          </li>
-          <li>
-            <a href="Plucking.svg">ERD</a>
-          </li>
-        </ul>
-        <h1>ERD</h1>
-        <div class="image-container">
-          <img src="Plucking.svg" />
-        </div>
-        <h1>Appendix: Entities</h1>
-        <table>
-          <thead>
-            <tr>
-              <th colSpan="4">
-                <h2>Human</h2>
-              </th>
-            </tr>
-            <tr>
-              <th colSpan="4">
+        <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/styles/default.min.css">
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/highlight.min.js"></script>
+        </head>
+        <body>
+          <a href="./../index.html">Index</a>
+          <h1>Index</h1>
+          <ul></ul>
+          <h1>Links</h1>
+          <ul>
+            <li>
+              <a href="Plucking.xsd">XSD</a>
+            </li>
+            <li>
+              <a href="Plucking.svg">ERD</a>
+            </li>
+          </ul>
+          <h1>ERD</h1>
+          <div class="image-container">
+            <img src="Plucking.svg" />
+          </div>
+          <h1>Appendix: Entities</h1>
+          <table>
+            <thead>
+              <tr>
+                <th colSpan="4">
+                  <h2>Human</h2>
+                </th>
+              </tr>
+              <tr>
+                <th colSpan="4">
         No description
       </th>
-            </tr>
-            <tr>
-              <th>Name</th>
-              <th>Type</th>
-              <th>Restrictions</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>FirstName</td>
-              <td>Maybe String</td>
-              <td>
-                <div>
-                  <b>min</b>: 12
-                </div>
-                <div>
-                  <b>max</b>: 90
-                </div>
-                <div>
-                  <b>other</b>: "foo"
-                </div>
-              </td>
-              <td></td>
-            </tr>
-            <tr>
-              <td>LastName</td>
-              <td>String </td>
-              <td>
-                <div>
-                  <b>max</b>: 90
-                </div>
-                <div>
-                  <b>min</b>: 1
-                </div>
-              </td>
-              <td>
-                <div>
-                  <b>description</b>: Original Description
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>MiddleNames</td>
-              <td>List String</td>
-              <td>
-                <div>
-                  <b>min</b>: 1
-                </div>
-                <div>
-                  <b>max</b>: 100
-                </div>
-              </td>
-              <td></td>
-            </tr>
-            <tr>
-              <td>DateOfBirth</td>
-              <td>Date </td>
-              <td></td>
-              <td></td>
-            </tr>
-          </tbody>
-        </table>
-        <table>
-          <thead>
-            <tr>
-              <th colSpan="4">
-                <h2>Person</h2>
-              </th>
-            </tr>
-            <tr>
-              <th colSpan="4">
+              </tr>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Restrictions</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>FirstName</td>
+                <td>Maybe String</td>
+                <td>
+                  <div>
+                    <b>min</b>: 12
+                  </div>
+                  <div>
+                    <b>max</b>: 90
+                  </div>
+                  <div>
+                    <b>other</b>: "foo"
+                  </div>
+                </td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>LastName</td>
+                <td>String </td>
+                <td>
+                  <div>
+                    <b>max</b>: 90
+                  </div>
+                  <div>
+                    <b>min</b>: 1
+                  </div>
+                </td>
+                <td>
+                  <div>
+                    <b>description</b>: Original Description
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>MiddleNames</td>
+                <td>List String</td>
+                <td>
+                  <div>
+                    <b>min</b>: 1
+                  </div>
+                  <div>
+                    <b>max</b>: 100
+                  </div>
+                </td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>DateOfBirth</td>
+                <td>Date </td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+          <table>
+            <thead>
+              <tr>
+                <th colSpan="4">
+                  <h2>Person</h2>
+                </th>
+              </tr>
+              <tr>
+                <th colSpan="4">
         No description
       </th>
-            </tr>
-            <tr>
-              <th>Name</th>
-              <th>Type</th>
-              <th>Restrictions</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>FuurstName</td>
-              <td>Maybe String</td>
-              <td>
-                <div>
-                  <b>min</b>: 12
-                </div>
-                <div>
-                  <b>max</b>: 90
-                </div>
-                <div>
-                  <b>other</b>: "foo"
-                </div>
-              </td>
-              <td>
-                <div>
-                  <b>description</b>: This is an annotation for the FuurstName The FuurstName comes from the "Human" type
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>LastName</td>
-              <td>String </td>
-              <td>
-                <div>
-                  <b>max</b>: 90
-                </div>
-                <div>
-                  <b>min</b>: 1
-                </div>
-              </td>
-              <td>
-                <div>
-                  <b>original description</b>: Original Description
-                </div>
-                <div>
-                  <b>plucked from</b>: Human.LastName
-                </div>
-                <div>
-                  <b>description</b>: Maybe we'd like to add more description to this field...
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>CallingName</td>
-              <td>String </td>
-              <td>
-                <div>
-                  <b>min</b>: 1
-                </div>
-                <div>
-                  <b>max</b>: 100
-                </div>
-              </td>
-              <td></td>
-            </tr>
-          </tbody>
-        </table>
-      </body>
-    </html>
+              </tr>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Restrictions</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>FuurstName</td>
+                <td>Maybe String</td>
+                <td>
+                  <div>
+                    <b>min</b>: 12
+                  </div>
+                  <div>
+                    <b>max</b>: 90
+                  </div>
+                  <div>
+                    <b>other</b>: "foo"
+                  </div>
+                </td>
+                <td>
+                  <div>
+                    <b>description</b>: This is an annotation for the FuurstName The FuurstName comes from the "Human" type
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>LastName</td>
+                <td>String </td>
+                <td>
+                  <div>
+                    <b>max</b>: 90
+                  </div>
+                  <div>
+                    <b>min</b>: 1
+                  </div>
+                </td>
+                <td>
+                  <div>
+                    <b>original description</b>: Original Description
+                  </div>
+                  <div>
+                    <b>plucked from</b>: Human.LastName
+                  </div>
+                  <div>
+                    <b>description</b>: Maybe we'd like to add more description to this field...
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>CallingName</td>
+                <td>String </td>
+                <td>
+                  <div>
+                    <b>min</b>: 1
+                  </div>
+                  <div>
+                    <b>max</b>: 100
+                  </div>
+                </td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+          <script>hljs.initHighlightingOnLoad();</script>
+        </body>
+      </html>

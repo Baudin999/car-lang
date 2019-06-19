@@ -1,0 +1,10 @@
+# Basic Types
+
+```
+type Person =
+    Name: String
+```
+
+
+type Person =
+    Name: String
