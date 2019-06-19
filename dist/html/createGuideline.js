@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const outline_1 = require("../outline");
 const helpers_1 = require("../helpers");
-const hljs = require("highlightjs");
 exports.createGuideline = (guideline) => {
     const html = helpers_1.purge((guideline.markdown || []).map((node, index) => {
         if (node.type === outline_1.NodeType.MARKDOWN_CHAPTER) {
@@ -24,8 +23,7 @@ exports.createGuideline = (guideline) => {
         }
         else if (node.type === outline_1.NodeType.MARKDOWN_CODE) {
             let code = node;
-            let result = hljs.highlight(code.lang, code.source);
-            return `<pre><code class="${code.lang}">${result.value}</code></pre>`;
+            return `<pre><code class="${code.lang}">${code.source}</code></pre>`;
         }
         else {
             return null;

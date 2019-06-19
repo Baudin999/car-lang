@@ -8,7 +8,6 @@ import {
   IMarkdownCode
 } from "../outline";
 import { purge } from "../helpers";
-import * as hljs from "highlightjs";
 
 export const createGuideline = (guideline: IGuideline) => {
   const html = purge(
@@ -28,8 +27,7 @@ export const createGuideline = (guideline: IGuideline) => {
         return `<ul>${list_items}</ul>`;
       } else if (node.type === NodeType.MARKDOWN_CODE) {
         let code = node as IMarkdownCode;
-        let result = hljs.highlight(code.lang, code.source);
-        return `<pre><code class="${code.lang}">${result.value}</code></pre>`;
+        return `<pre><code class="${code.lang}">${code.source}</code></pre>`;
       } else {
         return null;
       }
