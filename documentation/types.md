@@ -8,6 +8,8 @@ type Person =
     LastName: String
 ```
 
+<iframe width="560" height="315" src="https://youtu.be/WrRYmbP6WM8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 As you can see we can extract the following rules:
 
 1.  Types always start with a capital letter.
@@ -41,6 +43,8 @@ alias Money = Number
 This will indicate that the `Money` type can now be used and will have validation on it specifying
 that we would need at least and no more than 2 decimal numbers.
 
+<iframe width="560" height="315" src="https://youtu.be/iMmXbOM-Ues" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 Every language which can create a description of data should also be able to represent some sort of
 selection list, an enumeration of sorts. In the `car` language this is called a `choice`. Defining a
 `choice` is really straight forward. A `choice` can either be string literals or number literal.
@@ -65,6 +69,10 @@ The `data` type is also called an
 goes to the Haskell description of what ADTs are. Haskell has been the main influence when it came
 to the `data` type in the `car` language and because of this I've also called it `data`. It is an
 option type. Your type is defined in terms of other types.
+
+<iframe width="560" height="315" src="https://youtu.be/kQc2ejk9YWE" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+> Sorry: Something went wrong with the video, will upload a new one about data types and choices
 
 A lot of times in software we'll need a recursive data type, in our case we would use the `data`
 keyword. Imagine having to model the filesystem:
