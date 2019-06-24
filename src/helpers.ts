@@ -1,6 +1,7 @@
 import * as fetch from "node-fetch";
 import { IRestriction, IExpression, IError } from "./outline";
 import { IToken } from "chevrotain";
+import { readFile } from "fs";
 
 /**
  *
@@ -51,6 +52,11 @@ export interface IModule {
   ast: IExpression[];
 
   /**
+   * The CST as outputted by the chevrotain parser.
+   */
+  cst: any[];
+
+  /**
    * The actual AST the source code transpiles to.
    */
   tokens: IToken[];
@@ -65,7 +71,21 @@ export interface IModule {
    */
   timestamp: Date;
 
+  /**
+   * The ERD URL
+   */
   erdURL?: string;
+
+  fullPath: string;
+  source: string;
+  outPath: string;
+  config: IConfiguration;
+
+  parse: () => IModule;
+
+  link: (modules: IModule[]) => Promise<IModule>;
+
+  update: (source?: string) => Promise<IModule>;
 }
 
 export interface IModuleDictionary {
@@ -86,6 +106,17 @@ export const clone = (source: any, template?: any) => {
   } else {
     return JSON.parse(JSON.stringify(source));
   }
+};
+
+export const readFileAsync = (filePath, parse) => {
+  return new Promise(function(resolve, reject) {
+    readFile(filePath, "utf8", (err, source) => {
+      if (err) reject(err);
+      else {
+        resolve(parse ? JSON.parse(source) : source);
+      }
+    });
+  });
 };
 
 /**

@@ -14,7 +14,7 @@ const getNodeById = (ast, params = [], id) => {
 };
 exports.substituteAliases = (ast = []) => {
     const errors = [];
-    const newAST = ast.map((node) => {
+    const _ast = ast.map((node) => {
         if (node.type !== outline_1.NodeType.ALIAS)
             return node;
         else if (helpers_1.baseTypes.indexOf(node.ofType) > -1) {
@@ -79,12 +79,12 @@ exports.substituteAliases = (ast = []) => {
             return _node;
         }
     });
-    return { newAST: helpers_1.purge(newAST), errors };
+    return { ast: helpers_1.purge(_ast), errors };
 };
 exports.substitutePluckedFields = (ast = []) => {
     const errors = [];
     if (!Array.isArray(ast))
-        return { newAST: [], errors: [] };
+        return { ast: [], errors: [] };
     const newAST = ast.map((node) => {
         if (node.type !== outline_1.NodeType.TYPE)
             return node;
@@ -158,7 +158,7 @@ exports.substitutePluckedFields = (ast = []) => {
             return newNode;
         }
     });
-    return { newAST, errors };
+    return { ast, errors };
 };
 exports.substituteExtensions = (ast = []) => {
     const errors = [];
@@ -190,6 +190,6 @@ exports.substituteExtensions = (ast = []) => {
             return newNode;
         }
     });
-    return { newAST, errors };
+    return { ast: newAST, errors };
 };
 //# sourceMappingURL=substitute.js.map

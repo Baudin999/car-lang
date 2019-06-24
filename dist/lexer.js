@@ -8,7 +8,7 @@ exports.EndBlock = chevrotain_1.createToken({
 });
 const CommentBlock = chevrotain_1.createToken({
     name: "CommentBlock",
-    pattern: /({\*)[^*}]*(\*})(?= *\n)/
+    pattern: /\w*({\*)[^}]*(\*})/
 });
 const KW_type = chevrotain_1.createToken({
     pattern: /type/,
@@ -257,6 +257,7 @@ const MarkdownParagraphLiteral = chevrotain_1.createToken({
 const multiModeLexerDefinition = {
     modes: {
         root: [
+            CommentBlock,
             KW_type,
             KW_alias,
             KW_data,
@@ -271,25 +272,27 @@ const multiModeLexerDefinition = {
             SIGN_close,
             AnnotationLiteral,
             exports.EndBlock,
-            CommentBlock,
             MarkdownChapterLiteral,
             MarkdownCodeLiteral,
             MarkdownImageLiteral,
             MarkdownListLiteral,
-            MarkdownParagraphLiteral
+            MarkdownParagraphLiteral,
+            NewLine,
+            WhiteSpace
         ],
         type_definition: [
+            CommentBlock,
+            exports.EndBlock,
             KW_extends,
             AnnotationLiteral,
             SIGN_EqualsType,
             GenericParameter,
             GenericIdentifier,
             Identifier,
-            exports.EndBlock,
-            WhiteSpace,
-            CommentBlock
+            WhiteSpace
         ],
         type_field_definition: [
+            CommentBlock,
             exports.EndBlock,
             AnnotationLiteral,
             Indent,
@@ -307,10 +310,10 @@ const multiModeLexerDefinition = {
             PatternLiteral,
             Identifier,
             NewLine,
-            WhiteSpace,
-            CommentBlock
+            WhiteSpace
         ],
         alias_definition: [
+            CommentBlock,
             exports.EndBlock,
             Indent,
             AnnotationLiteral,
@@ -324,19 +327,19 @@ const multiModeLexerDefinition = {
             PatternLiteral,
             Identifier,
             NewLine,
-            WhiteSpace,
-            CommentBlock
+            WhiteSpace
         ],
         data_definition: [
+            CommentBlock,
             SIGN_EqualsData,
             GenericParameter,
             GenericIdentifier,
             Identifier,
             exports.EndBlock,
-            WhiteSpace,
-            CommentBlock
+            WhiteSpace
         ],
         data_field_definition: [
+            CommentBlock,
             exports.EndBlock,
             AnnotationLiteral,
             SIGN_Or,
@@ -346,10 +349,10 @@ const multiModeLexerDefinition = {
             NewLine,
             Indent,
             exports.EndBlock,
-            WhiteSpace,
-            CommentBlock
+            WhiteSpace
         ],
         view_definition: [
+            CommentBlock,
             exports.EndBlock,
             StringLiteral,
             KW_as,
@@ -361,10 +364,10 @@ const multiModeLexerDefinition = {
             NewLine,
             Indent,
             exports.EndBlock,
-            WhiteSpace,
-            CommentBlock
+            WhiteSpace
         ],
         choice_definition: [
+            CommentBlock,
             exports.EndBlock,
             AnnotationLiteral,
             SIGN_Or,
@@ -374,8 +377,7 @@ const multiModeLexerDefinition = {
             StringLiteral,
             NumberLiteral,
             NewLine,
-            WhiteSpace,
-            CommentBlock
+            WhiteSpace
         ],
         open_definition: [
             Identifier,
@@ -383,7 +385,9 @@ const multiModeLexerDefinition = {
             SIGN_dot,
             SIGN_collectionOpen,
             SIGN_collectionSeparator,
-            SIGN_collectionClose
+            SIGN_collectionClose,
+            WhiteSpace,
+            NewLine
         ],
         aggregate_definition: [
             KW_type,

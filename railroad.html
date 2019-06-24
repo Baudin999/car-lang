@@ -60,7 +60,7 @@
                 "name": "CommentBlock",
                 "label": "CommentBlock",
                 "idx": 0,
-                "pattern": "({\\*)[^*}]*(\\*})(?= *\\n)"
+                "pattern": "\\w*({\\*)[^}]*(\\*})"
               }
             ]
           },
@@ -320,7 +320,7 @@
   {
     "type": "Rule",
     "name": "TYPE",
-    "orgText": "() => {\n            $.CONSUME(lexer_1.tokenLookup.KW_type);\n            $.SUBRULE($.IDENTIFIER);\n            $.OPTION(() => {\n                $.CONSUME(lexer_1.tokenLookup.KW_extends);\n                $.AT_LEAST_ONE1(() => $.CONSUME1(lexer_1.tokenLookup.Identifier));\n            });\n            $.OPTION1(() => {\n                $.CONSUME(lexer_1.tokenLookup.SIGN_EqualsType);\n                $.AT_LEAST_ONE2({\n                    DEF: () => $.SUBRULE($.TYPE_FIELD)\n                });\n            });\n        }",
+    "orgText": "() => {\n            $.CONSUME(lexer_1.tokenLookup.KW_type);\n            $.SUBRULE($.IDENTIFIER);\n            $.OPTION1(() => {\n                $.CONSUME(lexer_1.tokenLookup.KW_extends);\n                $.AT_LEAST_ONE1(() => $.CONSUME1(lexer_1.tokenLookup.Identifier));\n            });\n            $.OPTION2(() => {\n                $.CONSUME(lexer_1.tokenLookup.SIGN_EqualsType);\n                $.AT_LEAST_ONE2({\n                    DEF: () => $.OR([{ ALT: () => $.SUBRULE($.COMMENT) }, { ALT: () => $.SUBRULE($.TYPE_FIELD) }])\n                });\n            });\n        }",
     "definition": [
       {
         "type": "Terminal",
@@ -336,7 +336,7 @@
       },
       {
         "type": "Option",
-        "idx": 0,
+        "idx": 1,
         "definition": [
           {
             "type": "Terminal",
@@ -362,7 +362,7 @@
       },
       {
         "type": "Option",
-        "idx": 1,
+        "idx": 2,
         "definition": [
           {
             "type": "Terminal",
@@ -376,9 +376,30 @@
             "idx": 2,
             "definition": [
               {
-                "type": "NonTerminal",
-                "name": "TYPE_FIELD",
-                "idx": 0
+                "type": "Alternation",
+                "idx": 0,
+                "definition": [
+                  {
+                    "type": "Flat",
+                    "definition": [
+                      {
+                        "type": "NonTerminal",
+                        "name": "COMMENT",
+                        "idx": 0
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Flat",
+                    "definition": [
+                      {
+                        "type": "NonTerminal",
+                        "name": "TYPE_FIELD",
+                        "idx": 0
+                      }
+                    ]
+                  }
+                ]
               }
             ]
           }
@@ -899,6 +920,33 @@
         "label": "SIGN_close",
         "idx": 0,
         "pattern": "}"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "COMMENT",
+    "orgText": "() => {\n            $.OPTION(() => $.CONSUME(lexer_1.tokenLookup.Indent));\n            $.CONSUME(lexer_1.tokenLookup.CommentBlock);\n        }",
+    "definition": [
+      {
+        "type": "Option",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Terminal",
+            "name": "Indent",
+            "label": "Indent",
+            "idx": 0,
+            "pattern": "( {4})|\\t"
+          }
+        ]
+      },
+      {
+        "type": "Terminal",
+        "name": "CommentBlock",
+        "label": "CommentBlock",
+        "idx": 0,
+        "pattern": "\\w*({\\*)[^}]*(\\*})"
       }
     ]
   },
@@ -1614,12 +1662,20 @@
   {
     "type": "Rule",
     "name": "MAP_FLOW",
-    "orgText": "() => {\n            $.OPTION(() => lexer_1.tokenLookup.Indent);\n            $.AT_LEAST_ONE_SEP({\n                SEP: lexer_1.tokenLookup.SIGN_arrow,\n                DEF: () => {\n                    $.SUBRULE($.MAP_FLOW_KEY);\n                }\n            });\n        }",
+    "orgText": "() => {\n            $.OPTION(() => $.CONSUME(lexer_1.tokenLookup.Indent));\n            $.AT_LEAST_ONE_SEP({\n                SEP: lexer_1.tokenLookup.SIGN_arrow,\n                DEF: () => {\n                    $.SUBRULE($.MAP_FLOW_KEY);\n                }\n            });\n        }",
     "definition": [
       {
         "type": "Option",
         "idx": 0,
-        "definition": []
+        "definition": [
+          {
+            "type": "Terminal",
+            "name": "Indent",
+            "label": "Indent",
+            "idx": 0,
+            "pattern": "( {4})|\\t"
+          }
+        ]
       },
       {
         "type": "RepetitionMandatoryWithSeparator",

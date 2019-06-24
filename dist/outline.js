@@ -94,7 +94,9 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
         return {
             type: NodeType.OPEN,
             module: ctx.Identifier.map(i => i.image).join("."),
-            imports: this.visit(ctx.IMPORTING[0])
+            module_start: helpers_1.getStartToken(ctx.Identifier[0]),
+            imports: this.visit(ctx.IMPORTING[0]),
+            imports_start: ctx.IMPORTING[0].children.Identifier.map(helpers_1.getStartToken)
         };
     }
     IMPORTING(ctx) {
@@ -610,4 +612,12 @@ const defaultStart = {
     startColumn: 0,
     endColumn: 0
 };
+var ErrorType;
+(function (ErrorType) {
+    ErrorType["MismatchedTokenException"] = "MismatchedTokenException";
+    ErrorType["TypeUndefined"] = "TypeUndefined";
+    ErrorType["ParameterTypeUndefined"] = "ParameterTypeUndefined";
+    ErrorType["FieldTypeUndefined"] = "FieldTypeUndefined";
+    ErrorType["Other"] = "Other";
+})(ErrorType = exports.ErrorType || (exports.ErrorType = {}));
 //# sourceMappingURL=outline.js.map

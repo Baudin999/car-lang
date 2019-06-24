@@ -36,6 +36,10 @@ export interface IModule {
      */
     ast: IExpression[];
     /**
+     * The CST as outputted by the chevrotain parser.
+     */
+    cst: any[];
+    /**
      * The actual AST the source code transpiles to.
      */
     tokens: IToken[];
@@ -47,7 +51,17 @@ export interface IModule {
      * Last compile run date/time.
      */
     timestamp: Date;
+    /**
+     * The ERD URL
+     */
     erdURL?: string;
+    fullPath: string;
+    source: string;
+    outPath: string;
+    config: IConfiguration;
+    parse: () => IModule;
+    link: (modules: IModule[]) => Promise<IModule>;
+    update: (source?: string) => Promise<IModule>;
 }
 export interface IModuleDictionary {
     [module: string]: IModule;
@@ -55,6 +69,7 @@ export interface IModuleDictionary {
 export declare const flatten: <T>(items: T[]) => T[];
 export declare const purge: <T>(items: T[]) => T[];
 export declare const clone: (source: any, template?: any) => any;
+export declare const readFileAsync: (filePath: any, parse: any) => Promise<{}>;
 /**
  * Fold a long line and intersperse with newlines at certain intervals
  * @param s - input string

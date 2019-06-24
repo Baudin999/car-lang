@@ -3,29 +3,32 @@ import { IModule, fetchImage, IConfiguration } from "./helpers";
 import { readFile } from "fs";
 import { outputFile, remove } from "fs-extra";
 import { normalize, join } from "path";
-import { createAST, transpile } from "./transpiler";
+import { createAST } from "./transpiler";
 import * as stringHash from "string-hash";
 import { IToken } from "chevrotain";
 //@ts-ignore
 import { generateURL } from "./deflate/deflate";
-import { createERD } from "./erd/createERD";
-import { createHTML } from "./html/createHTML";
-import { createXSD } from "./xsd/createXSD";
-import { createTS } from "./typescript/createTS";
-import { createJsonSchema } from "./jsonSchema/createJsonSchema";
+import { createERD } from "./transformations/erd/createERD";
+import { createHTML } from "./transformations/html/createHTML";
+import { createXSD } from "./transformations/xsd/createXSD";
+import { createTS } from "./transformations/typescript/createTS";
+import { createJsonSchema } from "./transformations/jsonSchema/createJsonSchema";
 
 export class Module implements IModule {
   name: string;
   path: string;
   hash: string;
   ast: IExpression[];
+  cst: any[];
   tokens: IToken[];
   errors: IError[];
   timestamp: Date;
+  fullPath: string;
+  source: string;
   // The output path of this module, use this to load the svgs and
   // other assets needed to avoid useless HTTP requests.
   outPath: string;
-  config?: IConfiguration;
+  config: IConfiguration;
   // a hash of stringHashes and urls
   svgs: any;
 
@@ -37,127 +40,176 @@ export class Module implements IModule {
    *
    * @param {string} projectDirectory The project directory from which we will manage this module.
    */
-  constructor(projectDirectory: string, configuration?: IConfiguration) {
+  constructor(projectDirectory: string, configuration: IConfiguration) {
     // simple constructor
     this.projectDirectory = projectDirectory;
     this.config = configuration;
   }
 
-  /**
-   * Parse the module by passing in the full path
-   * @param {string} fullPath The full path the file
-   * @returns {Promise<Module>} The updated module
-   */
-  public parse(fullPath: string, versionPath: string): Promise<Module> {
-    return new Promise<Module>(resolve => {
-      readFile(fullPath, "utf8", (error, source) => {
-        const { ast, errors, tokens } = transpile(source); //createAST(source);
-        this.hash = stringHash(source || "");
-        this.ast = ast;
-        this.path = normalize(fullPath);
-        this.name = fullPath
-          .replace(this.projectDirectory, "")
-          .replace(/\//g, ".")
-          .replace(/\\/g, ".")
-          .replace(/\.car/, "")
-          .replace(/^\./, "");
-        this.timestamp = new Date();
-        this.errors = errors;
-        this.tokens = tokens;
-        this.outPath = join(versionPath, this.name);
+  async init(moduleName: string): Promise<IModule> {
+    // we can init through the module name or through the
+    // fullPath of a module
+    if (moduleName.endsWith(".car")) {
+      this.fullPath = moduleName;
+      this.name = moduleName
+        .replace(this.projectDirectory, "")
+        .replace(/\//g, ".")
+        .replace(/\\/g, ".")
+        .replace(/\.car/, "")
+        .replace(/^\./, "");
+    } else {
+      this.name = moduleName;
+      this.fullPath = join(this.projectDirectory, this.name.replace(/\./g, "/") + ".car");
+    }
 
-        readFile(join(this.outPath, "svgs.json"), "utf8", (error2, svgsJSON) => {
-          if (!error2) {
-            this.svgs = JSON.parse(svgsJSON);
-          } else {
-            this.svgs = {};
+    this.path = normalize(this.fullPath);
+    this.outPath = join(this.config.version, this.name);
+
+    return new Promise<IModule>((resolve, reject) => {
+      readFile(this.fullPath, "utf8", (err, source) => {
+        if (err) {
+          reject(
+            `Could not initialize module "${this.name}" in directory ${this.projectDirectory}`
+          );
+        }
+        this.source = source.trimRight();
+        resolve(this);
+      });
+    });
+  }
+
+  async update(source?: string): Promise<IModule> {
+    if (source) {
+      this.source = source.trimRight();
+      return this;
+    } else {
+      return new Promise<IModule>((resolve, reject) => {
+        readFile(this.fullPath, "utf8", (err, source) => {
+          if (err) {
+            reject(
+              `Could not initialize module "${this.name}" in directory ${this.projectDirectory}`
+            );
           }
+          this.errors = [];
+          this.source = source.trimRight();
           resolve(this);
         });
       });
-    });
+    }
   }
 
-  generateFullOutput(outPath: string): Promise<string> {
-    return new Promise(resolve => {
-      // the modulePath is the location all the assets of a module will
-      // be saved to.
-      let modulePath = join(outPath, this.name);
+  /**
+   * Parse the module by passing in the full path
+   * @param {string} fullPath The full path the file
+   * @returns {Module} The updated module
+   */
+  parse(): IModule {
+    let newHash = stringHash(this.source);
+    if (newHash === this.hash) return this;
 
-      // Save the plantUML code to a .puml file
-      const savePlantUML = (puml: string) => {
-        const filePathPuml = join(modulePath, this.name + ".puml");
-        outputFile(filePathPuml, puml);
-      };
+    // start processing the module
+    let result;
+    try {
+      result = createAST(this.source);
+    } catch (err) {
+      console.log(err);
+    }
 
-      // Generate the SVG by going to the site and generating the svg
-      const generateSVG = (puml: string) => {
-        const url = generateURL(puml);
-        fetchImage(url).then(img => {
-          const filePathSVG = join(modulePath, this.name + ".svg");
-          outputFile(filePathSVG, img);
-        });
-      };
-
-      // Create the entire ERD
-      const puml = createERD(this.ast);
-      const pumlHash = stringHash(puml).toString();
-      const isChanged = !this.svgs.erd || this.svgs.erd !== pumlHash;
-      if (puml && isChanged) {
-        this.svgs.erd = pumlHash;
-        savePlantUML(puml);
-        generateSVG(puml);
-      }
-
-      // Generate the XSD file
-      const xsd = createXSD(this.ast, this.config);
-      const filePathXSD = join(modulePath, this.name + ".xsd");
-      outputFile(filePathXSD, xsd);
-
-      //
-      // Generate the HTML file
-      //
-      const { html, svgs } = createHTML(
-        this.ast,
-        modulePath,
-        this.svgs || {},
-        puml ? this.name : undefined
-      );
-      const filePathHTML = join(modulePath, this.name + ".html");
-      outputFile(filePathHTML, html);
-
-      //
-      // DO SOMETHING WITH THE HASHES
-      //
-      this.svgs = { ...svgs };
-      Object.keys(this.svgs).forEach(hash => {
-        if (hash === "erd" || hash === "hashes") return;
-        if (this.svgs.hashes.indexOf(hash) === -1) {
-          remove(join(modulePath, hash + ".svg"));
-          delete this.svgs[hash];
-        }
-      });
-      this.svgs.hashes = [];
-      outputFile(join(modulePath, "svgs.json"), JSON.stringify(this.svgs, null, 4));
-
-      //
-      // JSON SCHEMAS
-      //
-      const schemas = createJsonSchema(this.ast);
-      schemas.map(schema => {
-        const schemaPath = join(modulePath, schema.name + ".json");
-        outputFile(schemaPath, JSON.stringify(schema.schema, null, 4));
-      });
-
-      //
-      // Generate the TypeScript file
-      //
-      const tsFileContent = createTS(this.ast);
-      const tsPath = join(modulePath, this.name + ".ts");
-      outputFile(tsPath, tsFileContent);
-
-      resolve(puml);
-      console.log("Compiled: ", this.name);
-    });
+    this.hash = newHash;
+    this.timestamp = new Date();
+    this.ast = result.ast;
+    this.cst = result.cst;
+    this.errors = result.errors || [];
+    this.tokens = result.tokens;
+    return this;
   }
+
+  async link(modules: IModule[]): Promise<IModule> {
+    return this;
+  }
+
+  toErd() {}
+
+  // generateFullOutput(outPath: string): Promise<string> {
+  //   return new Promise(resolve => {
+  //     // the modulePath is the location all the assets of a module will
+  //     // be saved to.
+  //     let modulePath = join(outPath, this.name);
+
+  //     // Save the plantUML code to a .puml file
+  //     const savePlantUML = (puml: string) => {
+  //       const filePathPuml = join(modulePath, this.name + ".puml");
+  //       outputFile(filePathPuml, puml);
+  //     };
+
+  //     // Generate the SVG by going to the site and generating the svg
+  //     const generateSVG = (puml: string) => {
+  //       const url = generateURL(puml);
+  //       fetchImage(url).then(img => {
+  //         const filePathSVG = join(modulePath, this.name + ".svg");
+  //         outputFile(filePathSVG, img);
+  //       });
+  //     };
+
+  //     // Create the entire ERD
+  //     const puml = createERD(this.ast);
+  //     const pumlHash = stringHash(puml).toString();
+  //     const isChanged = !this.svgs.erd || this.svgs.erd !== pumlHash;
+  //     if (puml && isChanged) {
+  //       this.svgs.erd = pumlHash;
+  //       savePlantUML(puml);
+  //       generateSVG(puml);
+  //     }
+
+  //     // Generate the XSD file
+  //     const xsd = createXSD(this.ast, this.config);
+  //     const filePathXSD = join(modulePath, this.name + ".xsd");
+  //     outputFile(filePathXSD, xsd);
+
+  //     //
+  //     // Generate the HTML file
+  //     //
+  //     const { html, svgs } = createHTML(
+  //       this.ast,
+  //       modulePath,
+  //       this.svgs || {},
+  //       puml ? this.name : undefined
+  //     );
+  //     const filePathHTML = join(modulePath, this.name + ".html");
+  //     outputFile(filePathHTML, html);
+
+  //     //
+  //     // DO SOMETHING WITH THE HASHES
+  //     //
+  //     this.svgs = { ...svgs };
+  //     Object.keys(this.svgs).forEach(hash => {
+  //       if (hash === "erd" || hash === "hashes") return;
+  //       if (this.svgs.hashes.indexOf(hash) === -1) {
+  //         remove(join(modulePath, hash + ".svg"));
+  //         delete this.svgs[hash];
+  //       }
+  //     });
+  //     this.svgs.hashes = [];
+  //     outputFile(join(modulePath, "svgs.json"), JSON.stringify(this.svgs, null, 4));
+
+  //     //
+  //     // JSON SCHEMAS
+  //     //
+  //     const schemas = createJsonSchema(this.ast);
+  //     schemas.map(schema => {
+  //       const schemaPath = join(modulePath, schema.name + ".json");
+  //       outputFile(schemaPath, JSON.stringify(schema.schema, null, 4));
+  //     });
+
+  //     //
+  //     // Generate the TypeScript file
+  //     //
+  //     const tsFileContent = createTS(this.ast);
+  //     const tsPath = join(modulePath, this.name + ".ts");
+  //     outputFile(tsPath, tsFileContent);
+
+  //     resolve(puml);
+  //     console.log("Compiled: ", this.name);
+  //   });
+  // }
 }

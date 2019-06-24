@@ -3,41 +3,39 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const lexer_1 = require("./lexer");
 const parser_1 = require("./parser");
 const outline_1 = require("./outline");
-const substitute_1 = require("./substitute");
-const tchecker_1 = require("./tchecker");
 const helpers_1 = require("./helpers");
 // Modules is the associated hash for looking up module references
 // in the other modules (the imports).
-const sanitizeSouce = (source) => {
-    return source.trimRight();
-};
-exports.transpile = (source) => {
-    // clean up the source
-    source = sanitizeSouce(source);
-    // first run, create the AST from the source
-    const { ast, cst, tokens, errors: astErrors } = exports.createAST(source);
-    // now do another pass to update the plucked fields
-    let pluckResult = substitute_1.substitutePluckedFields(ast);
-    let pluckAST = pluckResult.newAST;
-    // substitute the references to the aliasses with the actual aliasses
-    let rwAlias = substitute_1.substituteAliases(pluckAST);
-    let rwAliasAST = rwAlias.newAST;
-    let rwAliasErrors = rwAlias.errors;
-    // substitute the extensions, here we add the fields which
-    // are added due to the extensions
-    var { newAST, errors } = substitute_1.substituteExtensions(rwAliasAST);
-    // type check the whole kaboodle.
-    const checkASTs = tchecker_1.typeChecker(newAST) || [];
-    // generate the errors
-    let fullErrors = [...(astErrors || []), ...rwAliasErrors, ...errors, ...checkASTs];
-    // return the result.
-    return {
-        tokens,
-        cst,
-        ast: newAST,
-        errors: fullErrors
-    };
-};
+// const sanitizeSouce = (source: string): string => {
+//   return source.trimRight();
+// };
+// export const transpile = (source: string): ITranspilationResult => {
+//   // clean up the source
+//   source = sanitizeSouce(source);
+//   // first run, create the AST from the source
+//   const { ast, cst, tokens, errors: astErrors } = createAST(source);
+//   // now do another pass to update the plucked fields
+//   let pluckResult = substitutePluckedFields(ast);
+//   let pluckAST = pluckResult.ast;
+//   // substitute the references to the aliasses with the actual aliasses
+//   let rwAlias = substituteAliases(pluckAST);
+//   let rwAliasAST = rwAlias.ast;
+//   let rwAliasErrors = rwAlias.errors;
+//   // substitute the extensions, here we add the fields which
+//   // are added due to the extensions
+//   var r = substituteExtensions(rwAliasAST);
+//   // type check the whole kaboodle.
+//   const checkASTs = typeChecker(r.ast) || [];
+//   // generate the errors
+//   let fullErrors = [...(astErrors || []), ...rwAliasErrors, ...r.errors, ...checkASTs];
+//   // return the result.
+//   return {
+//     tokens,
+//     cst,
+//     ast: r.ast,
+//     errors: fullErrors
+//   };
+// };
 exports.createAST = (source) => {
     if (!source || source.length === 0) {
         return {
@@ -46,33 +44,44 @@ exports.createAST = (source) => {
             cst: []
         };
     }
+    let errors = [];
     const lexedSource = lexer_1.DomainLexer.tokenize(source);
     parser_1.parser.input = lexedSource.tokens;
     const cst = parser_1.parser.START();
     //   // We've removed this in favour of our custom error messages. But
     //   // uncomment if you want to debug something.
-    // if (parser.errors && parser.errors.length > 0) {
-    //   console.log(JSON.stringify(parser.errors, null, 4));
-    // }
+    if (parser_1.parser.errors && parser_1.parser.errors.length > 0) {
+        //console.log(JSON.stringify(parser.errors, null, 4));
+        parser_1.parser.errors.forEach(error => {
+            //console.log(error);
+            if (error.name === "MismatchedTokenException") {
+                let message = error.message;
+                if (error.message.indexOf("SIGN_TypeDefStart") > 0) {
+                    message = `It seems like your field definition is incomplete. We would
+have expected something like: 
+
+${error.previousToken.image}: String
+
+But we found an empty type.`;
+                }
+                errors.push({
+                    message: message,
+                    startLineNumber: error.previousToken.startLine,
+                    endLineNumber: error.previousToken.endLine,
+                    startColumn: error.previousToken.startColumn,
+                    endColumn: error.previousToken.endColumn,
+                    ruleStack: error.context.ruleStack,
+                    type: outline_1.ErrorType.MismatchedTokenException
+                });
+            }
+            else {
+                // console.log(parser.input);
+                console.log(error);
+            }
+        });
+    }
     const visitor = new outline_1.OutlineVisitor();
     const ast = visitor.visit(cst);
-    let errors = parser_1.parser.errors.map(error => {
-        let message = "";
-        if (error.name === "MismatchedTokenException") {
-            message =
-                error.message +
-                    `
-Previous token was: ${error.previousToken.image}`;
-        }
-        return {
-            message: message,
-            ruleStack: error.context ? error.context.ruleStack || [] : null,
-            startLineNumber: error.token.startLine,
-            endLineNumber: error.token.endLine,
-            startColumn: error.token.startColumn,
-            endColumn: error.token.endColumn
-        };
-    });
     return { ast, tokens: lexedSource.tokens, cst, errors };
 };
 exports.resolveImports = (modules) => {
@@ -80,47 +89,52 @@ exports.resolveImports = (modules) => {
         module.ast
             .filter(node => node.type === outline_1.NodeType.OPEN)
             .map((node) => {
-            const m = modules.getModule(node.module);
-            if (!m) {
-                throw "Can't find module " + node.module;
+            const m = modules.find(m => m.name === node.module);
+            if (m === undefined) {
+                module.errors.push(Object.assign({ message: `Could not find module ${node.module} to open` }, node.module_start));
             }
-            node.imports.forEach(id => {
-                const ref = getNodeById(id, m.ast || []);
-                if (ref)
-                    module.ast.unshift(helpers_1.clone(ref, { imported: true }));
-            });
-            return module;
+            else {
+                node.imports.forEach((id, index) => {
+                    const ref = getNodeById(id, m.ast || []);
+                    if (ref) {
+                        module.ast.unshift(helpers_1.clone(ref, { imported: true }));
+                    }
+                    else {
+                        module.errors.push(Object.assign({ message: `Could not find type "${id}" in module ${node.module} to import.` }, node.imports_start[index]));
+                    }
+                });
+            }
         });
         return module;
     });
 };
-exports.extensions = (modules) => {
-    return modules.map(module => {
-        let { errors, newAST } = substitute_1.substituteExtensions(module.ast);
-        return Object.assign({}, module, { ast: newAST, errors: [...module.errors, ...errors] });
-    });
-};
-exports.pluck = (modules) => {
-    return modules.map(module => {
-        let { errors, newAST } = substitute_1.substitutePluckedFields(module.ast);
-        return Object.assign({}, module, { ast: newAST, errors: [...module.errors, ...errors] });
-    });
-};
-exports.resolveAlias = (modules) => {
-    return modules.map(module => {
-        const { newAST, errors } = substitute_1.substituteAliases(module.ast);
-        return Object.assign({}, module, { ast: newAST, errors: [...module.errors, ...errors] });
-    });
-};
-exports.typeCheck = (modules) => {
-    return modules.map(module => {
-        let errors = tchecker_1.typeChecker(module.ast);
-        return Object.assign({}, module, { errors: [...module.errors, ...errors] });
-    });
-};
-exports.compile = (modules) => {
-    return exports.typeCheck(exports.pluck(exports.resolveAlias(exports.extensions(exports.resolveImports(modules)))));
-};
+// export const extensions = (modules: ModuleDictionary) => {
+//   return modules.map(module => {
+//     let { errors, newAST } = substituteExtensions(module.ast);
+//     return { ...module, ast: newAST, errors: [...module.errors, ...errors] } as Module;
+//   });
+// };
+// export const pluck = (modules: ModuleDictionary) => {
+//   return modules.map(module => {
+//     let { errors, newAST } = substitutePluckedFields(module.ast);
+//     return { ...module, ast: newAST, errors: [...module.errors, ...errors] } as Module;
+//   });
+// };
+// export const resolveAlias = (modules: ModuleDictionary) => {
+//   return modules.map(module => {
+//     const { newAST, errors } = substituteAliases(module.ast);
+//     return { ...module, ast: newAST, errors: [...module.errors, ...errors] } as Module;
+//   });
+// };
+// export const typeCheck = (modules: ModuleDictionary) => {
+//   return modules.map(module => {
+//     let errors = typeChecker(module.ast);
+//     return { ...module, errors: [...module.errors, ...errors] } as Module;
+//   });
+// };
+// export const compile = (modules: ModuleDictionary): ModuleDictionary => {
+//   return typeCheck(pluck(resolveAlias(extensions(resolveImports(modules)))));
+// };
 const getNodeById = (id, ast) => {
     return ast.find(node => node.id && node.id === id);
 };

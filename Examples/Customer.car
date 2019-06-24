@@ -49,6 +49,7 @@ type Address =
         | length 2
         | pattern /[A-Z]{2}/
     Country: Maybe String
+    Foo: Bar
 
 type Person extends Customer =
     FirstName: Maybe String
@@ -87,7 +88,7 @@ view {
 
 ## Customer Aggregate
 
-This is the customer aggregate.
+This is the customer aggregate. 
 
 @ Please do not use Aggregates yet!!
 aggregate Customer {
@@ -138,3 +139,6 @@ map {
     Lead -> Offer -> Prospect
 }
 
+
+type Something =
+    Name: Other

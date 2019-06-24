@@ -23,6 +23,12 @@
     </xsd:complexType>
   </xsd:element>
   <xsd:complexType name="Klas">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <key>api</key>
+        <value>klas</value>
+      </xsd:appinfo>
+    </xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Klas_Studenten" minOccurs="1" />
       <xsd:element ref="self:Klas_Docenten" minOccurs="1" />
@@ -67,6 +73,12 @@
     <xsd:annotation></xsd:annotation>
   </xsd:element>
   <xsd:complexType name="Student">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <key>api</key>
+        <value>student</value>
+      </xsd:appinfo>
+    </xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Student_Nummer" minOccurs="1" />
       <xsd:element ref="self:Student_HeeftVakken" minOccurs="1" />
@@ -114,6 +126,7 @@
     <xsd:annotation></xsd:annotation>
   </xsd:element>
   <xsd:complexType name="Docent">
+    <xsd:annotation></xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Docent_DocentenNummer" minOccurs="1" />
       <xsd:element ref="self:Docent_BevoegdVoor" minOccurs="1" />
@@ -144,6 +157,7 @@
     <xsd:annotation></xsd:annotation>
   </xsd:element>
   <xsd:complexType name="Persoon">
+    <xsd:annotation></xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Persoon_Voornaam" minOccurs="1" />
       <xsd:element ref="self:Persoon_Achternaam" minOccurs="1" />
@@ -169,6 +183,7 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Adres">
+    <xsd:annotation></xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Adres_Straat" minOccurs="1" />
       <xsd:element ref="self:Adres_Huisnummer" minOccurs="1" />
@@ -190,6 +205,7 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Vak">
+    <xsd:annotation></xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Vak_Naam" minOccurs="1" />
       <xsd:element ref="self:Vak_IsBelangrijk" minOccurs="1" />

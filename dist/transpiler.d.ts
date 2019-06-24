@@ -1,7 +1,6 @@
 import { IExpression, IError } from "./outline";
 import { IToken } from "chevrotain";
-import { ModuleDictionary } from "./ModuleDictionary";
-export declare const transpile: (source: string) => ITranspilationResult;
+import { IModule } from "./helpers";
 export declare const createAST: (source: string) => {
     ast: {};
     tokens: never[];
@@ -13,12 +12,7 @@ export declare const createAST: (source: string) => {
     cst: any;
     errors: IError[];
 };
-export declare const resolveImports: (modules: ModuleDictionary) => ModuleDictionary;
-export declare const extensions: (modules: ModuleDictionary) => ModuleDictionary;
-export declare const pluck: (modules: ModuleDictionary) => ModuleDictionary;
-export declare const resolveAlias: (modules: ModuleDictionary) => ModuleDictionary;
-export declare const typeCheck: (modules: ModuleDictionary) => ModuleDictionary;
-export declare const compile: (modules: ModuleDictionary) => ModuleDictionary;
+export declare const resolveImports: (modules: IModule[]) => IModule[];
 export interface ITranspilationResult {
     tokens: IToken[];
     cst: any[];

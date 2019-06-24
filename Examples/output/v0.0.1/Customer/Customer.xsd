@@ -22,6 +22,7 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="CreditCard">
+    <xsd:annotation></xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:CreditCard_Number" minOccurs="1" />
       <xsd:element ref="self:CreditCard_ExpirationDate" minOccurs="1" />
@@ -117,6 +118,9 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Address">
+    <xsd:annotation>
+      <xsd:documentation>The address of a person. This is the functional location of where a person lives. This type is of course designed for the Dutch address system.</xsd:documentation>
+    </xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Address_Street" minOccurs="1" />
       <xsd:element ref="self:Address_PostalCode" minOccurs="1" />
@@ -164,6 +168,7 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Person">
+    <xsd:annotation></xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Person_FirstName" minOccurs="0" />
       <xsd:element ref="self:Person_LastName" minOccurs="1" />
@@ -180,6 +185,7 @@
     <xsd:annotation></xsd:annotation>
   </xsd:element>
   <xsd:complexType name="PaymentMethod">
+    <xsd:annotation></xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:PaymentMethod_Customer" minOccurs="1" />
       <xsd:element ref="self:PaymentMethod_CreditCard" minOccurs="1" />
@@ -207,6 +213,7 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Company">
+    <xsd:annotation></xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Company_OrganisationName" minOccurs="1" />
       <xsd:element ref="self:Company_CustomerId" minOccurs="1" />
@@ -226,6 +233,9 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Customer">
+    <xsd:annotation>
+      <xsd:documentation>Someone or some company who buys things</xsd:documentation>
+    </xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Customer_CustomerId" minOccurs="1" />
       <xsd:element ref="self:Customer_VATNumber" minOccurs="1" />

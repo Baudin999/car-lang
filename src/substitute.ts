@@ -17,9 +17,9 @@ const getNodeById = (ast: IExpression[], params: string[] = [], id: string) => {
 
 export const substituteAliases = (
   ast: IExpression[] = []
-): { newAST: IExpression[]; errors: IError[] } => {
+): { ast: IExpression[]; errors: IError[] } => {
   const errors: IError[] = [];
-  const newAST = ast.map((node: any) => {
+  const _ast = ast.map((node: any) => {
     if (node.type !== NodeType.ALIAS) return node;
     else if (baseTypes.indexOf(node.ofType) > -1) {
       // now we know it's a "simple type" a String or a Number,
@@ -85,14 +85,14 @@ export const substituteAliases = (
       return _node;
     }
   });
-  return { newAST: purge(newAST), errors };
+  return { ast: purge(_ast), errors };
 };
 
 export const substitutePluckedFields = (
   ast: IExpression[] = []
-): { newAST: IExpression[]; errors: IError[] } => {
+): { ast: IExpression[]; errors: IError[] } => {
   const errors: IError[] = [];
-  if (!Array.isArray(ast)) return { newAST: [], errors: [] };
+  if (!Array.isArray(ast)) return { ast: [], errors: [] };
   const newAST = ast.map((node: IType) => {
     if (node.type !== NodeType.TYPE) return node;
     else {
@@ -180,12 +180,12 @@ export const substitutePluckedFields = (
     }
   });
 
-  return { newAST, errors };
+  return { ast, errors };
 };
 
 export const substituteExtensions = (
   ast: IExpression[] = []
-): { newAST: IExpression[]; errors: IError[] } => {
+): { ast: IExpression[]; errors: IError[] } => {
   const errors: IError[] = [];
   const newAST = (ast || []).map((node: IType) => {
     if (node.type !== NodeType.TYPE) return node;
@@ -221,5 +221,5 @@ export const substituteExtensions = (
       return newNode;
     }
   });
-  return { newAST, errors };
+  return { ast: newAST, errors };
 };

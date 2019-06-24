@@ -1,9 +1,8 @@
 import { DomainLexer } from "../src/lexer";
 import { parser } from "../src/parser";
-import { OutlineVisitor } from "./../src/outline";
-import { transpile } from "../src/transpiler";
-import { createERD } from "../src/erd/createERD";
+import { OutlineVisitor } from "../src/outline";
 import { typeChecker } from "../src/tchecker";
+import { fakeModule } from "./fakes";
 
 /*
 AGGREGATES
@@ -79,22 +78,21 @@ aggregate Person {
     % version: 1
 
     Address
-    Foo
+
+    getPerson :: PersonId -> Person
 }
 
-type Person 
+type Person
 
-type Address 
+type Address
 
-type Foo =
-    Bar: String
 
 `;
 
-  const { ast, cst, tokens, errors } = transpile(source);
-
-  it("CST should be defined", () => {
-    expect(cst).toBeDefined();
+  it("We should be able to tokenize", async next => {
+    let { cst, ast, errors } = await fakeModule(source);
+    expect(errors.length).toEqual(0);
+    next();
   });
 });
 
@@ -112,10 +110,11 @@ type Address
 
 `;
 
-  const { ast, cst, tokens, errors } = transpile(source);
-
-  it("Errors should be of length 1", () => {
+  it("We should be able to tokenize", async next => {
+    let { cst, ast, errors } = await fakeModule(source);
     expect(errors.length).toEqual(1);
+
+    next();
   });
 });
 
@@ -133,9 +132,10 @@ type Person
 
 `;
 
-  const { ast, cst, tokens, errors } = transpile(source);
-
-  it("Errors should be of length 1", () => {
+  it("We should be able to tokenize", async next => {
+    let { cst, ast, errors } = await fakeModule(source);
     expect(errors.length).toEqual(1);
+
+    next();
   });
 });

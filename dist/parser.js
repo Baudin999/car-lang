@@ -51,14 +51,14 @@ class DomainParser extends chevrotain_1.Parser {
         $.RULE("TYPE", () => {
             $.CONSUME(lexer_1.tokenLookup.KW_type);
             $.SUBRULE($.IDENTIFIER);
-            $.OPTION(() => {
+            $.OPTION1(() => {
                 $.CONSUME(lexer_1.tokenLookup.KW_extends);
                 $.AT_LEAST_ONE1(() => $.CONSUME1(lexer_1.tokenLookup.Identifier));
             });
-            $.OPTION1(() => {
+            $.OPTION2(() => {
                 $.CONSUME(lexer_1.tokenLookup.SIGN_EqualsType);
                 $.AT_LEAST_ONE2({
-                    DEF: () => $.SUBRULE($.TYPE_FIELD)
+                    DEF: () => $.OR([{ ALT: () => $.SUBRULE($.COMMENT) }, { ALT: () => $.SUBRULE($.TYPE_FIELD) }])
                 });
             });
         });
@@ -162,6 +162,10 @@ class DomainParser extends chevrotain_1.Parser {
                 $.SUBRULE($.MARKDOWN);
             });
             $.CONSUME(lexer_1.tokenLookup.SIGN_close);
+        });
+        $.RULE("COMMENT", () => {
+            $.OPTION(() => $.CONSUME(lexer_1.tokenLookup.Indent));
+            $.CONSUME(lexer_1.tokenLookup.CommentBlock);
         });
         $.RULE("MARKDOWN", () => {
             $.OR([
@@ -293,7 +297,7 @@ class DomainParser extends chevrotain_1.Parser {
             $.CONSUME(lexer_1.tokenLookup.SIGN_close);
         });
         $.RULE("MAP_FLOW", () => {
-            $.OPTION(() => lexer_1.tokenLookup.Indent);
+            $.OPTION(() => $.CONSUME(lexer_1.tokenLookup.Indent));
             $.AT_LEAST_ONE_SEP({
                 SEP: lexer_1.tokenLookup.SIGN_arrow,
                 DEF: () => {
@@ -424,7 +428,8 @@ class DomainParser extends chevrotain_1.Parser {
     }
     isGenericParameter() {
         let t1 = this.LA(1);
-        return t1.image !== "extends";
+        let keywords = ["extends", "type", "alias", "data", "aggregate", "view", "map"];
+        return keywords.indexOf(t1.image) === -1;
     }
     isSub() {
         let t2 = this.LA(2);

@@ -1,5 +1,5 @@
-import { transpile } from "../../src/transpiler";
 import { IAggregate, IOperation } from "../../src/outline";
+import { fakeModule } from "../fakes";
 
 const log = source => {
   console.log(JSON.stringify(source, null, 4));
@@ -27,23 +27,21 @@ aggregate Person {
 
 `;
 
-  const { ast, cst, tokens, errors } = transpile(source);
-
-  //log(ast);
-  if (errors && errors.length > 0) log(errors);
-
-  it("Should result in valid elements", () => {
+  it("Should result in valid elements", async () => {
+    let { cst, ast, errors, tokens } = await fakeModule(source);
     expect(cst).toBeDefined();
     expect(ast).toBeDefined();
     expect(tokens).toBeDefined();
     expect(errors).toBeDefined();
   });
 
-  it("Should not contain errors", () => {
+  it("Should not contain errors", async () => {
+    let { cst, ast, errors, tokens } = await fakeModule(source);
     expect(errors.length).toEqual(0);
   });
 
-  it("Should have two operations and the operations should be correct", () => {
+  it("Should have two operations and the operations should be correct", async () => {
+    let { cst, ast, errors, tokens } = await fakeModule(source);
     let aggreagte = ast[3] as IAggregate;
     expect(aggreagte.operations.length).toEqual(2);
     let operation1 = aggreagte.operations[0];
@@ -79,23 +77,21 @@ aggregate Person {
 
 `;
 
-  const { ast, cst, tokens, errors } = transpile(source);
-
-  //log(ast);
-  if (errors && errors.length > 0) log(errors);
-
-  it("Should result in valid elements", () => {
+  it("Should result in valid elements", async () => {
+    let { cst, ast, errors, tokens } = await fakeModule(source);
     expect(cst).toBeDefined();
     expect(ast).toBeDefined();
     expect(tokens).toBeDefined();
     expect(errors).toBeDefined();
   });
 
-  it("Should not contain errors", () => {
+  it("Should not contain errors", async () => {
+    let { cst, ast, errors, tokens } = await fakeModule(source);
     expect(errors.length).toEqual(0);
   });
 
-  it("Should have two operations and the operations should be correct", () => {
+  it("Should have two operations and the operations should be correct", async () => {
+    let { cst, ast, errors, tokens } = await fakeModule(source);
     let aggreagte = ast[2] as IAggregate;
     expect(aggreagte.operations.length).toEqual(4);
   });

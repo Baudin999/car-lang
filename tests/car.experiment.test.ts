@@ -1,7 +1,5 @@
-import { transpile } from "../src/transpiler";
-import { getFileFromModuleName } from "../src/fileManager";
-import { createERD, createView } from "./../src/erd/createERD";
-import { NodeType, IView } from "../src/outline";
+import { fakeModule } from "./fakes";
+import { IData } from "../src/outline";
 
 const log = source => {
   console.log(JSON.stringify(source, null, 4));
@@ -16,18 +14,8 @@ type Person =
 
 `;
 
-  const { ast, cst, tokens, errors } = transpile(source);
-
-  if (errors && errors.length) console.log(errors);
-
-  it("should have a test", () => {
-    expect(cst).toBeDefined();
+  it("We should be able to tokenize", async () => {
+    let { cst, ast, errors } = await fakeModule(source);
     expect(ast).toBeDefined();
-    expect(tokens).toBeDefined();
-    expect(errors).toBeDefined();
-  });
-
-  it("Should not contain errors", () => {
-    //expect(errors.length).toEqual(0);
   });
 });

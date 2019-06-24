@@ -50,6 +50,7 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Namable">
+    <xsd:annotation></xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Namable_Name" minOccurs="1" />
       <xsd:element ref="self:Namable_Description" minOccurs="1" />
@@ -86,6 +87,7 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Buyable">
+    <xsd:annotation></xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Buyable_Source" minOccurs="1" />
       <xsd:element ref="self:Buyable_Stat" minOccurs="1" />
@@ -144,6 +146,9 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Skill">
+    <xsd:annotation>
+      <xsd:documentation>A skill is something a character can do</xsd:documentation>
+    </xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Skill_Name" minOccurs="1" />
       <xsd:element ref="self:Skill_Description" minOccurs="1" />
@@ -204,6 +209,7 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Resistance">
+    <xsd:annotation></xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Resistance_Name" minOccurs="1" />
       <xsd:element ref="self:Resistance_Description" minOccurs="1" />
@@ -264,6 +270,7 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Special">
+    <xsd:annotation></xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Special_Name" minOccurs="1" />
       <xsd:element ref="self:Special_Description" minOccurs="1" />
@@ -315,6 +322,7 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Feat">
+    <xsd:annotation></xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Feat_Rank" minOccurs="1" />
       <xsd:element ref="self:Feat_XP" minOccurs="1" />
@@ -350,6 +358,9 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Statistic">
+    <xsd:annotation>
+      <xsd:documentation>A statistic is a base value for a character's potential Statistics serve as a base bonus for certain abilities.</xsd:documentation>
+    </xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Statistic_Stat" minOccurs="1" />
       <xsd:element ref="self:Statistic_Description" minOccurs="1" />
@@ -406,6 +417,7 @@
     <xsd:annotation></xsd:annotation>
   </xsd:element>
   <xsd:complexType name="Character">
+    <xsd:annotation></xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Character_Name" minOccurs="1" />
       <xsd:element ref="self:Character_Skills" minOccurs="1" />

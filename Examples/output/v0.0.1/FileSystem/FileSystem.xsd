@@ -47,6 +47,7 @@
     <xsd:annotation></xsd:annotation>
   </xsd:element>
   <xsd:complexType name="FileInfo">
+    <xsd:annotation></xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:FileInfo_Size" minOccurs="1" />
       <xsd:element ref="self:FileInfo_LastModified" minOccurs="1" />
@@ -64,6 +65,7 @@
     </xsd:complexType>
   </xsd:element>
   <xsd:complexType name="DirectoryInfo">
+    <xsd:annotation></xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:DirectoryInfo_Children" minOccurs="1" />
     </xsd:all>

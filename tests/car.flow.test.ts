@@ -1,7 +1,4 @@
-import { DomainLexer } from "../src/lexer";
-import { parser } from "../src/parser";
-import { OutlineVisitor, IFlow } from "../src/outline";
-import { transpile } from "../src/transpiler";
+import { fakeModule } from "./fakes";
 
 /*
 
@@ -26,11 +23,11 @@ Car-lang will transpile these flows into PlantUML sequence diagrams.
 */
 
 const log = source => {
-    console.log(JSON.stringify(source, null, 4));
+  console.log(JSON.stringify(source, null, 4));
 };
 
 describe("Should be able to define an aggregate", () => {
-    const source = `
+  const source = `
 
 flow {
     % title: Book Operations
@@ -44,14 +41,10 @@ flow {
 
 `;
 
-    const { cst, errors, ast, tokens } = transpile(source);
-
-    //log(parser.errors);
-    //log(ast);
-
-    it("CST should be defined", () => {
-        expect(cst).toBeDefined();
-    });
+  it("We should be able to tokenize", async () => {
+    let { cst, ast, errors } = await fakeModule(source);
+    expect(ast).toBeDefined();
+  });
 });
 
 /*
@@ -65,7 +58,7 @@ why we also have the following notation:
 */
 
 describe("Should be able to define an aggregate", () => {
-    const source = `
+  const source = `
 
 flow {
 
@@ -79,14 +72,10 @@ flow {
 
 `;
 
-    const { cst, errors, ast, tokens } = transpile(source);
-
-    //log(parser.errors);
-    //log(ast);
-
-    it("CST should be defined", () => {
-        expect(cst).toBeDefined();
-    });
+  it("We should be able to tokenize", async () => {
+    let { cst, ast, errors } = await fakeModule(source);
+    expect(ast).toBeDefined();
+  });
 });
 
 /*
@@ -106,7 +95,7 @@ We will now describe how we will build these types of flows in our system:
 */
 
 describe("Define three types of operations", () => {
-    const source = `
+  const source = `
 
 flow {
 
@@ -128,14 +117,10 @@ flow {
 
 `;
 
-    const { cst, errors, ast, tokens } = transpile(source);
-
-    //log(errors);
-    //log((ast[0] as any).operations[0]);
-
-    it("CST should be defined", () => {
-        expect(cst).toBeDefined();
-    });
+  it("We should be able to tokenize", async () => {
+    let { cst, ast, errors } = await fakeModule(source);
+    expect(ast).toBeDefined();
+  });
 });
 
 /*
@@ -156,7 +141,7 @@ is always the return type.
 */
 
 describe("We should be able to define a function", () => {
-    const source = `
+  const source = `
 
 flow {
 
@@ -172,14 +157,10 @@ flow {
 
 `;
 
-    const { cst, errors, ast, tokens } = transpile(source);
-
-    //log(errors);
-    //log(ast);
-
-    it("CST should be defined", () => {
-        expect(cst).toBeDefined();
-    });
+  it("We should be able to tokenize", async () => {
+    let { cst, ast, errors } = await fakeModule(source);
+    expect(ast).toBeDefined();
+  });
 });
 
 /*
@@ -203,7 +184,7 @@ getCustomer :: (customerId: String) -> Customer
 */
 
 describe("We should be able to define a function", () => {
-    const source = `
+  const source = `
 
 flow {
 
@@ -217,14 +198,10 @@ flow {
 
 `;
 
-    const { cst, errors, ast, tokens } = transpile(source);
-
-    //log(errors);
-    //log(ast);
-
-    it("CST should be defined", () => {
-        expect(cst).toBeDefined();
-    });
+  it("We should be able to tokenize", async () => {
+    let { cst, ast, errors } = await fakeModule(source);
+    expect(ast).toBeDefined();
+  });
 });
 
 /*
@@ -247,7 +224,7 @@ patterns.
 */
 
 describe("We should be able to define Pub/Sub operations", () => {
-    const source = `
+  const source = `
 
 flow {
 
@@ -257,14 +234,10 @@ flow {
 
 `;
 
-    const { cst, errors, ast, tokens } = transpile(source);
-
-    //log(errors);
-    //log(ast);
-
-    it("CST should be defined", () => {
-        expect(cst).toBeDefined();
-    });
+  it("We should be able to tokenize", async () => {
+    let { cst, ast, errors } = await fakeModule(source);
+    expect(ast).toBeDefined();
+  });
 });
 
 /*
@@ -295,7 +268,7 @@ Customer -> NewProduct -> Proposition
 */
 
 describe("We should be able to define Fire & Forget operations", () => {
-    const source = `
+  const source = `
 
 flow {
 
@@ -305,24 +278,29 @@ flow {
 
 `;
 
-    const { cst, errors, ast, tokens } = transpile(source);
+  // const { cst, errors, ast, tokens } = transpile(source);
 
-    //log(errors);
-    //log(ast);
+  // //log(errors);
+  // //log(ast);
 
-    it("CST should be defined", () => {
-        expect(cst).toBeDefined();
-    });
+  // it("CST should be defined", () => {
+  //     expect(cst).toBeDefined();
+  // });
 
-    it("Should have three parameters", () => {
-        // the ast contains a flow and that flow has an operation with three params
-        let operation = (ast[0] as any).operations[0];
-        expect(operation.params.length).toEqual(3);
-        expect(operation.params[0].id).toEqual("Customer");
-        expect(operation.params[0].ofType).toEqual("Customer");
-        expect(operation.params[1].id).toEqual("newProduct");
-        expect(operation.params[1].ofType).toEqual("Product");
-        expect(operation.params[2].id).toEqual("Proposition");
-        expect(operation.params[2].ofType).toEqual("Proposition");
-    });
+  // it("Should have three parameters", () => {
+  //     // the ast contains a flow and that flow has an operation with three params
+  // });
+
+  it("We should be able to tokenize", async () => {
+    let { cst, ast, errors } = await fakeModule(source);
+    expect(ast).toBeDefined();
+    let operation = (ast[0] as any).operations[0];
+    expect(operation.params.length).toEqual(3);
+    expect(operation.params[0].id).toEqual("Customer");
+    expect(operation.params[0].ofType).toEqual("Customer");
+    expect(operation.params[1].id).toEqual("newProduct");
+    expect(operation.params[1].ofType).toEqual("Product");
+    expect(operation.params[2].id).toEqual("Proposition");
+    expect(operation.params[2].ofType).toEqual("Proposition");
+  });
 });

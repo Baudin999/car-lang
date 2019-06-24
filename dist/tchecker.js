@@ -34,14 +34,14 @@ exports.typeChecker = (ast = []) => {
                 : field.ofType;
             let ref = getNodeById(ast, node.params, typeId);
             if (!ref) {
-                errors.push(Object.assign({ message: `Cannot find type "${typeId}" of field "${field.id}" of type "${node.id}"` }, field.ofType_start));
+                errors.push(Object.assign({ message: `Cannot find type "${typeId}" of field "${field.id}" of type "${node.id}"` }, field.ofType_start, { type: outline_1.ErrorType.FieldTypeUndefined }));
             }
             // Now also check all the parameters if they exist
             for (let i = 0; i < field.ofType_params.length; ++i) {
                 let paramId = field.ofType_params[i];
                 let paramRef = getNodeById(ast, node.params, paramId);
                 if (!paramRef) {
-                    errors.push(Object.assign({ message: `Cannot find type "${paramId}" of field "${field.id}" of type "${node.id}"` }, field.ofType_params_start[i]));
+                    errors.push(Object.assign({ message: `Cannot find type "${paramId}" of field "${field.id}" of type "${node.id}"` }, field.ofType_params_start[i], { type: outline_1.ErrorType.ParameterTypeUndefined }));
                 }
             }
         });
@@ -95,7 +95,7 @@ exports.typeChecker = (ast = []) => {
         view.nodes.forEach((v, i) => {
             let valueObject = getNodeById(ast, [], v);
             if (!valueObject) {
-                errors.push(Object.assign({ message: `Cannot find the Node "${v}" on View "${view.id || "Unnamed view"}"` }, view.nodes_start[i]));
+                errors.push(Object.assign({ message: `Cannot find the Type "${v}" in View "${view.id || "Unnamed view"}"` }, view.nodes_start[i]));
             }
         });
     });

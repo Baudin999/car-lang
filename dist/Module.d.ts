@@ -6,11 +6,14 @@ export declare class Module implements IModule {
     path: string;
     hash: string;
     ast: IExpression[];
+    cst: any[];
     tokens: IToken[];
     errors: IError[];
     timestamp: Date;
+    fullPath: string;
+    source: string;
     outPath: string;
-    config?: IConfiguration;
+    config: IConfiguration;
     svgs: any;
     projectDirectory: string;
     /**
@@ -18,12 +21,15 @@ export declare class Module implements IModule {
      *
      * @param {string} projectDirectory The project directory from which we will manage this module.
      */
-    constructor(projectDirectory: string, configuration?: IConfiguration);
+    constructor(projectDirectory: string, configuration: IConfiguration);
+    init(moduleName: string): Promise<IModule>;
+    update(source?: string): Promise<IModule>;
     /**
      * Parse the module by passing in the full path
      * @param {string} fullPath The full path the file
-     * @returns {Promise<Module>} The updated module
+     * @returns {Module} The updated module
      */
-    parse(fullPath: string, versionPath: string): Promise<Module>;
-    generateFullOutput(outPath: string): Promise<string>;
+    parse(): IModule;
+    link(modules: IModule[]): Promise<IModule>;
+    toErd(): void;
 }

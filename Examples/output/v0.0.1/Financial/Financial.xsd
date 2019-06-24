@@ -25,6 +25,12 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Currency">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <key>currency is expressen like</key>
+        <value>$12,00</value>
+      </xsd:appinfo>
+    </xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Currency_Sign" minOccurs="1" />
       <xsd:element ref="self:Currency_Value" minOccurs="1" />
@@ -46,6 +52,7 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="CreditCard">
+    <xsd:annotation></xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:CreditCard_Number" minOccurs="1" />
       <xsd:element ref="self:CreditCard_ExpirationDate" minOccurs="1" />
@@ -61,6 +68,9 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="DirectDebit">
+    <xsd:annotation>
+      <xsd:documentation>Pay from a debit account</xsd:documentation>
+    </xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:DirectDebit_BankAccountNumber" minOccurs="1" />
     </xsd:all>

@@ -41,6 +41,12 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Human">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <key>erd</key>
+        <value>full</value>
+      </xsd:appinfo>
+    </xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Human_FirstName" minOccurs="0" />
       <xsd:element ref="self:Human_LastName" minOccurs="1" />
@@ -88,6 +94,7 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Person">
+    <xsd:annotation></xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Person_FuurstName" minOccurs="0" />
       <xsd:element ref="self:Person_LastName" minOccurs="1" />

@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const fetch = require("node-fetch");
+const fs_1 = require("fs");
 /**
  *
  * "startLine": 2,
@@ -31,6 +32,17 @@ exports.clone = (source, template) => {
     else {
         return JSON.parse(JSON.stringify(source));
     }
+};
+exports.readFileAsync = (filePath, parse) => {
+    return new Promise(function (resolve, reject) {
+        fs_1.readFile(filePath, "utf8", (err, source) => {
+            if (err)
+                reject(err);
+            else {
+                resolve(parse ? JSON.parse(source) : source);
+            }
+        });
+    });
 };
 /**
  * Fold a long line and intersperse with newlines at certain intervals

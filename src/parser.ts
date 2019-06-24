@@ -39,6 +39,7 @@ class DomainParser extends Parser {
   MAP_FLOW: any;
   MAP_FLOW_KEY: any;
 
+  COMMENT: any;
   IDENTIFIER: any;
   TYPE_IDENTIFIER: any;
   ID_OR_STRING: any;
@@ -111,15 +112,16 @@ class DomainParser extends Parser {
       $.CONSUME(tokenLookup.KW_type);
       $.SUBRULE($.IDENTIFIER);
 
-      $.OPTION(() => {
+      $.OPTION1(() => {
         $.CONSUME(tokenLookup.KW_extends);
         $.AT_LEAST_ONE1(() => $.CONSUME1(tokenLookup.Identifier));
       });
 
-      $.OPTION1(() => {
+      $.OPTION2(() => {
         $.CONSUME(tokenLookup.SIGN_EqualsType);
         $.AT_LEAST_ONE2({
-          DEF: () => $.SUBRULE($.TYPE_FIELD)
+          DEF: () =>
+            $.OR([{ ALT: () => $.SUBRULE($.COMMENT) }, { ALT: () => $.SUBRULE($.TYPE_FIELD) }])
         });
       });
     });
@@ -237,6 +239,11 @@ class DomainParser extends Parser {
         $.SUBRULE($.MARKDOWN);
       });
       $.CONSUME(tokenLookup.SIGN_close);
+    });
+
+    $.RULE("COMMENT", () => {
+      $.OPTION(() => $.CONSUME(tokenLookup.Indent));
+      $.CONSUME(tokenLookup.CommentBlock);
     });
 
     $.RULE("MARKDOWN", () => {
@@ -369,8 +376,12 @@ class DomainParser extends Parser {
     });
 
     $.RULE("RESTRICTION", () => {
-      $.AT_LEAST_ONE(() => {
+      $.MANY(() => {
         $.CONSUME(tokenLookup.Indent);
+        $.CONSUME(tokenLookup.AnnotationLiteral);
+      });
+      $.AT_LEAST_ONE(() => {
+        $.CONSUME1(tokenLookup.Indent);
       });
       $.CONSUME(tokenLookup.SIGN_Restriction);
       $.CONSUME(tokenLookup.RestrictionIdentifier);
@@ -390,7 +401,7 @@ class DomainParser extends Parser {
     });
 
     $.RULE("MAP_FLOW", () => {
-      $.OPTION(() => tokenLookup.Indent);
+      $.OPTION(() => $.CONSUME(tokenLookup.Indent));
       $.AT_LEAST_ONE_SEP({
         SEP: tokenLookup.SIGN_arrow,
         DEF: () => {
@@ -534,13 +545,23 @@ class DomainParser extends Parser {
       return t && t.tokenType && t.tokenType.tokenName === "SIGN_Restriction";
     };
 
+    /*
+    alias Name = String
+        | min 12  <-- The first token should always be at least one 
+                      Indent and then a restriction token
+        @ We could also have annotations
+        | max 30  <-- but we could also have an annotation first
+
+    The annotation first has not been implemented yet.
+    */
+
     return isOr(t2) || isOr(t3);
   }
 
   isGenericParameter(): boolean | undefined {
     let t1 = this.LA(1) as IToken;
-
-    return t1.image !== "extends";
+    let keywords = ["extends", "type", "alias", "data", "aggregate", "view", "map"];
+    return keywords.indexOf(t1.image) === -1;
   }
 
   isSub() {

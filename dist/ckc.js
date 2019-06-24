@@ -1,131 +1,258 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs_1 = require("fs");
-const transpiler_1 = require("./transpiler");
-const createERD_1 = require("./erd/createERD");
+const tslib_1 = require("tslib");
 const program = require("commander");
 const path_1 = require("path");
-const opn = require("open");
+const chalk_1 = require("chalk");
 const Project_1 = require("./Project");
+const ckc_init_1 = require("./ckc.init");
+const ckc_errors_1 = require("./ckc.errors");
+const promptly = require("promptly");
+const packageJSON = require("./../package.json");
 let projectPath = path_1.resolve("./");
 let moduleName = null;
-function id(val) {
-    return val;
-}
-function setModuleName(m) {
-    console.log(m);
-    moduleName = m;
-}
+// function id(val) {
+//   return val;
+// }
+// function setModuleName(m) {
+//   console.log(m);
+//   moduleName = m;
+// }
 /**
- *
- * @param {string} projectPath path to the project
+//  *
+//  * @param {string} projectPath path to the project
+//  */
+// function setProject(p) {
+//   projectPath = resolve(p);
+//   console.log(`Opening project at: ${projectPath}`);
+// }
+program.version(packageJSON.version, "-v, --version");
+// .option("-a", "Output the AST, default is true")
+// .option("-c", "Output the CST, default is false")
+// .option("-f, --file <s>", "The input file", id)
+// .option("-o, --open <s>", "Open a module", setModuleName)
+// .option(
+//   "-p, --project <s>",
+//   "Specify the project directory, the 'carconfig.json' location",
+//   setProject
+// )
+// .option("-u, --uml", "Output the UML")
+// .option(
+//   "-w, --watch",
+//   "Watch for file changes, can only be used together with the <project> flag."
+// )
+// .option("-d, --deflate", "Output the deflated uml url");
+/**
+ * INITIALIZE THE PROJECT
  */
-function setProject(p) {
-    projectPath = path_1.resolve(p);
-    console.log(`Opening project at: ${projectPath}`);
-}
 program
-    .version("1.3.0", "-v, --version")
-    .option("-a", "Output the AST, default is true")
-    .option("-c", "Output the CST, default is false")
-    .option("-f, --file <s>", "The input file", id)
-    .option("-i, --init", "Initialize the 'carconfig.json' file")
-    .option("-o, --open <s>", "Open a module", setModuleName)
-    .option("-p, --project <s>", "Specify the project directory, the 'carconfig.json' location", setProject)
-    .option("-u, --uml", "Output the UML")
-    .option("-w, --watch", "Watch for file changes, can only be used together with the <project> flag.")
-    .option("-d, --deflate", "Output the deflated uml url")
-    .parse(process.argv);
-if (program.project && program.watch && !program.open) {
-    // we'll watch the file system on save...
-    new Project_1.Project(projectPath)
-        .verify()
-        .then(project => {
-        project.watch();
-        setTimeout(() => {
-            opn(project.indexPath);
-        }, 100);
-    })
-        .catch(error => {
-        console.log(error);
-        process.exit(1);
+    .command("init")
+    .alias("i")
+    .description("Initialize the project")
+    .option("-p, --path", "Optionally the path to the Project, is not specified the current directory will be used.")
+    .action((...args) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+    let path = args.reverse()[1] || ".";
+    let projectPath = path_1.resolve(path);
+    const name = yield promptly.prompt("Name: ");
+    const description = yield promptly.prompt("Description: ", { default: "" });
+    const xsdNamespace = yield promptly.prompt("XSD namespace: ", { default: "no.namesapce.org/" });
+    const jsonNamespace = yield promptly.prompt("JSON Schema namespace: ", {
+        default: "https://no.namespace.org/"
     });
-}
-else if (program.project && !program.open) {
-    // if we look at a project we'll want to the parse every file, then
-    // include all the imports and do the rest...
-    //runProgram(program.project);
-    new Project_1.Project(projectPath)
-        .verify()
-        .then(project => {
-        project.compile();
-    })
-        .catch(error => {
-        console.log(error);
-        process.exit(1);
-    });
-}
-if (program.file) {
-    fs_1.readFile(program.file, "utf8", (err, sourceCode) => {
-        exports.maybeRaiseError(err);
-        const { errors, ast, tokens, cst } = transpiler_1.transpile(sourceCode);
-        if (errors && errors.length > 0) {
-            console.log(JSON.stringify(errors, null, 4));
-        }
-        else if (program.uml) {
-            console.log(createERD_1.createERD(ast));
-        }
-        else {
-            console.log(JSON.stringify(ast, null, 4));
-        }
-        process.exit(0);
-    });
-}
-if (program.init) {
-    new Project_1.Project(projectPath)
-        .init()
-        .then(success => {
-        if (success) {
-            console.log("");
-            process.exit(0);
-        }
-        else {
-            process.exit(1);
-        }
-    })
-        .catch(e => {
-        console.log("Failed to initialize the project");
-        console.log(e);
-        process.exit(1);
-    });
-}
-if (program.open) {
-    fs_1.readFile(path_1.join(projectPath, "carconfig.json"), "utf8", (err, data) => {
-        if (err) {
-            console.log(err);
-            process.exit(1);
-        }
-        const config = JSON.parse(data);
-        let version = config.version;
-        if (!version.startsWith("v")) {
-            version = "v" + version;
-        }
-        let versionPath = path_1.join(projectPath, config.outPath || ".out", version);
-        if (moduleName === null) {
-            const indexPath = path_1.join(versionPath, "index.html");
-            opn(indexPath);
-        }
-        else {
-            const htmlPath = path_1.join(versionPath, moduleName, moduleName + ".html");
-            console.log("Opening: file://" + htmlPath);
-            opn(htmlPath);
-        }
-    });
-}
-exports.maybeRaiseError = error => {
-    if (error) {
-        console.log(error);
-        process.exit(1);
+    const config = {
+        name,
+        description,
+        xsd: { namespace: xsdNamespace },
+        json: { namespace: jsonNamespace }
+    };
+    let project = yield ckc_init_1.initProject(projectPath, config);
+}));
+/**
+ * Verify the current project
+ */
+program
+    .command("verify")
+    .option("-p, --path <path>", "The path to build")
+    .description("Verify the current project")
+    .action((...args) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+    try {
+        let { path = ".", ts = false, xsd = false, all = false, module } = args.reverse()[0];
+        let fullPath = path_1.resolve(path);
+        let result = yield new Project_1.Project(fullPath).verify();
+        console.log(`Project at ${fullPath} has successfully been verified.`);
     }
+    catch (error) {
+        console.log(error);
+    }
+}));
+/**
+ * Build the Project and return the result; including the errors.
+ */
+program
+    .command("build")
+    .alias("b")
+    .description("Build the project")
+    .option("-p, --path <path>", "The path to build")
+    .option("-m, --module <module>", "The module which needs parsing")
+    .option("--xsd", "Build the XSD output")
+    .option("-t, --ts", "Build the TypeScript output")
+    .option("-a, --all", "Generate all the output")
+    .action((...args) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+    try {
+        let { path = ".", ts = false, xsd = false, all = false, module } = args.reverse()[0];
+        let fullPath = path_1.resolve(path);
+        let project = yield new Project_1.Project(fullPath).compile();
+        if (module) {
+            let $module = project.modules.find(m => m.name === module);
+            if (!$module) {
+                console.log(`${module} could not be found in the result-set. Please check your code and try again.`);
+            }
+            else {
+                if ($module.errors && $module.errors.length > 0) {
+                    console.log(chalk_1.default.red("We've found a few errors for you!"));
+                    console.log(ckc_errors_1.cliErrorMessageForModule($module));
+                }
+            }
+        }
+        else {
+            project.modules.forEach(m => {
+                if (m.errors && m.errors.length > 0) {
+                    console.log(chalk_1.default.red(`\nWe've found some errors in module "${m.name}"`));
+                    console.log(ckc_errors_1.cliErrorMessageForModule(m));
+                }
+                else {
+                    console.log(`Perfectly parsed module ${m.name}`);
+                }
+            });
+        }
+    }
+    catch (err) {
+        console.log(err);
+    }
+}));
+program
+    .command("watch")
+    .alias("w")
+    .option("-p, --path <path>", "The path to build")
+    .description("Watch the project")
+    .action((...args) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+    try {
+        let { path = ".", ts = false, xsd = false, all = false, module } = args.reverse()[0];
+        let fullPath = path_1.resolve(path);
+        let project = yield new Project_1.Project(fullPath).verify();
+        project.watch();
+        // for await (const path of project.watchCarFiles()) {
+        //   console.log(path);
+        // }
+    }
+    catch (err) {
+        console.log(err);
+    }
+    // log the errors
+    // console.log("Building TypeScript");
+    // console.log(project);
+}));
+program.parse(process.argv);
+// program.on("error", e => {
+//   console.log(e);
+// });
+// try {
+//   program.parse(process.argv);
+// } catch (e) {
+//   console.log(e);
+// }
+/*
+if (program.project && program.watch && !program.open) {
+  // we'll watch the file system on save...
+  new Project(projectPath)
+    .verify()
+    .then(project => {
+      project.watch();
+
+      setTimeout(() => {
+        opn(project.indexPath);
+      }, 100);
+    })
+    .catch(error => {
+      console.log(error);
+      process.exit(1);
+    });
+} else if (program.project && !program.open) {
+  // if we look at a project we'll want to the parse every file, then
+  // include all the imports and do the rest...
+  //runProgram(program.project);
+  new Project(projectPath)
+    .verify()
+    .then(project => {
+      project.compile();
+    })
+    .catch(error => {
+      console.log(error);
+      process.exit(1);
+    });
+}
+
+if (program.file) {
+  readFile(program.file, "utf8", (err, sourceCode) => {
+    maybeRaiseError(err);
+
+    const { errors, ast, tokens, cst } = transpile(sourceCode);
+
+    if (errors && errors.length > 0) {
+      console.log(JSON.stringify(errors, null, 4));
+    } else if (program.uml) {
+      console.log(createERD(ast));
+    } else {
+      console.log(JSON.stringify(ast, null, 4));
+    }
+    process.exit(0);
+  });
+}
+
+// if (program.init) {
+//   initProject(projectPath);
+// }
+
+if (program.open) {
+  new Project(projectPath)
+    .verify()
+    .then(project => {
+      if (!!!moduleName) {
+        //
+      }
+    })
+    .catch(err => {
+      console.log(err);
+    });
+
+  readFile(join(projectPath, "carconfig.json"), "utf8", (err, data) => {
+    if (err) {
+      console.log(err);
+      process.exit(1);
+    }
+    const config = JSON.parse(data);
+    let version = config.version;
+    if (!version.startsWith("v")) {
+      version = "v" + version;
+    }
+    let versionPath = join(projectPath, config.outPath || ".out", version);
+
+    if (moduleName === null) {
+      const indexPath = join(versionPath, "index.html");
+      opn(indexPath);
+    } else {
+      const htmlPath = join(versionPath, moduleName as string, moduleName + ".html");
+      console.log("Opening: file://" + htmlPath);
+      opn(htmlPath);
+    }
+  });
+}
+
+export const maybeRaiseError = error => {
+  if (error) {
+    console.log(error);
+    process.exit(1);
+  }
 };
+*/
 //# sourceMappingURL=ckc.js.map

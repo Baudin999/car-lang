@@ -7,7 +7,8 @@ import {
   ITypeField,
   IPluckedField,
   IAggregate,
-  IView
+  IView,
+  ErrorType
 } from "./outline";
 
 const lookupTree = {};
@@ -49,7 +50,8 @@ export const typeChecker = (ast: IExpression[] = []): IError[] => {
           if (!ref) {
             errors.push({
               message: `Cannot find type "${typeId}" of field "${field.id}" of type "${node.id}"`,
-              ...(field.ofType_start as ITokenStart)
+              ...(field.ofType_start as ITokenStart),
+              type: ErrorType.FieldTypeUndefined
             });
           }
 
@@ -62,7 +64,8 @@ export const typeChecker = (ast: IExpression[] = []): IError[] => {
                 message: `Cannot find type "${paramId}" of field "${field.id}" of type "${
                   node.id
                 }"`,
-                ...(field.ofType_params_start[i] as ITokenStart)
+                ...(field.ofType_params_start[i] as ITokenStart),
+                type: ErrorType.ParameterTypeUndefined
               });
             }
           }
@@ -148,7 +151,7 @@ export const typeChecker = (ast: IExpression[] = []): IError[] => {
           let valueObject = getNodeById(ast, [], v);
           if (!valueObject) {
             errors.push({
-              message: `Cannot find the Node "${v}" on View "${view.id || "Unnamed view"}"`,
+              message: `Cannot find the Type "${v}" in View "${view.id || "Unnamed view"}"`,
               ...view.nodes_start[i]
             });
           }

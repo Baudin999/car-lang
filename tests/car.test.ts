@@ -1,8 +1,7 @@
 import { DomainLexer } from "../src/lexer";
 import { parser } from "../src/parser";
 import { OutlineVisitor } from "./../src/outline";
-import { transpile } from "../src/transpiler";
-import { createERD } from "../src/erd/createERD";
+import { fakeModule } from "./fakes";
 
 const log = source => {
   console.log(JSON.stringify(source, null, 4));
@@ -41,12 +40,9 @@ type Person =
     FirstName: String
 
 `;
-  const { cst, ast, errors } = transpile(source);
-
-  if (errors && errors.length) log(errors);
-
-  it("CST should be defined", () => {
-    expect(cst).toBeDefined();
+  it("We should be able to tokenize", async () => {
+    let { cst, ast, errors } = await fakeModule(source);
+    expect(ast).toBeDefined();
   });
 });
 
@@ -56,12 +52,10 @@ describe("An alias type", () => {
 alias Foo = Something String
 
 `;
-  const { cst, errors, ast } = transpile(source);
 
-  it("CST should be defined", () => {
-    expect(cst).toBeDefined();
-  });
-  it("should contain errors because the type Something is unknown", () => {
+  it("We should be able to tokenize", async () => {
+    let { cst, ast, errors } = await fakeModule(source);
+    expect(ast).toBeDefined();
     expect(errors.length).toEqual(1);
   });
 });
@@ -74,11 +68,9 @@ choice Food =
     | "Filet 'o Fish"
 
 `;
-  const { cst, errors, ast, tokens } = transpile(source);
-
-  it("CST should be defined", () => {
-    expect(cst).toBeDefined();
-    expect(errors.length).toEqual(0);
+  it("We should be able to tokenize", async () => {
+    let { cst, ast, errors } = await fakeModule(source);
+    expect(ast).toBeDefined();
   });
 });
 
@@ -90,10 +82,9 @@ data Maybe a =
     | Nothing
 
 `;
-  const { cst, ast } = transpile(source);
-
-  it("CST should be defined", () => {
-    expect(cst).toBeDefined();
+  it("We should be able to tokenize", async () => {
+    let { cst, ast, errors } = await fakeModule(source);
+    expect(ast).toBeDefined();
   });
 });
 
@@ -120,10 +111,9 @@ type Success a b =
 
 
 `;
-  const { cst, ast, errors } = transpile(source);
-
-  it("Check the validity of the cst", () => {
-    expect(cst).toBeDefined();
+  it("We should be able to tokenize", async () => {
+    let { cst, ast, errors } = await fakeModule(source);
+    expect(ast).toBeDefined();
   });
 });
 
@@ -140,10 +130,9 @@ describe("Comments should be possible", () => {
 type Foo
 
 `;
-  const { cst, ast } = transpile(source);
-
-  it("Check the validity of the cst", () => {
-    expect(cst).toBeDefined();
+  it("We should be able to tokenize", async () => {
+    let { cst, ast, errors } = await fakeModule(source);
+    expect(ast).toBeDefined();
   });
 });
 
@@ -179,10 +168,9 @@ fun sum a b => a + b
  And another paragraph
 
 `;
-  const { tokens, cst, ast } = transpile(source);
-
-  it("Check the validity of the cst", () => {
-    expect(cst).toBeDefined();
+  it("We should be able to tokenize", async () => {
+    let { cst, ast, errors } = await fakeModule(source);
+    expect(ast).toBeDefined();
   });
 });
 
@@ -207,14 +195,9 @@ data FileSystemInfo =
     | DirectoryInfo
 
 `;
-  const { cst, ast, errors } = transpile(source);
-
-  //console.log(createERD(ast));
-
-  //console.log(ast);
-
-  it("Check the validity of the cst", () => {
-    expect(cst).toBeDefined();
+  it("We should be able to tokenize", async () => {
+    let { cst, ast, errors } = await fakeModule(source);
+    expect(ast).toBeDefined();
   });
 });
 
@@ -258,19 +241,8 @@ type Person extends MyEntity =
 
 `;
 
-  const { ast, cst, tokens, errors } = transpile(source);
-  //log(errors);
-  //log(ast);
-  //console.log(createERD(ast));
-
-  it("should have a test", () => {
-    expect(cst).toBeDefined();
+  it("We should be able to tokenize", async () => {
+    let { cst, ast, errors } = await fakeModule(source);
     expect(ast).toBeDefined();
-    expect(tokens).toBeDefined();
-    expect(errors).toBeDefined();
-  });
-
-  it("Should not contain errors", () => {
-    //expect(errors.length).toEqual(0);
   });
 });

@@ -1,0 +1,12 @@
+# Prelude
+
+The prelude is a simple set of types you can use to build 
+more complex types.
+
+@ A list
+type List a
+
+@ A nullable type
+data Maybe a =
+    | Just a
+    | Nothing

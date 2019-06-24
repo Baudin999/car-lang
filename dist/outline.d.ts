@@ -76,7 +76,9 @@ export declare class OutlineVisitor extends BaseCstVisitorWithDefaults {
 export interface IOpen {
     type: NodeType;
     module: string;
+    module_start: ITokenStart;
     imports: string[];
+    imports_start: ITokenStart[];
 }
 export interface IType {
     type: NodeType;
@@ -308,7 +310,7 @@ export interface IMarkdownList {
     items: string[];
 }
 export declare type IMarkdown = IMarkdownChapter | IMarkdownCode | IMarkdownImage | IMarkdownList | IMarkdownCode;
-export declare type IExpression = IType | IAlias | IData | IComment | IAggregate | IChoice | IFlow | IView | IMap | IGuideline | IMarkdownChapter | IMarkdownCode | IMarkdownImage | IMarkdownList | IMarkdownParagraph;
+export declare type IExpression = IOpen | IType | IAlias | IData | IComment | IAggregate | IChoice | IFlow | IView | IMap | IGuideline | IMarkdownChapter | IMarkdownCode | IMarkdownImage | IMarkdownList | IMarkdownParagraph;
 export declare enum NodeType {
     TYPE = "TYPE",
     TYPE_FIELD = "TYPE_FIELD",
@@ -341,6 +343,13 @@ export declare enum NodeType {
     FLOW_FUNCTION = "FLOW_FUNCTION",
     GUIDELINE = "GUIDELINE"
 }
+export declare enum ErrorType {
+    MismatchedTokenException = "MismatchedTokenException",
+    TypeUndefined = "TypeUndefined",
+    ParameterTypeUndefined = "ParameterTypeUndefined",
+    FieldTypeUndefined = "FieldTypeUndefined",
+    Other = "Other"
+}
 export interface IError {
     message: string | object;
     startLineNumber: number;
@@ -348,5 +357,6 @@ export interface IError {
     startColumn: number;
     endColumn: number;
     ruleStack?: string[];
+    type?: ErrorType;
 }
 export {};

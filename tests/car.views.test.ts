@@ -1,4 +1,6 @@
-import { transpile } from "../src/transpiler";
+import { IType, NodeType, IAlias, IData, IView } from "../src/outline";
+import { Module } from "./../src/Module";
+import { fakeConfig, fakeModule } from "./fakes";
 
 const log = source => {
   console.log(JSON.stringify(source, null, 4));
@@ -37,10 +39,19 @@ view PersonView {
 
 `;
 
-  const { tokens, errors, ast } = transpile(source);
-
-  it("AST should be defined", () => {
+  it("We should be able to tokenize", async next => {
+    let { cst, ast, errors } = await fakeModule(source);
+    expect(errors.length).toEqual(0);
     expect(ast).toBeDefined();
+    expect(ast.length).toEqual(4);
+    expect(ast[3].type).toEqual(NodeType.VIEW);
+    let view = ast[3] as IView;
+    expect(view.directives.length).toEqual(2);
+    expect(view.directives[0].key).toEqual("title");
+    expect(view.directives[0].value).toEqual("Person View");
+    expect(view.nodes.length).toEqual(1);
+    expect(view.nodes[0]).toEqual("Person");
+    next();
   });
 });
 
@@ -57,9 +68,10 @@ type Address
 
 `;
 
-  const { tokens, errors, ast } = transpile(source);
-
-  it("Errors should be of length 2", () => {
-    expect(errors.length).toEqual(2);
+  it("We should be able to tokenize", async next => {
+    let { cst, ast, errors } = await fakeModule(source);
+    expect(ast).toBeDefined();
+    expect(errors.length).toBe(2);
+    next();
   });
 });

@@ -16,6 +16,7 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Person">
+    <xsd:annotation></xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Person_Name" minOccurs="1" />
     </xsd:all>

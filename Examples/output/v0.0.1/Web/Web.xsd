@@ -10,6 +10,7 @@
     <xsd:annotation></xsd:annotation>
   </xsd:element>
   <xsd:complexType name="Response">
+    <xsd:annotation></xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Response_Body" minOccurs="1" />
     </xsd:all>
@@ -33,6 +34,7 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Customer">
+    <xsd:annotation></xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Customer_Name" minOccurs="1" />
       <xsd:element ref="self:Customer_Number" minOccurs="1" />
@@ -42,6 +44,7 @@
     <xsd:annotation></xsd:annotation>
   </xsd:element>
   <xsd:complexType name="CustomerResponse">
+    <xsd:annotation></xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:CustomerResponse_Body" minOccurs="1" />
     </xsd:all>
@@ -65,6 +68,7 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="Error">
+    <xsd:annotation></xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Error_Code" minOccurs="1" />
       <xsd:element ref="self:Error_Message" minOccurs="1" />
@@ -89,6 +93,7 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="NotFound">
+    <xsd:annotation></xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:NotFound_Code" minOccurs="1" />
       <xsd:element ref="self:NotFound_Message" minOccurs="1" />
@@ -113,6 +118,7 @@
     </xsd:simpleType>
   </xsd:element>
   <xsd:complexType name="OtherError">
+    <xsd:annotation></xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:OtherError_Code" minOccurs="1" />
       <xsd:element ref="self:OtherError_Message" minOccurs="1" />

@@ -1,4 +1,4 @@
-import { transpile } from "../src/transpiler";
+import { fakeModule } from "./fakes";
 
 const log = source => {
   console.log(JSON.stringify(source, null, 4));
@@ -21,11 +21,8 @@ guideline {
 
 `;
 
-  const { cst, ast, errors } = transpile(source);
-
-  //log(ast);
-
-  it("We should be able to tokenize", () => {
+  it("We should be able to tokenize", async () => {
+    let { cst, ast, errors } = await fakeModule(source);
     expect(ast).toBeDefined();
   });
 });

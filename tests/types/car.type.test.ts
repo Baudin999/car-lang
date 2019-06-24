@@ -1,4 +1,4 @@
-import { transpile } from "../../src/transpiler";
+import { fakeModule } from "./../fakes";
 import { IType, ITypeField } from "../../src/outline";
 
 const log = source => {
@@ -12,9 +12,8 @@ type Person
 
 `;
 
-  const { cst, errors, ast, tokens } = transpile(source);
-
-  it("CST should be defined", () => {
+  it("CST should be defined", async () => {
+    let { cst, ast, errors, tokens } = await fakeModule(source);
     expect(cst).toBeDefined();
     expect(ast).toBeDefined();
     expect(tokens).toBeDefined();
@@ -37,9 +36,8 @@ type Person
   
   `;
 
-  const { cst, errors, ast, tokens } = transpile(source);
-
-  it("CST should be defined", () => {
+  it("CST should be defined", async () => {
+    let { cst, ast, errors, tokens } = await fakeModule(source);
     expect(cst).toBeDefined();
     expect(ast).toBeDefined();
     expect(tokens).toBeDefined();
@@ -68,9 +66,8 @@ type Person =
 
     `;
 
-  const { cst, errors, ast, tokens } = transpile(source);
-
-  it("CST should be defined", () => {
+  it("CST should be defined", async () => {
+    let { cst, ast, errors, tokens } = await fakeModule(source);
     expect(cst).toBeDefined();
     expect(ast).toBeDefined();
     expect(tokens).toBeDefined();
@@ -96,30 +93,29 @@ type Person =
 
     `;
 
-  const { cst, errors, ast, tokens } = transpile(source);
-
-  it("CST should be defined", () => {
+  it("CST should be defined", async () => {
+    let { cst, ast, errors, tokens } = await fakeModule(source);
     expect(errors).toBeDefined();
     expect(errors.length).toEqual(1);
   });
 });
 
 describe("We can extend types", () => {
-  it("Should just work", () => {
+  it("Should just work", async () => {
     const source = `
-
+    
 type Human =
     FirstName: Maybe String
     LastName: String
     MiddleNames: List String
     DateOfBirth: Date
-
+    
 type Person extends Human =
     CallingName: String
+    
+    `;
 
-      `;
-
-    const { cst, errors, ast, tokens } = transpile(source);
+    let { cst, ast, errors, tokens } = await fakeModule(source);
 
     expect(cst).toBeDefined();
     expect(ast).toBeDefined();
@@ -132,7 +128,7 @@ type Person extends Human =
     expect((ast[1] as IType).fields.length).toEqual(5);
   });
 
-  it("We can't extend if the type does not exist", () => {
+  it("We can't extend if the type does not exist", async () => {
     const source = `
 
 type Human =
@@ -146,7 +142,7 @@ type Person extends Human, Ironman, Hulk =
 
       `;
 
-    const { cst, errors, ast, tokens } = transpile(source);
+    let { cst, ast, errors, tokens } = await fakeModule(source);
 
     expect(errors.length).toEqual(2);
   });
@@ -167,12 +163,14 @@ type Person =
 
       `;
 
-  const { cst, errors, ast, tokens } = transpile(source);
+  it("Should work", async () => {
+    let { cst, ast, errors, tokens } = await fakeModule(source);
 
-  expect(cst).toBeDefined();
-  expect(ast).toBeDefined();
-  expect(tokens).toBeDefined();
-  expect(errors).toBeDefined();
+    expect(cst).toBeDefined();
+    expect(ast).toBeDefined();
+    expect(tokens).toBeDefined();
+    expect(errors).toBeDefined();
+  });
 });
 
 describe("We can pluck and rename fields from types", () => {
@@ -196,18 +194,20 @@ type Person =
 
       `;
 
-  const { cst, errors, ast, tokens } = transpile(source);
+  it("Should work", async () => {
+    let { cst, ast, errors, tokens } = await fakeModule(source);
 
-  expect(cst).toBeDefined();
-  expect(ast).toBeDefined();
-  expect(tokens).toBeDefined();
-  expect(errors).toBeDefined();
+    expect(cst).toBeDefined();
+    expect(ast).toBeDefined();
+    expect(tokens).toBeDefined();
+    expect(errors).toBeDefined();
 
-  let personType = ast[1] as IType;
-  let fuurstNameField = personType.fields[0] as ITypeField;
-  expect(fuurstNameField.id).toEqual("FuurstName");
-  expect(fuurstNameField.ofType).toEqual("Maybe");
-  expect(fuurstNameField.ofType_params[0]).toEqual("String");
+    let personType = ast[1] as IType;
+    let fuurstNameField = personType.fields[0] as ITypeField;
+    expect(fuurstNameField.id).toEqual("FuurstName");
+    expect(fuurstNameField.ofType).toEqual("Maybe");
+    expect(fuurstNameField.ofType_params[0]).toEqual("String");
+  });
 });
 
 /* RECURSION */
@@ -237,10 +237,12 @@ data FileSystemInfo =
 
       `;
 
-  const { cst, errors, ast, tokens } = transpile(source);
+  it("Should work", async () => {
+    let { cst, ast, errors, tokens } = await fakeModule(source);
 
-  expect(cst).toBeDefined();
-  expect(ast).toBeDefined();
-  expect(tokens).toBeDefined();
-  expect(errors).toBeDefined();
+    expect(cst).toBeDefined();
+    expect(ast).toBeDefined();
+    expect(tokens).toBeDefined();
+    expect(errors).toBeDefined();
+  });
 });

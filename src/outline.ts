@@ -125,7 +125,9 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
     return {
       type: NodeType.OPEN,
       module: ctx.Identifier.map(i => i.image).join("."),
-      imports: this.visit(ctx.IMPORTING[0])
+      module_start: getStartToken(ctx.Identifier[0]),
+      imports: this.visit(ctx.IMPORTING[0]),
+      imports_start: ctx.IMPORTING[0].children.Identifier.map(getStartToken)
     };
   }
 
@@ -683,7 +685,9 @@ const parseDirectives = (ctx: any): IDirective[] => {
 export interface IOpen {
   type: NodeType;
   module: string;
+  module_start: ITokenStart;
   imports: string[];
+  imports_start: ITokenStart[];
 }
 
 export interface IType {
@@ -952,6 +956,7 @@ export type IMarkdown =
   | IMarkdownCode;
 
 export type IExpression =
+  | IOpen
   | IType
   | IAlias
   | IData
@@ -1008,6 +1013,14 @@ const defaultStart: ITokenStart = {
   endColumn: 0
 };
 
+export enum ErrorType {
+  MismatchedTokenException = "MismatchedTokenException",
+  TypeUndefined = "TypeUndefined",
+  ParameterTypeUndefined = "ParameterTypeUndefined",
+  FieldTypeUndefined = "FieldTypeUndefined",
+  Other = "Other"
+}
+
 export interface IError {
   message: string | object;
   startLineNumber: number;
@@ -1015,4 +1028,5 @@ export interface IError {
   startColumn: number;
   endColumn: number;
   ruleStack?: string[];
+  type?: ErrorType;
 }

@@ -1,6 +1,6 @@
 {
   "name": "car-lang",
-  "version": "1.1.0",
+  "version": "0.0.2",
   "description": "The language to rule dragons",
   "main": "dist/ckc.js",
   "repository": "https://github.com/Baudin999/car-lang.git",
@@ -19,6 +19,7 @@
     "clean": "rm -rf ./dist; rm -rf ./lib",
     "go": "yarn clean; yarn build; yarn railroad; yarn package; yarn move",
     "open": "ts-node ./src/ckc.ts -p ./Examples -o",
+    "ckc": "ts-node ./src/ckc.ts",
     "ci:build": "yarn clean; yarn build; yarn railroad; yarn package"
   },
   "dependencies": {
@@ -26,9 +27,11 @@
     "@types/lodash": "^4.14.122",
     "@types/ramda": "^0.26.1",
     "app-root-path": "^2.1.0",
+    "chalk": "^2.4.2",
     "chevrotain": "^4.2.0",
     "chokidar": "^2.1.2",
     "commander": "^2.19.0",
+    "file-watch-iterator": "^0.6.3",
     "fs-extra": "^7.0.1",
     "jest": "^24.3.1",
     "lodash": "^4.17.11",
@@ -36,6 +39,7 @@
     "open": "^6.0.0",
     "pkg": "^4.3.7",
     "pretty-data": "^0.40.0",
+    "promptly": "^3.0.3",
     "ramda": "^0.26.1",
     "string-hash": "^1.1.3",
     "ts-jest": "^24.0.0",
@@ -54,7 +58,10 @@
     "assets": [
       "./src/html/hljs.js",
       "./src/html/hljs.xcode.css",
-      "./src/html/hljs.default.css"
+      "./src/html/hljs.default.css",
+      "./package.json",
+      "./src/assets/styles.css",
+      "./src/assets/Prelude.car"
     ]
   }
 }

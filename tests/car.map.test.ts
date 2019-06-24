@@ -1,11 +1,7 @@
-import { DomainLexer } from "../src/lexer";
-import { parser } from "../src/parser";
-import { OutlineVisitor } from "./../src/outline";
-import { transpile } from "../src/transpiler";
-import { createERD } from "../src/erd/createERD";
+import { fakeModule } from "./fakes";
 
 const log = source => {
-    console.log(JSON.stringify(source, null, 4));
+  console.log(JSON.stringify(source, null, 4));
 };
 
 /**
@@ -13,7 +9,7 @@ const log = source => {
  * simple mind-maps and data flows.
  */
 describe("Define and parser a simple type", () => {
-    const source = `
+  const source = `
 
 map {
     Foo -> Bar -> "Or other thing I'd like to see" -> Something
@@ -24,13 +20,8 @@ map {
 }
 
 `;
-
-    const { cst, errors, ast, tokens } = transpile(source);
-
-    //log(ast);
-
-    it("should have a test", () => {
-        expect(cst).toBeDefined();
-        expect(ast).toBeDefined();
-    });
+  it("We should be able to tokenize", async () => {
+    let { cst, ast, errors } = await fakeModule(source);
+    expect(ast).toBeDefined();
+  });
 });

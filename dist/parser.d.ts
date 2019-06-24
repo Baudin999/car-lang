@@ -34,6 +34,7 @@ declare class DomainParser extends Parser {
     MAP: any;
     MAP_FLOW: any;
     MAP_FLOW_KEY: any;
+    COMMENT: any;
     IDENTIFIER: any;
     TYPE_IDENTIFIER: any;
     ID_OR_STRING: any;

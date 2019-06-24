@@ -1,5 +1,5 @@
-import { createXSD } from "../../src/xsd/createXSD";
-import { transpile } from "../../src/transpiler";
+import { createXSD } from "../../src/transformations/xsd/createXSD";
+import { fakeModule } from "../fakes";
 
 const log = source => {
   console.log(JSON.stringify(source, null, 4));
@@ -17,18 +17,15 @@ data FooBar =
     | Bar
   `;
 
-  const { ast, cst, tokens, errors } = transpile(source);
-  const xsd = createXSD(ast, {
-    version: "1.0",
-    xsd: {
-      namespace: "http://xsd.essent.nl"
-    }
-  } as any);
-
-  if (errors && errors.length > 0) log(errors);
-  //console.log(xsd);
-
-  it("Should not contain errors", () => {
+  it("We should be able to tokenize", async () => {
+    let { cst, ast, errors } = await fakeModule(source);
+    const xsd = createXSD(ast, {
+      version: "1.0",
+      xsd: {
+        namespace: "http://xsd.essent.nl"
+      }
+    } as any);
+    expect(ast).toBeDefined();
     expect(errors.length).toEqual(0);
   });
 });
