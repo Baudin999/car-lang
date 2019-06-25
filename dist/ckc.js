@@ -4,6 +4,7 @@ const tslib_1 = require("tslib");
 const program = require("commander");
 const path_1 = require("path");
 const chalk_1 = require("chalk");
+const opn = require("open");
 const Project_1 = require("./Project");
 const ckc_init_1 = require("./ckc.init");
 const ckc_errors_1 = require("./ckc.errors");
@@ -85,6 +86,21 @@ program
         console.log(error);
     }
 }));
+program
+    .command("clean")
+    .option("-p, --path <path>", "path to be cleaned")
+    .description("Clean the current builds and reset the output directory.")
+    .action((...args) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+    try {
+        let { path = ".", ts = false, xsd = false, all = false, module } = args.reverse()[0];
+        let fullPath = path_1.resolve(path);
+        let result = yield new Project_1.Project(fullPath).clean();
+        console.log(`Project at ${result.versionPath} has successfully cleaned.`);
+    }
+    catch (error) {
+        console.log(error);
+    }
+}));
 /**
  * Build the Project and return the result; including the errors.
  */
@@ -122,6 +138,7 @@ program
                 }
                 else {
                     console.log(`Perfectly parsed module ${m.name}`);
+                    m.writeDocumentation();
                 }
             });
         }
@@ -144,6 +161,28 @@ program
         // for await (const path of project.watchCarFiles()) {
         //   console.log(path);
         // }
+    }
+    catch (err) {
+        console.log(err);
+    }
+    // log the errors
+    // console.log("Building TypeScript");
+    // console.log(project);
+}));
+program
+    .command("open")
+    .alias("o")
+    .option("-p, --path <path>", "The path to the project")
+    .option("-m, --module <module>", "The name of the module")
+    .description("Open the module")
+    .action((...args) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+    try {
+        let { path = ".", ts = false, xsd = false, all = false, module } = args.reverse()[0];
+        let fullPath = path_1.resolve(path);
+        let project = yield new Project_1.Project(fullPath).verify();
+        let fileName = path_1.join(project.versionPath, module, module + ".html");
+        console.log("Opening: " + fileName);
+        opn(fileName);
     }
     catch (err) {
         console.log(err);

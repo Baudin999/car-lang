@@ -278,8 +278,12 @@ class DomainParser extends chevrotain_1.Parser {
             ]);
         });
         $.RULE("RESTRICTION", () => {
-            $.AT_LEAST_ONE(() => {
+            $.MANY(() => {
                 $.CONSUME(lexer_1.tokenLookup.Indent);
+                $.CONSUME(lexer_1.tokenLookup.AnnotationLiteral);
+            });
+            $.AT_LEAST_ONE(() => {
+                $.CONSUME1(lexer_1.tokenLookup.Indent);
             });
             $.CONSUME(lexer_1.tokenLookup.SIGN_Restriction);
             $.CONSUME(lexer_1.tokenLookup.RestrictionIdentifier);
@@ -424,6 +428,15 @@ class DomainParser extends chevrotain_1.Parser {
         const isOr = t => {
             return t && t.tokenType && t.tokenType.tokenName === "SIGN_Restriction";
         };
+        /*
+        alias Name = String
+            | min 12  <-- The first token should always be at least one
+                          Indent and then a restriction token
+            @ We could also have annotations
+            | max 30  <-- but we could also have an annotation first
+    
+        The annotation first has not been implemented yet.
+        */
         return isOr(t2) || isOr(t3);
     }
     isGenericParameter() {

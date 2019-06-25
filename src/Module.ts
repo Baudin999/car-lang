@@ -1,6 +1,6 @@
 import { IError, IExpression } from "./outline";
-import { IModule, fetchImage, IConfiguration } from "./helpers";
-import { readFile } from "fs";
+import { IModule, fetchImage, IConfiguration, readFileAsync } from "./helpers";
+import { readFile, readFileSync } from "fs";
 import { outputFile, remove } from "fs-extra";
 import { normalize, join } from "path";
 import { createAST } from "./transpiler";
@@ -13,6 +13,8 @@ import { createHTML } from "./transformations/html/createHTML";
 import { createXSD } from "./transformations/xsd/createXSD";
 import { createTS } from "./transformations/typescript/createTS";
 import { createJsonSchema } from "./transformations/jsonSchema/createJsonSchema";
+
+let styles = readFileSync(join(__dirname + "/../src/assets/styles.css"), "utf8");
 
 export class Module implements IModule {
   name: string;
@@ -57,13 +59,19 @@ export class Module implements IModule {
         .replace(/\\/g, ".")
         .replace(/\.car/, "")
         .replace(/^\./, "");
+      this.path = join(this.projectDirectory, this.config.outPath || ".out");
     } else {
       this.name = moduleName;
       this.fullPath = join(this.projectDirectory, this.name.replace(/\./g, "/") + ".car");
+      this.path = join(this.projectDirectory, this.config.outPath || ".out");
     }
 
-    this.path = normalize(this.fullPath);
-    this.outPath = join(this.config.version, this.name);
+    this.outPath = join(this.path, ("v" + this.config.version).replace(/^vv/, "v"), this.name);
+    try {
+      this.svgs = await readFileAsync(join(this.outPath, "svgs.json"), true);
+    } catch {
+      this.svgs = {};
+    }
 
     return new Promise<IModule>((resolve, reject) => {
       readFile(this.fullPath, "utf8", (err, source) => {
@@ -128,6 +136,62 @@ export class Module implements IModule {
     return this;
   }
 
+  writeDocumentation(): Promise<IModule> {
+    return new Promise<IModule>((resolve, reject) => {
+      // Save the actual plant UML which the tool outputs
+      // this will help with the maintainability of the tool.
+      const savePlantUML = (puml: string) => {
+        const filePathPuml = join(this.outPath, this.name + ".puml");
+        outputFile(filePathPuml, puml);
+      };
+
+      // Generate the SVG by going to the site and generating the svg
+      const generateSVG = (puml: string) => {
+        const url = generateURL(puml);
+        fetchImage(url).then(img => {
+          const filePathSVG = join(this.outPath, this.name + ".svg");
+          outputFile(filePathSVG, img);
+        });
+      };
+
+      // Create the entire ERD
+      const puml = createERD(this.ast);
+      const pumlHash = stringHash(puml).toString();
+      const isChanged = !this.svgs.erd || this.svgs.erd !== pumlHash;
+      if (puml && isChanged) {
+        this.svgs.erd = pumlHash;
+        savePlantUML(puml);
+        generateSVG(puml);
+      }
+
+      // Generate the HTML files
+      const { html, svgs } = createHTML(
+        this.ast,
+        this.outPath,
+        this.svgs || {},
+        puml ? this.name : undefined
+      );
+      const filePathHTML = join(this.outPath, this.name + ".html");
+      outputFile(filePathHTML, html);
+      const stylesPath = join(this.outPath, "styles.css");
+      outputFile(stylesPath, styles);
+
+      // DO SOMETHING WITH THE HASHES
+      this.svgs = svgs;
+      Object.keys(this.svgs).forEach(hash => {
+        if (hash === "erd" || hash === "hashes") return;
+        if (this.svgs.hashes.indexOf(hash) === -1) {
+          remove(join(this.outPath, hash + ".svg"));
+          delete this.svgs[hash];
+        }
+      });
+      this.svgs.hashes = [];
+      outputFile(join(this.outPath, "svgs.json"), JSON.stringify(this.svgs, null, 4));
+
+      resolve(this);
+    });
+  }
+
   toErd() {}
 
   // generateFullOutput(outPath: string): Promise<string> {
@@ -137,60 +201,15 @@ export class Module implements IModule {
   //     let modulePath = join(outPath, this.name);
 
   //     // Save the plantUML code to a .puml file
-  //     const savePlantUML = (puml: string) => {
-  //       const filePathPuml = join(modulePath, this.name + ".puml");
-  //       outputFile(filePathPuml, puml);
-  //     };
-
-  //     // Generate the SVG by going to the site and generating the svg
-  //     const generateSVG = (puml: string) => {
-  //       const url = generateURL(puml);
-  //       fetchImage(url).then(img => {
-  //         const filePathSVG = join(modulePath, this.name + ".svg");
-  //         outputFile(filePathSVG, img);
-  //       });
-  //     };
-
-  //     // Create the entire ERD
-  //     const puml = createERD(this.ast);
-  //     const pumlHash = stringHash(puml).toString();
-  //     const isChanged = !this.svgs.erd || this.svgs.erd !== pumlHash;
-  //     if (puml && isChanged) {
-  //       this.svgs.erd = pumlHash;
-  //       savePlantUML(puml);
-  //       generateSVG(puml);
-  //     }
+  // const savePlantUML = (puml: string) => {
+  //   const filePathPuml = join(modulePath, this.name + ".puml");
+  //   outputFile(filePathPuml, puml);
+  // };
 
   //     // Generate the XSD file
   //     const xsd = createXSD(this.ast, this.config);
   //     const filePathXSD = join(modulePath, this.name + ".xsd");
   //     outputFile(filePathXSD, xsd);
-
-  //     //
-  //     // Generate the HTML file
-  //     //
-  //     const { html, svgs } = createHTML(
-  //       this.ast,
-  //       modulePath,
-  //       this.svgs || {},
-  //       puml ? this.name : undefined
-  //     );
-  //     const filePathHTML = join(modulePath, this.name + ".html");
-  //     outputFile(filePathHTML, html);
-
-  //     //
-  //     // DO SOMETHING WITH THE HASHES
-  //     //
-  //     this.svgs = { ...svgs };
-  //     Object.keys(this.svgs).forEach(hash => {
-  //       if (hash === "erd" || hash === "hashes") return;
-  //       if (this.svgs.hashes.indexOf(hash) === -1) {
-  //         remove(join(modulePath, hash + ".svg"));
-  //         delete this.svgs[hash];
-  //       }
-  //     });
-  //     this.svgs.hashes = [];
-  //     outputFile(join(modulePath, "svgs.json"), JSON.stringify(this.svgs, null, 4));
 
   //     //
   //     // JSON SCHEMAS

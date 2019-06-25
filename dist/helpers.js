@@ -33,7 +33,7 @@ exports.clone = (source, template) => {
         return JSON.parse(JSON.stringify(source));
     }
 };
-exports.readFileAsync = (filePath, parse) => {
+exports.readFileAsync = (filePath, parse = false) => {
     return new Promise(function (resolve, reject) {
         fs_1.readFile(filePath, "utf8", (err, source) => {
             if (err)

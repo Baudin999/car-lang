@@ -62,6 +62,7 @@ export interface IModule {
     parse: () => IModule;
     link: (modules: IModule[]) => Promise<IModule>;
     update: (source?: string) => Promise<IModule>;
+    writeDocumentation: () => Promise<IModule>;
 }
 export interface IModuleDictionary {
     [module: string]: IModule;
@@ -69,7 +70,7 @@ export interface IModuleDictionary {
 export declare const flatten: <T>(items: T[]) => T[];
 export declare const purge: <T>(items: T[]) => T[];
 export declare const clone: (source: any, template?: any) => any;
-export declare const readFileAsync: (filePath: any, parse: any) => Promise<{}>;
+export declare const readFileAsync: (filePath: any, parse?: boolean) => Promise<{}>;
 /**
  * Fold a long line and intersperse with newlines at certain intervals
  * @param s - input string

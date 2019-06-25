@@ -1535,8 +1535,28 @@
   {
     "type": "Rule",
     "name": "RESTRICTION",
-    "orgText": "() => {\n            $.AT_LEAST_ONE(() => {\n                $.CONSUME(lexer_1.tokenLookup.Indent);\n            });\n            $.CONSUME(lexer_1.tokenLookup.SIGN_Restriction);\n            $.CONSUME(lexer_1.tokenLookup.RestrictionIdentifier);\n            $.OR([\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.NumberLiteral) },\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.StringLiteral) },\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.PatternLiteral) },\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.BooleanLiteral) }\n            ]);\n        }",
+    "orgText": "() => {\n            $.MANY(() => {\n                $.CONSUME(lexer_1.tokenLookup.Indent);\n                $.CONSUME(lexer_1.tokenLookup.AnnotationLiteral);\n            });\n            $.AT_LEAST_ONE(() => {\n                $.CONSUME1(lexer_1.tokenLookup.Indent);\n            });\n            $.CONSUME(lexer_1.tokenLookup.SIGN_Restriction);\n            $.CONSUME(lexer_1.tokenLookup.RestrictionIdentifier);\n            $.OR([\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.NumberLiteral) },\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.StringLiteral) },\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.PatternLiteral) },\n                { ALT: () => $.CONSUME(lexer_1.tokenLookup.BooleanLiteral) }\n            ]);\n        }",
     "definition": [
+      {
+        "type": "Repetition",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Terminal",
+            "name": "Indent",
+            "label": "Indent",
+            "idx": 0,
+            "pattern": "( {4})|\\t"
+          },
+          {
+            "type": "Terminal",
+            "name": "AnnotationLiteral",
+            "label": "AnnotationLiteral",
+            "idx": 0,
+            "pattern": "\\w*@.*\\n"
+          }
+        ]
+      },
       {
         "type": "RepetitionMandatory",
         "idx": 0,
@@ -1545,7 +1565,7 @@
             "type": "Terminal",
             "name": "Indent",
             "label": "Indent",
-            "idx": 0,
+            "idx": 1,
             "pattern": "( {4})|\\t"
           }
         ]

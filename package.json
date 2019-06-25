@@ -56,9 +56,6 @@
       "./node_modules/chevrotain/lib/chevrotain.min.js"
     ],
     "assets": [
-      "./src/html/hljs.js",
-      "./src/html/hljs.xcode.css",
-      "./src/html/hljs.default.css",
       "./package.json",
       "./src/assets/styles.css",
       "./src/assets/Prelude.car"

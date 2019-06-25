@@ -22,7 +22,7 @@ import { createTableDATA } from "./tableDATA";
 import { createTableCHOICE } from "./tableCHOICE";
 import { createTableALIAS } from "./tableALIAS";
 // @ts-ignore
-import { generateURL } from "./../deflate/deflate";
+import { generateURL } from "./../../deflate/deflate";
 import { createView } from "../erd/createERD";
 import { createFlow } from "../flows/createFlow";
 import { createMap } from "../maps/createMap";
@@ -152,7 +152,7 @@ export const createHTML = (
   <head>
     <title></title>
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
-    <link rel="stylesheet" href="./../style.css">
+    <link rel="stylesheet" href="./styles.css">
     <link rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/styles/default.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/highlight.min.js"></script>

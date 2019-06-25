@@ -8,7 +8,7 @@ const tableDATA_1 = require("./tableDATA");
 const tableCHOICE_1 = require("./tableCHOICE");
 const tableALIAS_1 = require("./tableALIAS");
 // @ts-ignore
-const deflate_1 = require("./../deflate/deflate");
+const deflate_1 = require("./../../deflate/deflate");
 const createERD_1 = require("../erd/createERD");
 const createFlow_1 = require("../flows/createFlow");
 const createMap_1 = require("../maps/createMap");

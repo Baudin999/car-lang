@@ -26,4 +26,5 @@ export declare class Project {
     watchCarFiles(): AsyncIterableIterator<any>;
     getModule(name: string): Promise<IModule | undefined>;
     getModules(): Promise<IModule[]>;
+    clean(): Promise<Project>;
 }

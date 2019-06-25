@@ -75,7 +75,7 @@ But we found an empty type.`;
                 });
             }
             else {
-                // console.log(parser.input);
+                //console.log(parser.input);
                 console.log(error);
             }
         });

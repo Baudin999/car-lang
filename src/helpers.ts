@@ -86,6 +86,8 @@ export interface IModule {
   link: (modules: IModule[]) => Promise<IModule>;
 
   update: (source?: string) => Promise<IModule>;
+
+  writeDocumentation: () => Promise<IModule>;
 }
 
 export interface IModuleDictionary {
@@ -108,7 +110,7 @@ export const clone = (source: any, template?: any) => {
   }
 };
 
-export const readFileAsync = (filePath, parse) => {
+export const readFileAsync = (filePath, parse = false) => {
   return new Promise(function(resolve, reject) {
     readFile(filePath, "utf8", (err, source) => {
       if (err) reject(err);

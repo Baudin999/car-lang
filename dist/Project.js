@@ -133,6 +133,9 @@ class Project {
                         }
                         else {
                             console.log(`Perfectly parsed module ${module.name}`);
+                            //console.log(module.outPath);
+                            //remove(module.outPath);
+                            //module.writeDocumentation();
                         }
                     }
                 }
@@ -208,14 +211,25 @@ class Project {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             try {
                 let paths = yield this.getCarFiles();
-                let modules = yield Promise.all(paths.map(path => {
-                    return new Module_1.Module(this.projectDirectory, this.config).init(path);
-                }));
+                let modules = yield Promise.all(paths.map((path) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+                    let module = yield new Module_1.Module(this.projectDirectory, this.config).init(path);
+                    return module;
+                })));
                 return modules;
             }
             catch (err) {
+                console.log(err);
                 return [];
             }
+        });
+    }
+    clean() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            if (!this.versionPath) {
+                yield this.verify();
+            }
+            fs_extra_1.remove(this.versionPath);
+            return this;
         });
     }
 }

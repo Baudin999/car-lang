@@ -31,5 +31,6 @@ export declare class Module implements IModule {
      */
     parse(): IModule;
     link(modules: IModule[]): Promise<IModule>;
+    writeDocumentation(): Promise<IModule>;
     toErd(): void;
 }

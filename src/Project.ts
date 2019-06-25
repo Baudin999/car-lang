@@ -144,6 +144,9 @@ export class Project {
           console.log(cliErrorMessageForModule(module));
         } else {
           console.log(`Perfectly parsed module ${module.name}`);
+          //console.log(module.outPath);
+          //remove(module.outPath);
+          //module.writeDocumentation();
         }
       }
     }
@@ -196,13 +199,23 @@ export class Project {
     try {
       let paths = await this.getCarFiles();
       let modules = await Promise.all(
-        paths.map(path => {
-          return new Module(this.projectDirectory, this.config).init(path);
+        paths.map(async path => {
+          let module = await new Module(this.projectDirectory, this.config).init(path);
+          return module;
         })
       );
       return modules;
     } catch (err) {
+      console.log(err);
       return [];
     }
+  }
+
+  async clean(): Promise<Project> {
+    if (!this.versionPath) {
+      await this.verify();
+    }
+    remove(this.versionPath);
+    return this;
   }
 }

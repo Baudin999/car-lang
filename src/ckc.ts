@@ -97,6 +97,21 @@ program
     }
   });
 
+program
+  .command("clean")
+  .option("-p, --path <path>", "path to be cleaned")
+  .description("Clean the current builds and reset the output directory.")
+  .action(async (...args) => {
+    try {
+      let { path = ".", ts = false, xsd = false, all = false, module } = args.reverse()[0];
+      let fullPath = resolve(path);
+      let result = await new Project(fullPath).clean();
+      console.log(`Project at ${result.versionPath} has successfully cleaned.`);
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
 /**
  * Build the Project and return the result; including the errors.
  */
@@ -134,6 +149,7 @@ program
             console.log(cliErrorMessageForModule(m));
           } else {
             console.log(`Perfectly parsed module ${m.name}`);
+            m.writeDocumentation();
           }
         });
       }
@@ -156,6 +172,30 @@ program
       // for await (const path of project.watchCarFiles()) {
       //   console.log(path);
       // }
+    } catch (err) {
+      console.log(err);
+    }
+
+    // log the errors
+
+    // console.log("Building TypeScript");
+    // console.log(project);
+  });
+
+program
+  .command("open")
+  .alias("o")
+  .option("-p, --path <path>", "The path to the project")
+  .option("-m, --module <module>", "The name of the module")
+  .description("Open the module")
+  .action(async (...args) => {
+    try {
+      let { path = ".", ts = false, xsd = false, all = false, module } = args.reverse()[0];
+      let fullPath = resolve(path);
+      let project = await new Project(fullPath).verify();
+      let fileName = join(project.versionPath, module, module + ".html");
+      console.log("Opening: " + fileName);
+      opn(fileName);
     } catch (err) {
       console.log(err);
     }
