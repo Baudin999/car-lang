@@ -135,7 +135,7 @@ exports.createHTML = (ast, modulePath, svgs, moduleName) => {
   <head>
     <title></title>
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
-    <link rel="stylesheet" href="./../style.css">
+    <link rel="stylesheet" href="./styles.css">
     <link rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/styles/default.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/highlight.min.js"></script>

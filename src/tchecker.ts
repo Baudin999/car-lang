@@ -70,46 +70,6 @@ export const typeChecker = (ast: IExpression[] = []): IError[] => {
             }
           }
         });
-
-      // check the plucked fields for errors
-      node.fields
-        .filter(field => field.type == NodeType.PLUCKED_FIELD)
-        .forEach(
-          (field: IPluckedField): void => {
-            if (field.parts.length === 1) {
-              errors.push({
-                message: `Cannot pluck the entire object, must specify a field.`,
-                ...(field.parts_start[0] as ITokenStart)
-              });
-            }
-
-            // the id of the field
-            let typeId = field.parts[0];
-            let ref = getNodeById(ast, node.params, typeId);
-            if (!ref) {
-              errors.push({
-                message: `Cannot find type "${typeId}" to pluck from on type ${node.id}`,
-                ...field.parts_start[0]
-              });
-              return;
-            }
-            if ((ref as any).type !== NodeType.TYPE) {
-              errors.push({
-                message: `Can only pluck from a type`,
-                ...field.parts_start[0]
-              });
-            }
-            let refField = (ref as IType).fields.find(
-              f => f.type === NodeType.TYPE_FIELD && (f as ITypeField).id === field.parts[1]
-            );
-            if (!refField) {
-              errors.push({
-                message: `Cannot find field "${field.parts[1]}" of type "${typeId}" to pluck`,
-                ...field.parts_start[1]
-              });
-            }
-          }
-        );
     });
 
   /**

@@ -1,5 +1,13 @@
 import { baseTypes, clone, purge } from "./helpers";
-import { IExpression, IType, NodeType, IError, ITypeField, IPluckedField } from "./outline";
+import {
+  IExpression,
+  IType,
+  NodeType,
+  IError,
+  ITypeField,
+  IPluckedField,
+  ErrorType
+} from "./outline";
 
 const lookupTree = {};
 
@@ -92,6 +100,7 @@ export const substitutePluckedFields = (
   ast: IExpression[] = []
 ): { ast: IExpression[]; errors: IError[] } => {
   const errors: IError[] = [];
+
   if (!Array.isArray(ast)) return { ast: [], errors: [] };
   const newAST = ast.map((node: IType) => {
     if (node.type !== NodeType.TYPE) return node;
@@ -99,38 +108,77 @@ export const substitutePluckedFields = (
       let newNode = node as IType;
 
       // Manage the plucked fields
-      newNode.fields = node.fields.map((field: any) => {
-        if (field.type !== NodeType.PLUCKED_FIELD) return field;
-        let [ofType, fieldName] = field.parts;
-        let targetNode = getNodeById(ast, [], ofType) as any;
-        if (!targetNode) return field;
-        let targetField = (targetNode.fields || []).find(f => f.id === fieldName);
-        let result = clone(targetField);
+      newNode.fields = purge(
+        node.fields.map((field: any) => {
+          if (field.type !== NodeType.PLUCKED_FIELD) return field;
+          let [ofType, fieldName] = field.parts;
+          let targetNode = getNodeById(ast, [], ofType) as any;
+          if (!targetNode) {
+            errors.push({
+              message: `Could not find the type "${ofType}" to pluck from.
+The type you're plucking from should be defined. 
+              `.trim(),
+              ...field.parts_start[0],
+              type: ErrorType.PluckedFieldUndefined
+            });
+            return field;
+          }
+          let targetField = (targetNode.fields || []).find(f => f.id === fieldName);
+          if (!targetField) {
+            if (fieldName === undefined) {
+              errors.push({
+                message: `Could not find the field to pluck from.
+Plucking always looks like this:
 
-        // Here we manipulate the annotations of the result in order to get
-        // everything we need to this new field.
-        result.annotations = result.annotations.map(a => {
-          if (a.key !== "description") return a;
-          else return { key: "original description", value: a.value };
-        });
-        result.annotations.push({
-          key: "plucked from",
-          value: `${ofType}.${fieldName}`
-        });
-        Array.prototype.push.apply(result.annotations, field.annotations);
+type Temp =
+    pluck Person.FirstName
 
-        // We should also manipulate the restrictions of the new fields
-        // we might override the previous restrictions when plucking.
-        let restrictions = targetField.restrictions || [];
-        (field.restrictions || []).forEach(r => {
-          let or = restrictions.find(_r => _r.key === r.key);
-          if (!or) restrictions.push(r);
-          else or.value = r.value;
-        });
+or, if you only want to pluck the Type but want to rename the field:
 
-        result.restrictions = restrictions;
-        return result;
-      });
+type Temp =
+    NewName: Person.FirstName
+
+                `.trim(),
+                ...field.parts_start[0],
+                type: ErrorType.PluckedFieldUndefined
+              });
+              return field;
+            } else {
+              errors.push({
+                message: `Could not find the field "${fieldName}" on type "${ofType}" to pluck from.`,
+                ...field.parts_start[1],
+                type: ErrorType.PluckedFieldUnknown
+              });
+              return field;
+            }
+          }
+          let result = clone(targetField);
+
+          // Here we manipulate the annotations of the result in order to get
+          // everything we need to this new field.
+          result.annotations = result.annotations.map(a => {
+            if (a.key !== "description") return a;
+            else return { key: "original description", value: a.value };
+          });
+          result.annotations.push({
+            key: "plucked from",
+            value: `${ofType}.${fieldName}`
+          });
+          Array.prototype.push.apply(result.annotations, field.annotations);
+
+          // We should also manipulate the restrictions of the new fields
+          // we might override the previous restrictions when plucking.
+          let restrictions = targetField.restrictions || [];
+          (field.restrictions || []).forEach(r => {
+            let or = restrictions.find(_r => _r.key === r.key);
+            if (!or) restrictions.push(r);
+            else or.value = r.value;
+          });
+
+          result.restrictions = restrictions;
+          return result;
+        })
+      );
 
       // Manage and substitute the fields which take the type from
       // another field in the application.

@@ -481,6 +481,12 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
         id: ctx.FieldName[0].image,
         id_start: getStartToken(ctx.FieldName[0])
       };
+    } else if (ctx.Identifier.length > 1) {
+      //throw new Error("Invalid number of Identifiers");
+      return {
+        id: ctx.Identifier[0].image,
+        id_start: getStartToken(ctx.Identifier[0])
+      };
     } else {
       return {
         id: ctx.Identifier[0].image,
@@ -1018,6 +1024,8 @@ export enum ErrorType {
   TypeUndefined = "TypeUndefined",
   ParameterTypeUndefined = "ParameterTypeUndefined",
   FieldTypeUndefined = "FieldTypeUndefined",
+  PluckedFieldUnknown = "PluckedFieldUnknown",
+  PluckedFieldUndefined = "PluckedFieldUndefined",
   Other = "Other"
 }
 

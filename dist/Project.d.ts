@@ -20,11 +20,12 @@ export declare class Project {
      */
     verify(): Promise<Project>;
     init(template: any): Promise<Project>;
-    compile(): Promise<Project>;
+    compile(ignore?: boolean): Promise<Project>;
     watch(): Promise<void>;
+    writeIndexFile(): Promise<Project>;
     getCarFiles(): Promise<string[]>;
     watchCarFiles(): AsyncIterableIterator<any>;
-    getModule(name: string): Promise<IModule | undefined>;
+    getModule(name: string): Promise<IModule>;
     getModules(): Promise<IModule[]>;
     clean(): Promise<Project>;
 }

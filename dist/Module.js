@@ -11,9 +11,14 @@ const stringHash = require("string-hash");
 const deflate_1 = require("./deflate/deflate");
 const createERD_1 = require("./transformations/erd/createERD");
 const createHTML_1 = require("./transformations/html/createHTML");
-console.log(__dirname);
+const createXSD_1 = require("./transformations/xsd/createXSD");
+const createTS_1 = require("./transformations/typescript/createTS");
+const createJsonSchema_1 = require("./transformations/jsonSchema/createJsonSchema");
+const substitute_1 = require("./substitute");
+const tchecker_1 = require("./tchecker");
+const chalk_1 = require("chalk");
+const ckc_errors_1 = require("./ckc.errors");
 let styles = fs_1.readFileSync(path_1.join(__dirname + "/../src/assets/styles.css"), "utf8");
-console.log(styles);
 class Module {
     /**
      * Ceate/initialize a module.
@@ -45,6 +50,7 @@ class Module {
                 this.path = path_1.join(this.projectDirectory, this.config.outPath || ".out");
             }
             this.outPath = path_1.join(this.path, ("v" + this.config.version).replace(/^vv/, "v"), this.name);
+            this.htmlPath = path_1.join(this.outPath, this.name + ".html");
             try {
                 this.svgs = yield helpers_1.readFileAsync(path_1.join(this.outPath, "svgs.json"), true);
             }
@@ -57,6 +63,10 @@ class Module {
                         reject(`Could not initialize module "${this.name}" in directory ${this.projectDirectory}`);
                     }
                     this.source = source.trimRight();
+                    this.ast = [];
+                    this.cst = [];
+                    this.tokens = [];
+                    this.errors = [];
                     resolve(this);
                 });
             });
@@ -101,10 +111,27 @@ class Module {
         }
         this.hash = newHash;
         this.timestamp = new Date();
-        this.ast = result.ast;
-        this.cst = result.cst;
+        this.ast = !result.ast || !Array.isArray(result.ast) ? [] : result.ast;
+        this.cst = result.cst || [];
         this.errors = result.errors || [];
-        this.tokens = result.tokens;
+        this.tokens = result.tokens || [];
+        return this;
+    }
+    typeCheck() {
+        let r0 = substitute_1.substitutePluckedFields(this.ast);
+        let r1 = substitute_1.substituteAliases(r0.ast);
+        let r2 = substitute_1.substituteExtensions(r1.ast);
+        let errors = tchecker_1.typeChecker(r2.ast);
+        this.ast = r2.ast;
+        this.errors = [...this.errors, ...r0.errors, ...r1.errors, ...r2.errors, ...errors];
+        // now output the found errors
+        if (this.errors && this.errors.length > 0) {
+            console.log(chalk_1.default.red(`\nWe've found some errors in module "${this.name}"`));
+            console.log(ckc_errors_1.cliErrorMessageForModule(this));
+        }
+        else {
+            console.log(`Perfectly parsed module ${this.name}`);
+        }
         return this;
     }
     link(modules) {
@@ -141,8 +168,10 @@ class Module {
             const { html, svgs } = createHTML_1.createHTML(this.ast, this.outPath, this.svgs || {}, puml ? this.name : undefined);
             const filePathHTML = path_1.join(this.outPath, this.name + ".html");
             fs_extra_1.outputFile(filePathHTML, html);
+            const stylesPath = path_1.join(this.outPath, "styles.css");
+            fs_extra_1.outputFile(stylesPath, styles);
             // DO SOMETHING WITH THE HASHES
-            this.svgs = Object.assign({}, svgs);
+            this.svgs = svgs;
             Object.keys(this.svgs).forEach(hash => {
                 if (hash === "erd" || hash === "hashes")
                     return;
@@ -153,6 +182,32 @@ class Module {
             });
             this.svgs.hashes = [];
             fs_extra_1.outputFile(path_1.join(this.outPath, "svgs.json"), JSON.stringify(this.svgs, null, 4));
+            resolve(this);
+        });
+    }
+    writeJSONSchema() {
+        return new Promise((resolve, reject) => {
+            const schemas = createJsonSchema_1.createJsonSchema(this.ast);
+            schemas.map(schema => {
+                const schemaPath = path_1.join(this.outPath, schema.name + ".json");
+                fs_extra_1.outputFile(schemaPath, JSON.stringify(schema.schema, null, 4));
+            });
+            resolve(this);
+        });
+    }
+    writeXSD() {
+        return new Promise((resolve, reject) => {
+            const xsd = createXSD_1.createXSD(this.ast, this.config);
+            const filePathXSD = path_1.join(this.outPath, this.name + ".xsd");
+            fs_extra_1.outputFile(filePathXSD, xsd);
+            resolve(this);
+        });
+    }
+    writeTypeScript() {
+        return new Promise((resolve, reject) => {
+            const tsFileContent = createTS_1.createTS(this.ast);
+            const tsPath = path_1.join(this.outPath, this.name + ".ts");
+            fs_extra_1.outputFile(tsPath, tsFileContent);
             resolve(this);
         });
     }

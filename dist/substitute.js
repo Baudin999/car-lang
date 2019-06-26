@@ -91,7 +91,7 @@ exports.substitutePluckedFields = (ast = []) => {
         else {
             let newNode = node;
             // Manage the plucked fields
-            newNode.fields = node.fields.map((field) => {
+            newNode.fields = (node.fields || []).map((field) => {
                 if (field.type !== outline_1.NodeType.PLUCKED_FIELD)
                     return field;
                 let [ofType, fieldName] = field.parts;

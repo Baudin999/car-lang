@@ -241,6 +241,15 @@ export class Module implements IModule {
     });
   }
 
+  writeTypeScript(): Promise<IModule> {
+    return new Promise((resolve, reject) => {
+      const tsFileContent = createTS(this.ast);
+      const tsPath = join(this.outPath, this.name + ".ts");
+      outputFile(tsPath, tsFileContent);
+      resolve(this);
+    });
+  }
+
   toErd() {}
 
   // generateFullOutput(outPath: string): Promise<string> {

@@ -58,11 +58,15 @@ export interface IModule {
     fullPath: string;
     source: string;
     outPath: string;
+    htmlPath: string;
     config: IConfiguration;
     parse: () => IModule;
+    typeCheck: () => IModule;
     link: (modules: IModule[]) => Promise<IModule>;
     update: (source?: string) => Promise<IModule>;
     writeDocumentation: () => Promise<IModule>;
+    writeJSONSchema: () => Promise<IModule>;
+    writeXSD: () => Promise<IModule>;
 }
 export interface IModuleDictionary {
     [module: string]: IModule;

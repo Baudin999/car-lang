@@ -9,10 +9,7 @@ const watchAsync = require("file-watch-iterator");
 const Module_1 = require("./Module");
 const transpiler_1 = require("./transpiler");
 const helpers_1 = require("./helpers");
-const substitute_1 = require("./substitute");
-const tchecker_1 = require("./tchecker");
-const chalk_1 = require("chalk");
-const ckc_errors_1 = require("./ckc.errors");
+const createIndexPage_1 = require("./transformations/html/createIndexPage");
 /**
  * This module is a Project Module. A project is a directory containing
  * a carconfig.json file.
@@ -84,7 +81,7 @@ class Project {
             });
         });
     }
-    compile() {
+    compile(ignore = false) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             try {
                 yield this.verify();
@@ -92,14 +89,17 @@ class Project {
                 this.modules = this.modules.map(m => m.parse());
                 this.modules = transpiler_1.resolveImports(this.modules);
                 this.modules = this.modules.map(m => {
-                    let r0 = substitute_1.substitutePluckedFields(m.ast);
-                    let r1 = substitute_1.substituteAliases(r0.ast);
-                    let r2 = substitute_1.substituteExtensions(r1.ast);
-                    let errors = tchecker_1.typeChecker(r2.ast);
-                    m.ast = r2.ast;
-                    m.errors = [...m.errors, ...r0.errors, ...r1.errors, ...r2.errors, ...errors];
+                    if (!ignore) {
+                        m.typeCheck();
+                        if (m.errors.length === 0) {
+                            m.writeDocumentation();
+                            m.writeJSONSchema();
+                            m.writeXSD();
+                        }
+                    }
                     return m;
                 });
+                this.writeIndexFile();
                 return this;
             }
             catch (err) {
@@ -111,31 +111,28 @@ class Project {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             var e_1, _a;
             console.log(`Start watching the Project`);
-            let project = yield this.compile();
+            let project = yield this.compile(true);
             try {
                 for (var _b = tslib_1.__asyncValues(this.watchCarFiles()), _c; _c = yield _b.next(), !_c.done;) {
                     const file = _c.value;
                     let module = this.modules.find(m => m.fullPath === file);
-                    if (module) {
+                    if (!module) {
+                        module = yield this.getModule(file);
+                        console.log("Gotten the newly created Module.");
+                        this.modules.push(module);
+                        this.writeIndexFile();
+                    }
+                    else {
                         module = yield module.update();
+                    }
+                    if (module) {
                         module.parse();
                         this.modules = transpiler_1.resolveImports(this.modules);
-                        let r0 = substitute_1.substitutePluckedFields(module.ast);
-                        let r1 = substitute_1.substituteAliases(r0.ast);
-                        let r2 = substitute_1.substituteExtensions(r1.ast);
-                        let errors = tchecker_1.typeChecker(r2.ast);
-                        module.ast = r2.ast;
-                        module.errors = [...module.errors, ...r0.errors, ...r1.errors, ...r2.errors, ...errors];
-                        // now output the found errors
-                        if (module.errors && module.errors.length > 0) {
-                            console.log(chalk_1.default.red(`\nWe've found some errors in module "${module.name}"`));
-                            console.log(ckc_errors_1.cliErrorMessageForModule(module));
-                        }
-                        else {
-                            console.log(`Perfectly parsed module ${module.name}`);
-                            //console.log(module.outPath);
-                            //remove(module.outPath);
-                            //module.writeDocumentation();
+                        module.typeCheck();
+                        if (module.errors.length === 0) {
+                            module.writeDocumentation();
+                            module.writeJSONSchema();
+                            module.writeXSD();
                         }
                     }
                 }
@@ -147,6 +144,15 @@ class Project {
                 }
                 finally { if (e_1) throw e_1.error; }
             }
+        });
+    }
+    writeIndexFile() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => {
+                let source = createIndexPage_1.createIndexPage(this.modules);
+                fs_extra_1.outputFile(path_1.join(this.versionPath, "index.html"), source);
+                resolve(this);
+            });
         });
     }
     getCarFiles() {
@@ -203,7 +209,7 @@ class Project {
             }
             catch (err) {
                 console.log(err);
-                return;
+                throw new Error("Could not find module");
             }
         });
     }

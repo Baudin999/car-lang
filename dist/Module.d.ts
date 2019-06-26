@@ -13,6 +13,7 @@ export declare class Module implements IModule {
     fullPath: string;
     source: string;
     outPath: string;
+    htmlPath: string;
     config: IConfiguration;
     svgs: any;
     projectDirectory: string;
@@ -30,7 +31,11 @@ export declare class Module implements IModule {
      * @returns {Module} The updated module
      */
     parse(): IModule;
+    typeCheck(): IModule;
     link(modules: IModule[]): Promise<IModule>;
     writeDocumentation(): Promise<IModule>;
+    writeJSONSchema(): Promise<IModule>;
+    writeXSD(): Promise<IModule>;
+    writeTypeScript(): Promise<IModule>;
     toErd(): void;
 }

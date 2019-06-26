@@ -1,3 +1,4 @@
 # Chapter One
 
-type Person
+type Person =
+    FirstName

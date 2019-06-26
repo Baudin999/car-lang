@@ -2,6 +2,14 @@ class "CreditCard" as CreditCard  {
 	Number: String 
 	ExpirationDate: Date 
 }
+class "CreditCard" as CreditCard  {
+	Number: String 
+	ExpirationDate: Date 
+}
+class "CreditCard" as CreditCard  {
+	Number: String 
+	ExpirationDate: Date 
+}
 enum Gender {
 	Male
 	Female
