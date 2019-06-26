@@ -1,15 +1,12 @@
 import { exists, readFileSync } from "fs";
-import { join, normalize } from "path";
-import { remove, outputFile, readFile } from "fs-extra";
+import { join } from "path";
+import { remove, outputFile } from "fs-extra";
 import { watch } from "chokidar";
 const watchAsync = require("file-watch-iterator");
 import { Module } from "./Module";
 import { resolveImports } from "./transpiler";
 import { IConfiguration, readFileAsync, purge, IModule } from "./helpers";
-import { substitutePluckedFields, substituteAliases, substituteExtensions } from "./substitute";
-import { typeChecker } from "./tchecker";
-import chalk from "chalk";
-import { cliErrorMessageForModule } from "./ckc.errors";
+import { createIndexPage } from "./transformations/html/createIndexPage";
 
 /**
  * This module is a Project Module. A project is a directory containing
@@ -99,22 +96,24 @@ export class Project {
     });
   }
 
-  async compile(): Promise<Project> {
+  async compile(ignore = false): Promise<Project> {
     try {
       await this.verify();
       this.modules = await this.getModules();
       this.modules = this.modules.map(m => m.parse());
       this.modules = resolveImports(this.modules);
       this.modules = this.modules.map(m => {
-        let r0 = substitutePluckedFields(m.ast);
-        let r1 = substituteAliases(r0.ast);
-        let r2 = substituteExtensions(r1.ast);
-        let errors = typeChecker(r2.ast);
-
-        m.ast = r2.ast;
-        m.errors = [...m.errors, ...r0.errors, ...r1.errors, ...r2.errors, ...errors];
+        if (!ignore) {
+          m.typeCheck();
+          if (m.errors.length === 0) {
+            m.writeDocumentation();
+            m.writeJSONSchema();
+            m.writeXSD();
+          }
+        }
         return m;
       });
+      this.writeIndexFile();
       return this;
     } catch (err) {
       return err;
@@ -123,33 +122,36 @@ export class Project {
 
   async watch() {
     console.log(`Start watching the Project`);
-    let project = await this.compile();
+    let project = await this.compile(true);
     for await (const file of this.watchCarFiles()) {
       let module = this.modules.find(m => m.fullPath === file);
-      if (module) {
+      if (!module) {
+        module = await this.getModule(file);
+        console.log("Gotten the newly created Module.");
+        this.modules.push(module);
+        this.writeIndexFile();
+      } else {
         module = await module.update();
+      }
+      if (module) {
         module.parse();
         this.modules = resolveImports(this.modules);
-        let r0 = substitutePluckedFields(module.ast);
-        let r1 = substituteAliases(r0.ast);
-        let r2 = substituteExtensions(r1.ast);
-        let errors = typeChecker(r2.ast);
-
-        module.ast = r2.ast;
-        module.errors = [...module.errors, ...r0.errors, ...r1.errors, ...r2.errors, ...errors];
-
-        // now output the found errors
-        if (module.errors && module.errors.length > 0) {
-          console.log(chalk.red(`\nWe've found some errors in module "${module.name}"`));
-          console.log(cliErrorMessageForModule(module));
-        } else {
-          console.log(`Perfectly parsed module ${module.name}`);
-          //console.log(module.outPath);
-          //remove(module.outPath);
-          //module.writeDocumentation();
+        module.typeCheck();
+        if (module.errors.length === 0) {
+          module.writeDocumentation();
+          module.writeJSONSchema();
+          module.writeXSD();
         }
       }
     }
+  }
+
+  async writeIndexFile(): Promise<Project> {
+    return new Promise((resolve, reject) => {
+      let source = createIndexPage(this.modules);
+      outputFile(join(this.versionPath, "index.html"), source);
+      resolve(this);
+    });
   }
 
   async getCarFiles(): Promise<string[]> {
@@ -186,12 +188,12 @@ export class Project {
     }
   }
 
-  async getModule(name: string): Promise<IModule | undefined> {
+  async getModule(name: string): Promise<IModule> {
     try {
       return new Module(this.projectDirectory, this.config).init(name);
     } catch (err) {
       console.log(err);
-      return;
+      throw new Error("Could not find module");
     }
   }
 

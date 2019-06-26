@@ -13,6 +13,10 @@ import { createHTML } from "./transformations/html/createHTML";
 import { createXSD } from "./transformations/xsd/createXSD";
 import { createTS } from "./transformations/typescript/createTS";
 import { createJsonSchema } from "./transformations/jsonSchema/createJsonSchema";
+import { substitutePluckedFields, substituteAliases, substituteExtensions } from "./substitute";
+import { typeChecker } from "./tchecker";
+import chalk from "chalk";
+import { cliErrorMessageForModule } from "./ckc.errors";
 
 let styles = readFileSync(join(__dirname + "/../src/assets/styles.css"), "utf8");
 
@@ -30,6 +34,7 @@ export class Module implements IModule {
   // The output path of this module, use this to load the svgs and
   // other assets needed to avoid useless HTTP requests.
   outPath: string;
+  htmlPath: string;
   config: IConfiguration;
   // a hash of stringHashes and urls
   svgs: any;
@@ -67,6 +72,7 @@ export class Module implements IModule {
     }
 
     this.outPath = join(this.path, ("v" + this.config.version).replace(/^vv/, "v"), this.name);
+    this.htmlPath = join(this.outPath, this.name + ".html");
     try {
       this.svgs = await readFileAsync(join(this.outPath, "svgs.json"), true);
     } catch {
@@ -81,6 +87,10 @@ export class Module implements IModule {
           );
         }
         this.source = source.trimRight();
+        this.ast = [];
+        this.cst = [];
+        this.tokens = [];
+        this.errors = [];
         resolve(this);
       });
     });
@@ -125,10 +135,29 @@ export class Module implements IModule {
 
     this.hash = newHash;
     this.timestamp = new Date();
-    this.ast = result.ast;
-    this.cst = result.cst;
+    this.ast = !result.ast || !Array.isArray(result.ast) ? [] : result.ast;
+    this.cst = result.cst || [];
     this.errors = result.errors || [];
-    this.tokens = result.tokens;
+    this.tokens = result.tokens || [];
+    return this;
+  }
+
+  typeCheck(): IModule {
+    let r0 = substitutePluckedFields(this.ast);
+    let r1 = substituteAliases(r0.ast);
+    let r2 = substituteExtensions(r1.ast);
+    let errors = typeChecker(r2.ast);
+
+    this.ast = r2.ast;
+    this.errors = [...this.errors, ...r0.errors, ...r1.errors, ...r2.errors, ...errors];
+
+    // now output the found errors
+    if (this.errors && this.errors.length > 0) {
+      console.log(chalk.red(`\nWe've found some errors in module "${this.name}"`));
+      console.log(cliErrorMessageForModule(this));
+    } else {
+      console.log(`Perfectly parsed module ${this.name}`);
+    }
     return this;
   }
 
@@ -192,6 +221,26 @@ export class Module implements IModule {
     });
   }
 
+  writeJSONSchema(): Promise<IModule> {
+    return new Promise((resolve, reject) => {
+      const schemas = createJsonSchema(this.ast);
+      schemas.map(schema => {
+        const schemaPath = join(this.outPath, schema.name + ".json");
+        outputFile(schemaPath, JSON.stringify(schema.schema, null, 4));
+      });
+      resolve(this);
+    });
+  }
+
+  writeXSD(): Promise<IModule> {
+    return new Promise((resolve, reject) => {
+      const xsd = createXSD(this.ast, this.config);
+      const filePathXSD = join(this.outPath, this.name + ".xsd");
+      outputFile(filePathXSD, xsd);
+      resolve(this);
+    });
+  }
+
   toErd() {}
 
   // generateFullOutput(outPath: string): Promise<string> {
@@ -207,9 +256,6 @@ export class Module implements IModule {
   // };
 
   //     // Generate the XSD file
-  //     const xsd = createXSD(this.ast, this.config);
-  //     const filePathXSD = join(modulePath, this.name + ".xsd");
-  //     outputFile(filePathXSD, xsd);
 
   //     //
   //     // JSON SCHEMAS

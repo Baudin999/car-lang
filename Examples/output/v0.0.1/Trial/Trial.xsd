@@ -1,0 +1,15 @@
+
+
+<xsd:schema 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+  
+  xmlns:self="http://foo.bar/"
+  targetNamespace="http://foo.bar/">
+  <!-- VERSION: 0.0.1 -->
+  <xsd:complexType name="Person">
+    <xsd:annotation></xsd:annotation>
+    <xsd:all></xsd:all>
+  </xsd:complexType>
+</xsd:schema>
+  
+  

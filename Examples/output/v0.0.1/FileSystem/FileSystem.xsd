@@ -1,0 +1,81 @@
+
+
+<xsd:schema 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+  
+  xmlns:self="http://foo.bar/"
+  targetNamespace="http://foo.bar/">
+  <!-- VERSION: 0.0.1 -->
+  <xsd:simpleType name="Author">
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="/[A-Z][a-z]* [[A-Z][a-z]*]/" />
+      <xsd:minLength value="1" />
+      <xsd:maxLength value="100" />
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:element name="FileInfo_Size" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:integer">
+        <xsd:minInclusive value="1" />
+        <xsd:maxInclusive value="9999" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="FileInfo_LastModified" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="FileInfo_FullPath" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="FileInfo_CreatedBy" type="self:Author" nillable="false">
+    <xsd:annotation></xsd:annotation>
+  </xsd:element>
+  <xsd:element name="FileInfo_ModifiedBy" type="self:Author" nillable="false">
+    <xsd:annotation></xsd:annotation>
+  </xsd:element>
+  <xsd:complexType name="FileInfo">
+    <xsd:annotation></xsd:annotation>
+    <xsd:all>
+      <xsd:element ref="self:FileInfo_Size" minOccurs="1" />
+      <xsd:element ref="self:FileInfo_LastModified" minOccurs="1" />
+      <xsd:element ref="self:FileInfo_FullPath" minOccurs="1" />
+      <xsd:element ref="self:FileInfo_CreatedBy" minOccurs="1" />
+      <xsd:element ref="self:FileInfo_ModifiedBy" minOccurs="1" />
+    </xsd:all>
+  </xsd:complexType>
+  <xsd:element name="DirectoryInfo_Children" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element type="self:FileSystemInfo" name="foo" minOccurs="0" maxOccurs="100" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:complexType name="DirectoryInfo">
+    <xsd:annotation></xsd:annotation>
+    <xsd:all>
+      <xsd:element ref="self:DirectoryInfo_Children" minOccurs="1" />
+    </xsd:all>
+  </xsd:complexType>
+  <xsd:complexType name="FileSystemInfo">
+    <xsd:choice>
+      <xsd:element type="self:FileInfo" name="FileSystemInfo_FileInfo" />
+      <xsd:element type="self:DirectoryInfo" name="FileSystemInfo_DirectoryInfo" />
+    </xsd:choice>
+  </xsd:complexType>
+</xsd:schema>
+  
+  
