@@ -6,6 +6,12 @@
 - [Windows](https://github.com/Baudin999/car-lang/releases/download/v0.1.1-beta/ckc.exe)
 - [Linux](https://github.com/Baudin999/car-lang/releases/download/v0.1.1-beta/ckc-linux)
 
+Pre-Release:
+
+- [osx](https://github.com/Baudin999/car-lang/releases/download/v0.1.2-beta/ckc)
+- [Windows](https://github.com/Baudin999/car-lang/releases/download/v0.1.2-beta/ckc.exe)
+- [Linux](https://github.com/Baudin999/car-lang/releases/download/v0.1.2-beta/ckc-linux)
+
 # ZDragon
 
 ZDragon is the toolset around the `CAR` language. The `CAR language is a descriptive languages, not
