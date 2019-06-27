@@ -8,9 +8,9 @@
 
 Pre-Release:
 
-- [osx](https://github.com/Baudin999/car-lang/releases/download/v0.1.2-beta/ckc)
-- [Windows](https://github.com/Baudin999/car-lang/releases/download/v0.1.2-beta/ckc.exe)
-- [Linux](https://github.com/Baudin999/car-lang/releases/download/v0.1.2-beta/ckc-linux)
+- [osx](https://github.com/Baudin999/car-lang/releases/download/v0.1.3-beta/ckc)
+- [Windows](https://github.com/Baudin999/car-lang/releases/download/v0.1.3-beta/ckc.exe)
+- [Linux](https://github.com/Baudin999/car-lang/releases/download/v0.1.3-beta/ckc-linux)
 
 # ZDragon
 

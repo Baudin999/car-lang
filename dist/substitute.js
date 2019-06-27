@@ -91,14 +91,39 @@ exports.substitutePluckedFields = (ast = []) => {
         else {
             let newNode = node;
             // Manage the plucked fields
-            newNode.fields = (node.fields || []).map((field) => {
+            newNode.fields = helpers_1.purge(node.fields.map((field) => {
                 if (field.type !== outline_1.NodeType.PLUCKED_FIELD)
                     return field;
                 let [ofType, fieldName] = field.parts;
                 let targetNode = getNodeById(ast, [], ofType);
-                if (!targetNode)
+                if (!targetNode) {
+                    errors.push(Object.assign({ message: `Could not find the type "${ofType}" to pluck from.
+The type you're plucking from should be defined. 
+              `.trim() }, field.parts_start[0], { type: outline_1.ErrorType.PluckedFieldUndefined }));
                     return field;
+                }
                 let targetField = (targetNode.fields || []).find(f => f.id === fieldName);
+                if (!targetField) {
+                    if (fieldName === undefined) {
+                        errors.push(Object.assign({ message: `Could not find the field to pluck from.
+Plucking always looks like this:
+
+type Temp =
+    pluck Person.FirstName
+
+or, if you only want to pluck the Type but want to rename the field:
+
+type Temp =
+    NewName: Person.FirstName
+
+                `.trim() }, field.parts_start[0], { type: outline_1.ErrorType.PluckedFieldUndefined }));
+                        return field;
+                    }
+                    else {
+                        errors.push(Object.assign({ message: `Could not find the field "${fieldName}" on type "${ofType}" to pluck from.` }, field.parts_start[1], { type: outline_1.ErrorType.PluckedFieldUnknown }));
+                        return field;
+                    }
+                }
                 let result = helpers_1.clone(targetField);
                 // Here we manipulate the annotations of the result in order to get
                 // everything we need to this new field.
@@ -125,7 +150,7 @@ exports.substitutePluckedFields = (ast = []) => {
                 });
                 result.restrictions = restrictions;
                 return result;
-            });
+            }));
             // Manage and substitute the fields which take the type from
             // another field in the application.
             newNode.fields = node.fields.map((field) => {

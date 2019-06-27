@@ -4,38 +4,6 @@ const lexer_1 = require("./lexer");
 const parser_1 = require("./parser");
 const outline_1 = require("./outline");
 const helpers_1 = require("./helpers");
-// Modules is the associated hash for looking up module references
-// in the other modules (the imports).
-// const sanitizeSouce = (source: string): string => {
-//   return source.trimRight();
-// };
-// export const transpile = (source: string): ITranspilationResult => {
-//   // clean up the source
-//   source = sanitizeSouce(source);
-//   // first run, create the AST from the source
-//   const { ast, cst, tokens, errors: astErrors } = createAST(source);
-//   // now do another pass to update the plucked fields
-//   let pluckResult = substitutePluckedFields(ast);
-//   let pluckAST = pluckResult.ast;
-//   // substitute the references to the aliasses with the actual aliasses
-//   let rwAlias = substituteAliases(pluckAST);
-//   let rwAliasAST = rwAlias.ast;
-//   let rwAliasErrors = rwAlias.errors;
-//   // substitute the extensions, here we add the fields which
-//   // are added due to the extensions
-//   var r = substituteExtensions(rwAliasAST);
-//   // type check the whole kaboodle.
-//   const checkASTs = typeChecker(r.ast) || [];
-//   // generate the errors
-//   let fullErrors = [...(astErrors || []), ...rwAliasErrors, ...r.errors, ...checkASTs];
-//   // return the result.
-//   return {
-//     tokens,
-//     cst,
-//     ast: r.ast,
-//     errors: fullErrors
-//   };
-// };
 exports.createAST = (source) => {
     if (!source || source.length === 0) {
         return {

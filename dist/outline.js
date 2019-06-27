@@ -388,6 +388,13 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
                 id_start: helpers_1.getStartToken(ctx.FieldName[0])
             };
         }
+        else if (ctx.Identifier.length > 1) {
+            //throw new Error("Invalid number of Identifiers");
+            return {
+                id: ctx.Identifier[0].image,
+                id_start: helpers_1.getStartToken(ctx.Identifier[0])
+            };
+        }
         else {
             return {
                 id: ctx.Identifier[0].image,
@@ -618,6 +625,8 @@ var ErrorType;
     ErrorType["TypeUndefined"] = "TypeUndefined";
     ErrorType["ParameterTypeUndefined"] = "ParameterTypeUndefined";
     ErrorType["FieldTypeUndefined"] = "FieldTypeUndefined";
+    ErrorType["PluckedFieldUnknown"] = "PluckedFieldUnknown";
+    ErrorType["PluckedFieldUndefined"] = "PluckedFieldUndefined";
     ErrorType["Other"] = "Other";
 })(ErrorType = exports.ErrorType || (exports.ErrorType = {}));
 //# sourceMappingURL=outline.js.map

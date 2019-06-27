@@ -348,6 +348,8 @@ export declare enum ErrorType {
     TypeUndefined = "TypeUndefined",
     ParameterTypeUndefined = "ParameterTypeUndefined",
     FieldTypeUndefined = "FieldTypeUndefined",
+    PluckedFieldUnknown = "PluckedFieldUnknown",
+    PluckedFieldUndefined = "PluckedFieldUndefined",
     Other = "Other"
 }
 export interface IError {

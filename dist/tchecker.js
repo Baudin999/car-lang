@@ -45,28 +45,6 @@ exports.typeChecker = (ast = []) => {
                 }
             }
         });
-        // check the plucked fields for errors
-        node.fields
-            .filter(field => field.type == outline_1.NodeType.PLUCKED_FIELD)
-            .forEach((field) => {
-            if (field.parts.length === 1) {
-                errors.push(Object.assign({ message: `Cannot pluck the entire object, must specify a field.` }, field.parts_start[0]));
-            }
-            // the id of the field
-            let typeId = field.parts[0];
-            let ref = getNodeById(ast, node.params, typeId);
-            if (!ref) {
-                errors.push(Object.assign({ message: `Cannot find type "${typeId}" to pluck from on type ${node.id}` }, field.parts_start[0]));
-                return;
-            }
-            if (ref.type !== outline_1.NodeType.TYPE) {
-                errors.push(Object.assign({ message: `Can only pluck from a type` }, field.parts_start[0]));
-            }
-            let refField = ref.fields.find(f => f.type === outline_1.NodeType.TYPE_FIELD && f.id === field.parts[1]);
-            if (!refField) {
-                errors.push(Object.assign({ message: `Cannot find field "${field.parts[1]}" of type "${typeId}" to pluck` }, field.parts_start[1]));
-            }
-        });
     });
     /**
      * Type Check the AGGREGATES
