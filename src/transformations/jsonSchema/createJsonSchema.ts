@@ -1,5 +1,6 @@
 import { IExpression, IType, NodeType, IAlias, IChoice, IData } from "./../../outline";
 import { baseTypeToJSONType, purge } from "../../helpers";
+const noCase = require("no-case");
 
 const isAPI = (node: IExpression) => {
   let isAPI = false;
@@ -37,7 +38,7 @@ export const createJsonSchema = (ast: IExpression[]): { name: string; schema: ob
       definitions[typeName] = {
         $id: "#/" + typeName,
         description: description ? description.value : "",
-        oneOf: (node as IData).options.map(o => {
+        anyOf: (node as IData).options.map(o => {
           createInnerSchema(o.id, definitions);
           return { $ref: "#/definitions/" + o.id };
         })
@@ -79,19 +80,31 @@ export const createJsonSchema = (ast: IExpression[]): { name: string; schema: ob
 
   function mapFields(api: any, fields, definitions) {
     (api.fields || []).map(field => {
+      let snakeCaseFieldId = noCase(field.id, null, "_");
       let isList = field.ofType === "List";
       let isMaybe = field.ofType === "Maybe";
       let $type = isMaybe || isList ? field.ofType_params[0] : field.ofType;
       let resultType = baseTypeToJSONType($type);
       let description = field.annotations.find(a => a.key === "description");
+      let pattern = (field.restrictions || []).find(a => a.key === "pattern");
       if (resultType) {
         if (!isList) {
-          fields[field.id] = {
+          fields[snakeCaseFieldId] = {
             type: resultType,
             description: description ? description.value : ""
           };
+          if (pattern && resultType === "string") fields[snakeCaseFieldId].pattern = pattern.value;
+          if ($type === "Date") {
+            fields[snakeCaseFieldId].format = "date";
+          }
+          if ($type === "DateTime") {
+            fields[snakeCaseFieldId].format = "date-time";
+          }
+          if ($type === "Time") {
+            fields[snakeCaseFieldId].format = "time";
+          }
         } else {
-          fields[field.id] = {
+          fields[snakeCaseFieldId] = {
             type: "array",
             items: {
               $ref: "#/definitions/" + $type
@@ -102,13 +115,13 @@ export const createJsonSchema = (ast: IExpression[]): { name: string; schema: ob
         }
       } else {
         if (!isList) {
-          fields[field.id] = {
+          fields[snakeCaseFieldId] = {
             $ref: "#/definitions/" + $type,
             description: description ? description.value : ""
           };
           createInnerSchema($type, definitions);
         } else {
-          fields[field.id] = {
+          fields[snakeCaseFieldId] = {
             type: "array",
             description: description ? description.value : "",
             items: {
@@ -129,8 +142,8 @@ export const createJsonSchema = (ast: IExpression[]): { name: string; schema: ob
     let requiredFields = purge(
       (api.fields || []).map(field => {
         if (field.ofType === "Maybe") return null;
-        else if (field.ofType === "List") return field.ofType_params[0];
-        else return field.id;
+        else if (field.ofType === "List") return noCase(field.ofType_params[0], null, "_");
+        else return noCase(field.id, null, "_");
       })
     );
 

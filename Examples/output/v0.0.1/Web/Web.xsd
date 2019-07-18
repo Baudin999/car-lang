@@ -15,6 +15,21 @@
       <xsd:element ref="self:Response_Body" minOccurs="1" />
     </xsd:all>
   </xsd:complexType>
+  <xsd:element name="Address_Street" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:complexType name="Address">
+    <xsd:annotation></xsd:annotation>
+    <xsd:all>
+      <xsd:element ref="self:Address_Street" minOccurs="1" />
+    </xsd:all>
+  </xsd:complexType>
   <xsd:element name="Customer_Name" nillable="false">
     <xsd:annotation></xsd:annotation>
     <xsd:simpleType>
@@ -33,11 +48,37 @@
       </xsd:restriction>
     </xsd:simpleType>
   </xsd:element>
-  <xsd:complexType name="Customer">
+  <xsd:element name="Customer_CustomerNumber" nillable="false">
     <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string">
+        <xsd:minLength value="1" />
+        <xsd:maxLength value="100" />
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Customer_DateOfBirth" nillable="false">
+    <xsd:annotation></xsd:annotation>
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:date"></xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="Customer_CustomerAddress" type="self:Address" nillable="false">
+    <xsd:annotation></xsd:annotation>
+  </xsd:element>
+  <xsd:complexType name="Customer">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <key>api</key>
+        <value>something</value>
+      </xsd:appinfo>
+    </xsd:annotation>
     <xsd:all>
       <xsd:element ref="self:Customer_Name" minOccurs="1" />
       <xsd:element ref="self:Customer_Number" minOccurs="1" />
+      <xsd:element ref="self:Customer_CustomerNumber" minOccurs="1" />
+      <xsd:element ref="self:Customer_DateOfBirth" minOccurs="1" />
+      <xsd:element ref="self:Customer_CustomerAddress" minOccurs="1" />
     </xsd:all>
   </xsd:complexType>
   <xsd:element name="CustomerResponse_Body" type="self:Customer" nillable="false">

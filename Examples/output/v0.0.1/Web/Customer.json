@@ -1,0 +1,52 @@
+{
+    "$id": "https://schemas.com/Customer",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "description": "something",
+    "type": "object",
+    "required": [
+        "name",
+        "number",
+        "customer_number",
+        "date_of_birth",
+        "customer_address"
+    ],
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": ""
+        },
+        "number": {
+            "type": "string",
+            "description": ""
+        },
+        "customer_number": {
+            "type": "string",
+            "description": ""
+        },
+        "date_of_birth": {
+            "type": "string",
+            "description": "",
+            "format": "date"
+        },
+        "customer_address": {
+            "$ref": "#/definitions/Address",
+            "description": ""
+        }
+    },
+    "definitions": {
+        "Address": {
+            "$id": "#/Address",
+            "type": "object",
+            "properties": {
+                "street": {
+                    "type": "string",
+                    "description": ""
+                }
+            },
+            "description": "",
+            "required": [
+                "Street"
+            ]
+        }
+    }
+}

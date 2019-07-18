@@ -4,33 +4,33 @@
     "description": "student",
     "type": "object",
     "required": [
-        "Nummer",
-        "Vak",
-        "Voornaam",
-        "Achternaam",
-        "ActiefAdres"
+        "nummer",
+        "vak",
+        "voornaam",
+        "achternaam",
+        "actief_adres"
     ],
     "properties": {
-        "Nummer": {
+        "nummer": {
             "type": "string",
             "description": ""
         },
-        "HeeftVakken": {
+        "heeft_vakken": {
             "type": "array",
             "description": "",
             "items": {
                 "$ref": "#/definitions/Vak"
             }
         },
-        "Voornaam": {
+        "voornaam": {
             "type": "string",
             "description": ""
         },
-        "Achternaam": {
+        "achternaam": {
             "type": "string",
             "description": ""
         },
-        "ActiefAdres": {
+        "actief_adres": {
             "$ref": "#/definitions/Adres",
             "description": ""
         }
@@ -40,11 +40,11 @@
             "$id": "#/Vak",
             "type": "object",
             "properties": {
-                "Naam": {
+                "naam": {
                     "type": "string",
                     "description": ""
                 },
-                "IsBelangrijk": {
+                "is_belangrijk": {
                     "type": "boolean",
                     "description": ""
                 }
@@ -59,11 +59,11 @@
             "$id": "#/Adres",
             "type": "object",
             "properties": {
-                "Straat": {
+                "straat": {
                     "type": "string",
                     "description": ""
                 },
-                "Huisnummer": {
+                "huisnummer": {
                     "type": "string",
                     "description": ""
                 }

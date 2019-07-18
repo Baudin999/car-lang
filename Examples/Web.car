@@ -3,9 +3,16 @@
 type Response a =
     Body: a
 
+type Address =
+    Street: String
+
+@api: something
 type Customer =
     Name: String
     Number: String
+    CustomerNumber: String
+    DateOfBirth: Date
+    CustomerAddress: Address
 
 alias CustomerResponse = Response Customer
 

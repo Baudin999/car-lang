@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const outline_1 = require("./../../outline");
 const helpers_1 = require("../../helpers");
+const noCase = require("no-case");
 const isAPI = (node) => {
     let isAPI = false;
     if (node.type === outline_1.NodeType.TYPE) {
@@ -33,7 +34,7 @@ exports.createJsonSchema = (ast) => {
             definitions[typeName] = {
                 $id: "#/" + typeName,
                 description: description ? description.value : "",
-                oneOf: node.options.map(o => {
+                anyOf: node.options.map(o => {
                     createInnerSchema(o.id, definitions);
                     return { $ref: "#/definitions/" + o.id };
                 })
@@ -67,20 +68,33 @@ exports.createJsonSchema = (ast) => {
     };
     function mapFields(api, fields, definitions) {
         (api.fields || []).map(field => {
+            let snakeCaseFieldId = noCase(field.id, null, "_");
             let isList = field.ofType === "List";
             let isMaybe = field.ofType === "Maybe";
             let $type = isMaybe || isList ? field.ofType_params[0] : field.ofType;
             let resultType = helpers_1.baseTypeToJSONType($type);
             let description = field.annotations.find(a => a.key === "description");
+            let pattern = (field.restrictions || []).find(a => a.key === "pattern");
             if (resultType) {
                 if (!isList) {
-                    fields[field.id] = {
+                    fields[snakeCaseFieldId] = {
                         type: resultType,
                         description: description ? description.value : ""
                     };
+                    if (pattern && resultType === "string")
+                        fields[snakeCaseFieldId].pattern = pattern.value;
+                    if ($type === "Date") {
+                        fields[snakeCaseFieldId].format = "date";
+                    }
+                    if ($type === "DateTime") {
+                        fields[snakeCaseFieldId].format = "date-time";
+                    }
+                    if ($type === "Time") {
+                        fields[snakeCaseFieldId].format = "time";
+                    }
                 }
                 else {
-                    fields[field.id] = {
+                    fields[snakeCaseFieldId] = {
                         type: "array",
                         items: {
                             $ref: "#/definitions/" + $type
@@ -92,14 +106,14 @@ exports.createJsonSchema = (ast) => {
             }
             else {
                 if (!isList) {
-                    fields[field.id] = {
+                    fields[snakeCaseFieldId] = {
                         $ref: "#/definitions/" + $type,
                         description: description ? description.value : ""
                     };
                     createInnerSchema($type, definitions);
                 }
                 else {
-                    fields[field.id] = {
+                    fields[snakeCaseFieldId] = {
                         type: "array",
                         description: description ? description.value : "",
                         items: {
@@ -119,9 +133,9 @@ exports.createJsonSchema = (ast) => {
             if (field.ofType === "Maybe")
                 return null;
             else if (field.ofType === "List")
-                return field.ofType_params[0];
+                return noCase(field.ofType_params[0], null, "_");
             else
-                return field.id;
+                return noCase(field.id, null, "_");
         }));
         const schema = {
             $id: "https://schemas.com/" + api.id,

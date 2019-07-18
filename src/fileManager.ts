@@ -1,4 +1,4 @@
-import { transpile, ITranspilationResult } from "./transpiler";
+import { ITranspilationResult } from "./transpiler";
 import { readFile } from "fs";
 import { normalize, join } from "path";
 import { path } from "app-root-path";
@@ -22,7 +22,7 @@ export const getFileFromModuleName = (module: IOpen, root?: string) => {
 export const module = (fileName: string): Promise<ITranspilationResult> => {
   return new Promise((resolve, reject) => {
     readFile(normalize(fileName), "utf8", (err, source) => {
-      resolve(transpile(source));
+      //resolve(transpile(source));
     });
   });
 };

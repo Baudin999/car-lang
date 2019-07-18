@@ -1,10 +1,19 @@
 class "Response a" as Response << (T,orchid) >> {
 	Body: a 
 }
+class "Address" as Address  {
+	Street: String 
+}
 class "Customer" as Customer  {
 	Name: String 
 	Number: String 
+	CustomerNumber: String 
+	DateOfBirth: Date 
+	CustomerAddress: Address 
+===
+  <b>api</b>: something
 }
+Address --> Customer : CustomerAddress
 class "CustomerResponse " as CustomerResponse  {
 	Body: Customer 
 }
