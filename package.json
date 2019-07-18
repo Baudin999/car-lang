@@ -1,6 +1,6 @@
 {
   "name": "car-lang",
-  "version": "v0.1.3-beta",
+  "version": "v0.1.4-beta",
   "description": "The language to rule dragons",
   "main": "dist/ckc.js",
   "repository": "https://github.com/Baudin999/car-lang.git",
