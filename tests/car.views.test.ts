@@ -25,7 +25,7 @@ type Address =
     HouseNumberExtension: String
     City: String
     CountryCode: String
-        | length 2
+        & length 2
     Country: Maybe String
 
 

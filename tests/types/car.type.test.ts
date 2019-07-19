@@ -178,8 +178,8 @@ describe("We can pluck and rename fields from types", () => {
 
 type Human =
     FirstName: Maybe String
-        | min 10
-        | max 90
+        & min 10
+        & max 90
     LastName: String
     MiddleNames: List String
     DateOfBirth: Date
@@ -188,8 +188,8 @@ type Person =
     @ This is an annotation for the FuurstName
     @ The FuurstName comes from the "Human" type
     FuurstName: Human.FirstName
-        | min 12
-        | other "foo"
+        & min 12
+        & other "foo"
     CallingName: String
 
       `;
@@ -216,7 +216,7 @@ describe("A complex recursive example", () => {
   const source = `
 
 alias Author = String
-    | pattern /[A-Z][a-z]* [[A-Z][a-z]*]/
+    & pattern /[A-Z][a-z]* [[A-Z][a-z]*]/
 
 type FileInfo =
     Name: String

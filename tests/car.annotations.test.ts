@@ -54,9 +54,9 @@ describe("Annotate on an alias", () => {
 
 @ This is the name alias
 alias Name = String
-    | min 1
-    | max 31
-    | pattern /[A-Z][a-z]{30}/  
+    & min 1
+    & max 31
+    & pattern /[A-Z][a-z]{30}/  
 `;
 
   it("Should have annotations on the type and the fields", async () => {
@@ -80,8 +80,8 @@ type Person =
     @ type: String
     LastName: Name
     Age: Number
-        | min 0
-        | max 150
+        & min 0
+        & max 150
 
 @ A Maybe data type, just like in the 
 @ pretty languages...
@@ -95,9 +95,9 @@ data Maybe a =
 @ An alias can also have a description
 @ But no annotations on the restrictions
 alias Name = String
-    | min 2
-    | max 50
-    | pattern /[A-Z]\w+/
+    & min 2
+    & max 50
+    & pattern /[A-Z]\w+/
 
 choice Gender =
     @ Male

@@ -40,7 +40,7 @@ describe("Define and parser a simple type", () => {
 
 type Person =
     FirstName: String
-        | max 20
+        & max 20
     LastName: String
 
 `;
@@ -158,9 +158,9 @@ describe("Alias with restrictions", () => {
   const source = `
 
 alias Name = String
-    | min 2
-    | max 10
-    | pattern /[A-Z]\w{19}/
+    & min 2
+    & max 10
+    & pattern /[A-Z]\w{19}/
 
 `;
 

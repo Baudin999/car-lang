@@ -108,7 +108,7 @@ const SIGN_Or = chevrotain_1.createToken({
 });
 const SIGN_Restriction = chevrotain_1.createToken({
     name: "SIGN_Restriction",
-    pattern: /\|/
+    pattern: /\&/
 });
 const SIGN_TypeDefStart = chevrotain_1.createToken({
     name: "SIGN_TypeDefStart",

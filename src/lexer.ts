@@ -129,7 +129,7 @@ const SIGN_Or = createToken({
 
 const SIGN_Restriction = createToken({
   name: "SIGN_Restriction",
-  pattern: /\|/
+  pattern: /\&/
 });
 
 const SIGN_TypeDefStart = createToken({
