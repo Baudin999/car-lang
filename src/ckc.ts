@@ -98,8 +98,11 @@ program
         all = false,
         module
       } = args.reverse()[0];
-      let fullPath = relative ? path : resolve(path);
-      let project = await new Project(fullPath).compile();
+      if (relative) {
+        console.log("Compiling a relative version.");
+      }
+      let fullPath = resolve(path);
+      let project = await new Project(fullPath, path, relative).compile();
     } catch (err) {
       console.log(err);
     }

@@ -60,6 +60,7 @@ export interface IModule {
     outPath: string;
     htmlPath: string;
     config: IConfiguration;
+    projectDirectory: string;
     parse: () => IModule;
     typeCheck: () => IModule;
     link: (modules: IModule[]) => Promise<IModule>;

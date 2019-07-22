@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createIndexPage = (modules) => {
     let moduleList = modules
         .map(m => {
-        return `<li><a href="${m.htmlPath}">${m.name}</a></li>`;
+        return `<li><a href="${m.htmlPath.replace(m.projectDirectory, "")}">${m.name}</a></li>`;
     })
         .join("\n");
     let source = `

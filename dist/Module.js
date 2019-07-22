@@ -142,17 +142,18 @@ class Module {
     }
     writeDocumentation() {
         return new Promise((resolve, reject) => {
+            let op = this.outPath; //.replace(this.projectDirectory, "");
             // Save the actual plant UML which the tool outputs
             // this will help with the maintainability of the tool.
             const savePlantUML = (puml) => {
-                const filePathPuml = path_1.join(this.outPath, this.name + ".puml");
+                const filePathPuml = path_1.join(op, this.name + ".puml"); //.replace(this.projectDirectory, "");
                 fs_extra_1.outputFile(filePathPuml, puml);
             };
             // Generate the SVG by going to the site and generating the svg
             const generateSVG = (puml) => {
                 const url = deflate_1.generateURL(puml);
                 helpers_1.fetchImage(url).then(img => {
-                    const filePathSVG = path_1.join(this.outPath, this.name + ".svg");
+                    const filePathSVG = path_1.join(op, this.name + ".svg");
                     fs_extra_1.outputFile(filePathSVG, img);
                 });
             };
@@ -166,10 +167,10 @@ class Module {
                 generateSVG(puml);
             }
             // Generate the HTML files
-            const { html, svgs } = createHTML_1.createHTML(this.ast, this.outPath, this.svgs || {}, puml ? this.name : undefined);
-            const filePathHTML = path_1.join(this.outPath, this.name + ".html");
+            const { html, svgs } = createHTML_1.createHTML(this.ast, op, this.svgs || {}, puml ? this.name : undefined);
+            const filePathHTML = path_1.join(op, this.name + ".html");
             fs_extra_1.outputFile(filePathHTML, html);
-            const stylesPath = path_1.join(this.outPath, "styles.css");
+            const stylesPath = path_1.join(op, "styles.css");
             fs_extra_1.outputFile(stylesPath, styles);
             // DO SOMETHING WITH THE HASHES
             this.svgs = svgs;
@@ -177,12 +178,12 @@ class Module {
                 if (hash === "erd" || hash === "hashes")
                     return;
                 if (this.svgs.hashes.indexOf(hash) === -1) {
-                    fs_extra_1.remove(path_1.join(this.outPath, hash + ".svg"));
+                    fs_extra_1.remove(path_1.join(op, hash + ".svg"));
                     delete this.svgs[hash];
                 }
             });
             this.svgs.hashes = [];
-            fs_extra_1.outputFile(path_1.join(this.outPath, "svgs.json"), JSON.stringify(this.svgs, null, 4));
+            fs_extra_1.outputFile(path_1.join(op, "svgs.json"), JSON.stringify(this.svgs, null, 4));
             resolve(this);
         });
     }

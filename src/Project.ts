@@ -15,11 +15,13 @@ import { createIndexPage } from "./transformations/html/createIndexPage";
 
 export class Project {
   projectDirectory: string;
+  relativePath: string;
   configPath: string;
   outPath: string;
   versionPath: string;
   preludePath: string;
   indexPath: string;
+  isRelease: boolean;
   config: IConfiguration;
   modules: IModule[] = [];
 
@@ -27,11 +29,13 @@ export class Project {
     return purge((this.modules || []).map(m => m.errors));
   }
 
-  constructor(projectDirectory: string) {
+  constructor(projectDirectory: string, relativePath: string = ".", isRelease: boolean = false) {
     this.projectDirectory = projectDirectory;
+    this.relativePath = relativePath;
     this.configPath = join(this.projectDirectory, "carconfig.json");
     this.preludePath = join(this.projectDirectory, "Prelude.car");
     this.outPath = join(this.projectDirectory, ".out");
+    this.isRelease = isRelease;
   }
 
   /**
@@ -148,7 +152,7 @@ export class Project {
 
   async writeIndexFile(): Promise<Project> {
     return new Promise((resolve, reject) => {
-      let source = createIndexPage(this.modules);
+      let source = createIndexPage(this.modules, this.isRelease);
       outputFile(join(this.versionPath, "index.html"), source);
       resolve(this);
     });
