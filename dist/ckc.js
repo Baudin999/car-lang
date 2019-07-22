@@ -83,8 +83,11 @@ program
     .action((...args) => tslib_1.__awaiter(this, void 0, void 0, function* () {
     try {
         let { path = ".", relative = false, ts = false, xsd = false, all = false, module } = args.reverse()[0];
-        let fullPath = relative ? path : path_1.resolve(path);
-        let project = yield new Project_1.Project(fullPath).compile();
+        if (relative) {
+            console.log("Compiling a relative version.");
+        }
+        let fullPath = path_1.resolve(path);
+        let project = yield new Project_1.Project(fullPath, path, relative).compile();
     }
     catch (err) {
         console.log(err);

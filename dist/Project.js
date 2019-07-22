@@ -15,12 +15,14 @@ const createIndexPage_1 = require("./transformations/html/createIndexPage");
  * a carconfig.json file.
  */
 class Project {
-    constructor(projectDirectory) {
+    constructor(projectDirectory, relativePath = ".", isRelease = false) {
         this.modules = [];
         this.projectDirectory = projectDirectory;
+        this.relativePath = relativePath;
         this.configPath = path_1.join(this.projectDirectory, "carconfig.json");
         this.preludePath = path_1.join(this.projectDirectory, "Prelude.car");
         this.outPath = path_1.join(this.projectDirectory, ".out");
+        this.isRelease = isRelease;
     }
     get errors() {
         return helpers_1.purge((this.modules || []).map(m => m.errors));
@@ -149,7 +151,7 @@ class Project {
     writeIndexFile() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
-                let source = createIndexPage_1.createIndexPage(this.modules);
+                let source = createIndexPage_1.createIndexPage(this.modules, this.isRelease);
                 fs_extra_1.outputFile(path_1.join(this.versionPath, "index.html"), source);
                 resolve(this);
             });

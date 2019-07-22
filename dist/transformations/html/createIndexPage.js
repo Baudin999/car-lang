@@ -1,9 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createIndexPage = (modules) => {
+exports.createIndexPage = (modules, isRelease) => {
     let moduleList = modules
         .map(m => {
-        return `<li><a href="${m.htmlPath.replace(m.projectDirectory, "")}">${m.name}</a></li>`;
+        return isRelease
+            ? `<li><a href="/public/${m.name}.html">${m.name}</a></li>`
+            : `<li><a href="${m.htmlPath.replace(m.projectDirectory, "")}">${m.name}</a></li>`;
     })
         .join("\n");
     let source = `

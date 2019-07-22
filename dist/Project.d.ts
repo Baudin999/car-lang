@@ -5,15 +5,17 @@ import { IConfiguration, IModule } from "./helpers";
  */
 export declare class Project {
     projectDirectory: string;
+    relativePath: string;
     configPath: string;
     outPath: string;
     versionPath: string;
     preludePath: string;
     indexPath: string;
+    isRelease: boolean;
     config: IConfiguration;
     modules: IModule[];
     readonly errors: import("./outline").IError[][];
-    constructor(projectDirectory: string);
+    constructor(projectDirectory: string, relativePath?: string, isRelease?: boolean);
     /**
      * Verify the directory and inspect if the directory is ready to
      * be used for the models.
