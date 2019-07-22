@@ -5,7 +5,7 @@ const noCase = require("no-case");
 const isAPI = (node: IExpression) => {
   let isAPI = false;
   if (node.type === NodeType.TYPE || node.type === NodeType.ALIAS) {
-    isAPI = !!(node as IType).annotations.find(a => a.key === "api");
+    isAPI = !!(node as any).annotations.find(a => a.key === "api");
   }
   return isAPI;
 };

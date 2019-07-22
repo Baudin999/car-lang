@@ -1,9 +1,0 @@
-class "Person" as Person  {
-	Name: String 
-	Address: Address 
-}
-Address --> Person : Address
-class "Address" as Address  {
-}
-class "Food" as Food  {
-}

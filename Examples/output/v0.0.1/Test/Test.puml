@@ -1,3 +1,0 @@
-class "Person" as Person  {
-	FirstName: String 
-}

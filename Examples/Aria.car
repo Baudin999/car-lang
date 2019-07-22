@@ -1,4 +1,3 @@
-open Prelude importing (List, Maybe)
 
 # Aria
 
@@ -39,7 +38,7 @@ view {
 {* The types as described by Aria *}
 
 alias XP = Number
-    | min 0
+    & min 0
 
 choice BoughtFrom =
     | "Racial Package"

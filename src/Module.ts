@@ -73,6 +73,8 @@ export class Module implements IModule {
 
     this.outPath = join(this.path, ("v" + this.config.version).replace(/^vv/, "v"), this.name);
     this.htmlPath = join(this.outPath, this.name + ".html");
+
+    console.log(this.outPath);
     try {
       this.svgs = await readFileAsync(join(this.outPath, "svgs.json"), true);
     } catch {
@@ -167,10 +169,11 @@ export class Module implements IModule {
 
   writeDocumentation(): Promise<IModule> {
     return new Promise<IModule>((resolve, reject) => {
+      let op = this.outPath; //.replace(this.projectDirectory, "");
       // Save the actual plant UML which the tool outputs
       // this will help with the maintainability of the tool.
       const savePlantUML = (puml: string) => {
-        const filePathPuml = join(this.outPath, this.name + ".puml");
+        const filePathPuml = join(op, this.name + ".puml"); //.replace(this.projectDirectory, "");
         outputFile(filePathPuml, puml);
       };
 
@@ -178,7 +181,7 @@ export class Module implements IModule {
       const generateSVG = (puml: string) => {
         const url = generateURL(puml);
         fetchImage(url).then(img => {
-          const filePathSVG = join(this.outPath, this.name + ".svg");
+          const filePathSVG = join(op, this.name + ".svg");
           outputFile(filePathSVG, img);
         });
       };
@@ -196,13 +199,13 @@ export class Module implements IModule {
       // Generate the HTML files
       const { html, svgs } = createHTML(
         this.ast,
-        this.outPath,
+        op,
         this.svgs || {},
         puml ? this.name : undefined
       );
-      const filePathHTML = join(this.outPath, this.name + ".html");
+      const filePathHTML = join(op, this.name + ".html");
       outputFile(filePathHTML, html);
-      const stylesPath = join(this.outPath, "styles.css");
+      const stylesPath = join(op, "styles.css");
       outputFile(stylesPath, styles);
 
       // DO SOMETHING WITH THE HASHES
@@ -210,12 +213,12 @@ export class Module implements IModule {
       Object.keys(this.svgs).forEach(hash => {
         if (hash === "erd" || hash === "hashes") return;
         if (this.svgs.hashes.indexOf(hash) === -1) {
-          remove(join(this.outPath, hash + ".svg"));
+          remove(join(op, hash + ".svg"));
           delete this.svgs[hash];
         }
       });
       this.svgs.hashes = [];
-      outputFile(join(this.outPath, "svgs.json"), JSON.stringify(this.svgs, null, 4));
+      outputFile(join(op, "svgs.json"), JSON.stringify(this.svgs, null, 4));
 
       resolve(this);
     });

@@ -5,7 +5,7 @@ const helpers_1 = require("../../helpers");
 const noCase = require("no-case");
 const isAPI = (node) => {
     let isAPI = false;
-    if (node.type === outline_1.NodeType.TYPE) {
+    if (node.type === outline_1.NodeType.TYPE || node.type === outline_1.NodeType.ALIAS) {
         isAPI = !!node.annotations.find(a => a.key === "api");
     }
     return isAPI;

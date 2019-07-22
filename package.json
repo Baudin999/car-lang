@@ -11,6 +11,7 @@
   "scripts": {
     "test": "jest --watch",
     "run": "ts-node ./src/ckc.ts build -p ./Examples",
+    "relative": "ts-node ./src/ckc.ts build -p ./Examples --relative",
     "watch": "ts-node ./src/ckc.ts watch -p ./Examples",
     "build": "tsc --project ./; mkdir ./dist/deflate/; cp ./src/deflate/deflate.js ./dist/deflate/",
     "package": "yarn pkg . --out-path ./lib/",
@@ -18,7 +19,7 @@
     "move": "cp ./lib/car-lang-macos /usr/local/bin/ckc",
     "clean": "rm -rf ./dist; rm -rf ./lib",
     "go": "yarn clean; yarn build; yarn railroad; yarn package; yarn move",
-    "open": "ts-node ./src/ckc.ts -p ./Examples -o",
+    "open": "ts-node ./src/ckc.ts open -p ./Examples",
     "ckc": "ts-node ./src/ckc.ts",
     "ci:build": "yarn clean; yarn build; yarn railroad; yarn package"
   },

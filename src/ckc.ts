@@ -83,14 +83,22 @@ program
   .alias("b")
   .description("Build the project")
   .option("-p, --path <path>", "The path to build")
+  .option("-l, --relative", "Will output the directories relative to the out folder.")
   .option("-m, --module <module>", "The module which needs parsing")
   .option("--xsd", "Build the XSD output")
   .option("-t, --ts", "Build the TypeScript output")
   .option("-a, --all", "Generate all the output")
   .action(async (...args) => {
     try {
-      let { path = ".", ts = false, xsd = false, all = false, module } = args.reverse()[0];
-      let fullPath = resolve(path);
+      let {
+        path = ".",
+        relative = false,
+        ts = false,
+        xsd = false,
+        all = false,
+        module
+      } = args.reverse()[0];
+      let fullPath = relative ? path : resolve(path);
       let project = await new Project(fullPath).compile();
     } catch (err) {
       console.log(err);

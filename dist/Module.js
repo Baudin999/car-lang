@@ -51,6 +51,7 @@ class Module {
             }
             this.outPath = path_1.join(this.path, ("v" + this.config.version).replace(/^vv/, "v"), this.name);
             this.htmlPath = path_1.join(this.outPath, this.name + ".html");
+            console.log(this.outPath);
             try {
                 this.svgs = yield helpers_1.readFileAsync(path_1.join(this.outPath, "svgs.json"), true);
             }

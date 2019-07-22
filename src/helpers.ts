@@ -82,6 +82,8 @@ export interface IModule {
   htmlPath: string;
   config: IConfiguration;
 
+  projectDirectory: string;
+
   parse: () => IModule;
 
   typeCheck: () => IModule;
