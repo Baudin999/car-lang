@@ -83,7 +83,7 @@ open Prelude importing (List)
 
 
 alias Author = String
-    | pattern /[A-Z][a-z]* [[A-Z][a-z]*]/
+    & pattern /[A-Z][a-z]* [[A-Z][a-z]*]/
 
 type FileInfo =
     Size: Number
@@ -148,7 +148,7 @@ like a file system type:
 
 ```
 alias Author = String
-    | pattern /[A-Z][a-z]* [[A-Z][a-z]*]/
+    & pattern /[A-Z][a-z]* [[A-Z][a-z]*]/
 
 type FileInfo =
     Name: String
@@ -271,8 +271,8 @@ descriptions. You can of course annotate everything and keep it preserved:
 ```
 type Human =
     FirstName: Maybe String
-        | min 10
-        | max 90
+        & min 10
+        & max 90
     LastName: String
     MiddleNames: List String
     DateOfBirth: Date
@@ -281,7 +281,7 @@ type Person =
     @ This is an annotation for the FuurstName
     @ The FuurstName comes from the "Human" type
     FuurstName: Human.FirstName
-        | min 12
-        | other "foo"
+        & min 12
+        & other "foo"
     CallingName: String
 ```
