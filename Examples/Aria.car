@@ -1,3 +1,4 @@
+type List
 
 # Aria
 
@@ -78,6 +79,8 @@ type Feat extends Namable =
     Rank: Number
     XP: Number
     Stat: Stat
+
+alias Something = List String
 
 @ A statistic is a base value for a character's potential
 @ Statistics serve as a base bonus for certain abilities.

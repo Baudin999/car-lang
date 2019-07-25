@@ -84,19 +84,19 @@ program
   .description("Build the project")
   .option("-p, --path <path>", "The path to build")
   .option("-l, --relative", "Will output the directories relative to the out folder.")
-  .option("-m, --module <module>", "The module which needs parsing")
-  .option("--xsd", "Build the XSD output")
-  .option("-t, --ts", "Build the TypeScript output")
-  .option("-a, --all", "Generate all the output")
+  //.option("-m, --module <module>", "The module which needs parsing")
+  //.option("--xsd", "Build the XSD output")
+  //.option("-t, --ts", "Build the TypeScript output")
+  //.option("-a, --all", "Generate all the output")
   .action(async (...args) => {
     try {
       let {
         path = ".",
-        relative = false,
-        ts = false,
-        xsd = false,
-        all = false,
-        module
+        relative = false
+        // ts = false,
+        // xsd = false,
+        // all = false,
+        // module
       } = args.reverse()[0];
       if (relative) {
         console.log("Compiling a relative version.");
