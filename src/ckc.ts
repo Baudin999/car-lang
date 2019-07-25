@@ -92,17 +92,17 @@ program
     try {
       let {
         path = ".",
-        relative = false
+        relative: useRelativePaths = false,
         // ts = false,
         // xsd = false,
         // all = false,
         // module
       } = args.reverse()[0];
-      if (relative) {
+      if (useRelativePaths) {
         console.log("Compiling a relative version.");
       }
       let fullPath = resolve(path);
-      let project = await new Project(fullPath, path, relative).compile();
+      let project = await new Project(fullPath, path, useRelativePaths).compile();
     } catch (err) {
       console.log(err);
     }
