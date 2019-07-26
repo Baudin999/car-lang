@@ -15,7 +15,7 @@ import { createIndexPage } from "./transformations/html/createIndexPage";
 
 export class Project {
   projectDirectory: string;
-  relativePath: string;
+  useRelativePaths: boolean;
   configPath: string;
   outPath: string;
   versionPath: string;
@@ -29,9 +29,9 @@ export class Project {
     return purge((this.modules || []).map(m => m.errors));
   }
 
-  constructor(projectDirectory: string, relativePath: string = ".", isRelease: boolean = false) {
+  constructor(projectDirectory: string, useRelativePaths: boolean = false, isRelease: boolean = false) {
     this.projectDirectory = projectDirectory;
-    this.relativePath = relativePath;
+    this.useRelativePaths = useRelativePaths;
     this.configPath = join(this.projectDirectory, "carconfig.json");
     this.preludePath = join(this.projectDirectory, "Prelude.car");
     this.outPath = join(this.projectDirectory, ".out");
@@ -152,7 +152,7 @@ export class Project {
 
   async writeIndexFile(): Promise<Project> {
     return new Promise((resolve, reject) => {
-      let source = createIndexPage(this.modules, this.isRelease);
+      let source = createIndexPage(this.modules, this.isRelease, this.useRelativePaths);
       outputFile(join(this.versionPath, "index.html"), source);
       resolve(this);
     });
