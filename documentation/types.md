@@ -37,7 +37,7 @@ your own types by defining an `alias` like so:
 
 ```
 alias Money = Number
-    | decimals 2
+    & decimals 2
 ```
 
 This will indicate that the `Money` type can now be used and will have validation on it specifying
