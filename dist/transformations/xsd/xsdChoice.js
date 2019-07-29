@@ -8,13 +8,13 @@ class XsdChoice {
         this.node = node;
     }
     toString() {
-        const fields = helpers_1.purge(this.node.options.map(o => `<xsd:element name="${o.id}"/>`)).join("\n");
+        const fields = helpers_1.purge(this.node.options.map(o => `<xsd:enumeration value="${o.id}"/>`)).join("\n");
         return `
-    <xsd:complexType name="${this.node.id}">
-        <xsd:choice>
+    <xsd:simpleType name="${this.node.id}">
+      <xsd:restriction base="xsd:string">
         ${fields}
-        </xsd:choice>
-    </xsd:complexType>
+      </xsd:restriction>
+    </xsd:simpleType>
         `;
     }
 }

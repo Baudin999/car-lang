@@ -76,18 +76,18 @@ program
     .description("Build the project")
     .option("-p, --path <path>", "The path to build")
     .option("-l, --relative", "Will output the directories relative to the out folder.")
-    .option("-m, --module <module>", "The module which needs parsing")
-    .option("--xsd", "Build the XSD output")
-    .option("-t, --ts", "Build the TypeScript output")
-    .option("-a, --all", "Generate all the output")
+    //.option("-m, --module <module>", "The module which needs parsing")
+    //.option("--xsd", "Build the XSD output")
+    //.option("-t, --ts", "Build the TypeScript output")
+    //.option("-a, --all", "Generate all the output")
     .action((...args) => tslib_1.__awaiter(this, void 0, void 0, function* () {
     try {
-        let { path = ".", relative = false, ts = false, xsd = false, all = false, module } = args.reverse()[0];
-        if (relative) {
+        let { path = ".", relative: useRelativePaths = false, } = args.reverse()[0];
+        if (useRelativePaths) {
             console.log("Compiling a relative version.");
         }
         let fullPath = path_1.resolve(path);
-        let project = yield new Project_1.Project(fullPath, path, relative).compile();
+        let project = yield new Project_1.Project(fullPath, path, useRelativePaths).compile();
     }
     catch (err) {
         console.log(err);

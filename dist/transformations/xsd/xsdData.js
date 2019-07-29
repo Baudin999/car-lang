@@ -9,7 +9,7 @@ class XsdData {
     }
     toString() {
         let id = this.node.id;
-        const fields = helpers_1.purge(this.node.options.map(o => `<xsd:element type="self:${o.id}" name="${id}_${o.id}" />`)).join("\n");
+        const fields = helpers_1.purge(this.node.options.map(o => `<xsd:element type="self:${o.id}" name="${o.id}" />`)).join("\n");
         return `
     <xsd:complexType name="${this.node.id}">
         <xsd:choice>

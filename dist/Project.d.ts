@@ -5,7 +5,7 @@ import { IConfiguration, IModule } from "./helpers";
  */
 export declare class Project {
     projectDirectory: string;
-    relativePath: string;
+    useRelativePaths: boolean;
     configPath: string;
     outPath: string;
     versionPath: string;
@@ -15,7 +15,7 @@ export declare class Project {
     config: IConfiguration;
     modules: IModule[];
     readonly errors: import("./outline").IError[][];
-    constructor(projectDirectory: string, relativePath?: string, isRelease?: boolean);
+    constructor(projectDirectory: string, useRelativePaths?: boolean, isRelease?: boolean);
     /**
      * Verify the directory and inspect if the directory is ready to
      * be used for the models.
