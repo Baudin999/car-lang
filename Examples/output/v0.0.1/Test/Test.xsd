@@ -1,0 +1,87 @@
+
+
+<xsd:schema 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+  
+  xmlns:self="http://foo.bar/"
+  targetNamespace="http://foo.bar/">
+  <!-- VERSION: 0.0.1 -->
+  <xsd:simpleType name="Name">
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1" />
+      <xsd:maxLength value="100" />
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:complexType name="Product">
+    <xsd:choice>
+      <xsd:element type="self:Solar" name="Solar" />
+      <xsd:element type="self:Boiler" name="Boiler" />
+    </xsd:choice>
+  </xsd:complexType>
+  <xsd:complexType name="Solar">
+    <xsd:annotation></xsd:annotation>
+    <xsd:all></xsd:all>
+  </xsd:complexType>
+  <xsd:complexType name="Boiler">
+    <xsd:annotation></xsd:annotation>
+    <xsd:all></xsd:all>
+  </xsd:complexType>
+  <xsd:simpleType name="Gender">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="Male"/>
+      <xsd:enumeration value="Female"/>
+      <xsd:enumeration value="Other"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:complexType name="Address">
+    <xsd:annotation></xsd:annotation>
+    <xsd:all>
+      <xsd:element name="Street" minOccurs="1" maxOccurs="1">
+        <xsd:annotation></xsd:annotation>
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:string">
+            <xsd:minLength value="1" />
+            <xsd:maxLength value="100" />
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:element>
+    </xsd:all>
+  </xsd:complexType>
+  <xsd:complexType name="Person">
+    <xsd:annotation></xsd:annotation>
+    <xsd:all>
+      <xsd:element name="Id" minOccurs="1" maxOccurs="1">
+        <xsd:annotation></xsd:annotation>
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:string">
+            <xsd:minLength value="1" />
+            <xsd:maxLength value="100" />
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:element>
+      <xsd:element name="Foo" minOccurs="0" maxOccurs="1">
+        <xsd:annotation></xsd:annotation>
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:string">
+            <xsd:minLength value="1" />
+            <xsd:maxLength value="100" />
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:element>
+      <xsd:element name="Number" minOccurs="1" maxOccurs="1">
+        <xsd:annotation></xsd:annotation>
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:string">
+            <xsd:minLength value="12" />
+            <xsd:maxLength value="15" />
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:element>
+      <xsd:element name="Name" type="self:Name" minOccurs="1" maxOccurs="1" />
+      <xsd:element name="Address" type="self:Address" minOccurs="1" maxOccurs="1" />
+      <xsd:element name="Gender" type="self:Gender" minOccurs="1" maxOccurs="1" />
+    </xsd:all>
+  </xsd:complexType>
+</xsd:schema>
+  
+  

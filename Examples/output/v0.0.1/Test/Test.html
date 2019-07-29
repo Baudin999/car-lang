@@ -1,0 +1,248 @@
+<html>
+  <head>
+    <title></title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+      <link rel="stylesheet" href="./styles.css">
+        <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/styles/default.min.css">
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/highlight.min.js"></script>
+        </head>
+        <body>
+          <a href="./../index.html">Index</a>
+          <h1>Index</h1>
+          <ul></ul>
+          <h1>Links</h1>
+          <ul>
+            <li>
+              <a href="Test.xsd">XSD</a>
+            </li>
+            <li>
+              <a href="Test.svg">ERD</a>
+            </li>
+          </ul>
+          <h1>ERD</h1>
+          <div class="image-container">
+            <img src="Test.svg" />
+          </div>
+          <h1>Appendix: Entities</h1>
+          <table>
+            <thead>
+              <tr>
+                <th colSpan="4">
+                  <h2>Name</h2>
+                </th>
+              </tr>
+              <tr>
+                <th colSpan="4">
+        No description
+      </th>
+              </tr>
+              <tr>
+                <th>Restriction</th>
+                <th>Value</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <table>
+            <thead>
+              <tr>
+                <th colSpan="4">
+                  <h2>Product</h2>
+                </th>
+              </tr>
+              <tr>
+                <th colSpan="4">
+        No description
+      </th>
+              </tr>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Solar</td>
+                <td>Solar </td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Boiler</td>
+                <td>Boiler </td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+          <table>
+            <thead>
+              <tr>
+                <th colSpan="4">
+                  <h2>Solar</h2>
+                </th>
+              </tr>
+              <tr>
+                <th colSpan="4">
+        No description
+      </th>
+              </tr>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Restrictions</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <table>
+            <thead>
+              <tr>
+                <th colSpan="4">
+                  <h2>Boiler</h2>
+                </th>
+              </tr>
+              <tr>
+                <th colSpan="4">
+        No description
+      </th>
+              </tr>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Restrictions</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <table>
+            <thead>
+              <tr>
+                <th colSpan="4">
+                  <h2>Gender</h2>
+                </th>
+              </tr>
+              <tr>
+                <th colSpan="4">
+        No description
+      </th>
+              </tr>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Male</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Female</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Other</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+          <table>
+            <thead>
+              <tr>
+                <th colSpan="4">
+                  <h2>Address</h2>
+                </th>
+              </tr>
+              <tr>
+                <th colSpan="4">
+        No description
+      </th>
+              </tr>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Restrictions</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Street</td>
+                <td>String </td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+          <table>
+            <thead>
+              <tr>
+                <th colSpan="4">
+                  <h2>Person</h2>
+                </th>
+              </tr>
+              <tr>
+                <th colSpan="4">
+        No description
+      </th>
+              </tr>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Restrictions</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Id</td>
+                <td>String </td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Foo</td>
+                <td>Maybe String</td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Number</td>
+                <td>String </td>
+                <td>
+                  <div>
+                    <b>min</b>: 12
+                  </div>
+                  <div>
+                    <b>max</b>: 15
+                  </div>
+                </td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Name</td>
+                <td>Name </td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>BillingAddress</td>
+                <td>Address </td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Gender</td>
+                <td>Gender </td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+          <script>hljs.initHighlightingOnLoad();</script>
+        </body>
+      </html>

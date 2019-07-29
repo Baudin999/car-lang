@@ -1,0 +1,29 @@
+abstract "Product" as Product {
+	Solar 
+	Boiler 
+}
+Solar --* Product : Solar
+Boiler --* Product : Boiler
+class "Solar" as Solar  {
+}
+class "Boiler" as Boiler  {
+}
+enum Gender {
+	Male
+	Female
+	Other
+
+}
+class "Address" as Address  {
+	Street: String 
+}
+class "Person" as Person  {
+	Id: String 
+	Foo: Maybe String
+	Number: String 
+	Name: Name 
+	BillingAddress: Address 
+	Gender: Gender 
+}
+Address --> Person : BillingAddress
+Gender --> Person : Gender

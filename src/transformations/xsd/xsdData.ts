@@ -11,7 +11,7 @@ export class XsdData {
   toString() {
     let id = this.node.id;
     const fields = purge(
-      this.node.options.map(o => `<xsd:element type="self:${o.id}" name="${id}_${o.id}" />`)
+      this.node.options.map(o => `<xsd:element type="self:${o.id}" name="${o.id}" />`)
     ).join("\n");
 
     return `

@@ -1,0 +1,30 @@
+alias Name = String
+
+data Product =
+    | Solar
+    | Boiler
+
+type Solar
+
+type Boiler
+
+choice Gender =
+    | "Male"
+    | "Female"
+    | "Other"
+
+
+type Address = 
+    Street: String
+
+type Person =
+    Id: String
+    Foo: Maybe String
+    Number: String
+        & min 12
+        & max 15
+    Name: Name
+    BillingAddress: Address
+    Gender: Gender
+
+
