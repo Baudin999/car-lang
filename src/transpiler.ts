@@ -24,29 +24,46 @@ export const createAST = (source: string) => {
     //console.log(JSON.stringify(parser.errors, null, 4));
     parser.errors.forEach(error => {
       //console.log(error);
+      // It's either this or casting before each property call.
+      const anyErr = (error as any);
+
+      // If properties are empty, replace them with -1 to indicate an unknown value.
+      let shownError = {
+        message: "",
+        startLineNumber: anyErr.previousToken ? anyErr.previousToken.startLine : -1,
+        endLineNumber: anyErr.previousToken ? anyErr.previousToken.endLine : -1,
+        startColumn: anyErr.previousToken ? anyErr.previousToken.startColumn : -1,
+        endColumn: anyErr.previousToken ? anyErr.previousToken.endColumn : -1,
+        ruleStack: anyErr.context ? anyErr.context.ruleStack : "no context"
+      };
+
+      // Message is determined by the type of exception. 
+      let message = "Undetermined";
+
+      // In case a field has been declared without a type
       if (error.name === "MismatchedTokenException") {
-        let message = error.message;
+        message = error.message;
         if (error.message.indexOf("SIGN_TypeDefStart") > 0) {
-          message = `It seems like your field definition is incomplete. We would
-have expected something like: 
-
-${(error as any).previousToken.image}: String
-
-But we found an empty type.`;
+          message = `It seems like your field definition is incomplete. We would have expected something like: 
+            ${(error as any).previousToken.image}: String
+            But we found an empty type.`;
         }
-        errors.push({
-          message: message,
-          startLineNumber: (error as any).previousToken.startLine,
-          endLineNumber: (error as any).previousToken.endLine,
-          startColumn: (error as any).previousToken.startColumn,
-          endColumn: (error as any).previousToken.endColumn,
-          ruleStack: (error as any).context.ruleStack,
-          type: ErrorType.MismatchedTokenException
-        });
+        shownError.message = message;
+      } else if (error.name === "NoViableAltException") {
+        // In case of something like a malformed regex pattern.
+        const searchFor = 'but found:';
+        // Take the original error message and only show the unrecognised text.
+        const append = error.message.substr(error.message.indexOf(searchFor) + searchFor.length, error.message.length);
+        message = `Unexpected token(s) encountered: ${append}`;
       } else {
-        //console.log(parser.input);
-        console.log(error);
+        // Unknown error, so dump everything. Remove the console.error if you want a 'cleaner' console.
+        // This will add some 20 lines in the console.
+        console.error(error);
+        message = "Unknown transpilation error occurred, complete error dumped.";
       }
+      shownError.message = message;
+      // Add error to list that the module uses. Module will handle the rest.
+      errors.push(shownError);
     });
   }
 
@@ -67,17 +84,19 @@ export const resolveImports = (modules: IModule[]): IModule[] => {
             ...node.module_start
           });
         } else {
-          node.imports.forEach((id, index) => {
-            const ref = getNodeById(id, m.ast || []);
-            if (ref) {
-              module.ast.unshift(clone(ref, { imported: true }));
-            } else {
-              module.errors.push({
-                message: `Could not find type "${id}" in module ${node.module} to import.`,
-                ...node.imports_start[index]
-              });
-            }
-          });
+          if (node.imports) {
+            node.imports.forEach((id, index) => {
+              const ref = getNodeById(id, m.ast || []);
+              if (ref) {
+                module.ast.unshift(clone(ref, { imported: true }));
+              } else if (node.imports_start) {
+                module.errors.push({
+                  message: `Could not find type "${id}" in module ${node.module} to import.`,
+                  ...node.imports_start[index]
+                });
+              }
+            });
+          } else module.ast = [...m.ast, ...module.ast];
         }
       });
     return module;

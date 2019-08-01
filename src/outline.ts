@@ -122,13 +122,21 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
   }
 
   OPEN(ctx: any): IOpen {
-    return {
-      type: NodeType.OPEN,
-      module: ctx.Identifier.map(i => i.image).join("."),
-      module_start: getStartToken(ctx.Identifier[0]),
-      imports: this.visit(ctx.IMPORTING[0]),
-      imports_start: ctx.IMPORTING[0].children.Identifier.map(getStartToken)
-    };
+    if (ctx.IMPORTING) {
+      return {
+        type: NodeType.OPEN,
+        module: ctx.Identifier.map(i => i.image).join("."),
+        module_start: getStartToken(ctx.Identifier[0]),
+        imports: this.visit(ctx.IMPORTING[0]),
+        imports_start: ctx.IMPORTING[0].children.Identifier.map(getStartToken)
+      };
+    } else {
+      return {
+        type: NodeType.OPEN,
+        module: ctx.Identifier.map(i => i.image).join("."),
+        module_start: getStartToken(ctx.Identifier[0]),
+      };
+    }
   }
 
   IMPORTING(ctx: any): string[] {
@@ -537,12 +545,12 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
       value: ctx.NumberLiteral
         ? +ctx.NumberLiteral[0].image
         : ctx.StringLiteral
-        ? ctx.StringLiteral[0].image
-        : ctx.PatternLiteral
-        ? ctx.PatternLiteral[0].image
-        : ctx.BooleanLiteral
-        ? ctx.BooleanLiteral[0].image === "True"
-        : false
+          ? ctx.StringLiteral[0].image
+          : ctx.PatternLiteral
+            ? ctx.PatternLiteral[0].image
+            : ctx.BooleanLiteral
+              ? ctx.BooleanLiteral[0].image === "True"
+              : false
     };
   }
 
@@ -557,14 +565,14 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
     const depth = content.startsWith("#####")
       ? 5
       : content.startsWith("####")
-      ? 4
-      : content.startsWith("###")
-      ? 3
-      : content.startsWith("##")
-      ? 2
-      : content.startsWith("#")
-      ? 1
-      : 1;
+        ? 4
+        : content.startsWith("###")
+          ? 3
+          : content.startsWith("##")
+            ? 2
+            : content.startsWith("#")
+              ? 1
+              : 1;
     return {
       type: NodeType.MARKDOWN_CHAPTER,
       content: content.replace(/#+/, ""),
@@ -637,10 +645,10 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
     // Create the description annotation.
     const descriptionAnnotation = description
       ? {
-          type: NodeType.ANNOTATION,
-          key: "description",
-          value: description
-        }
+        type: NodeType.ANNOTATION,
+        key: "description",
+        value: description
+      }
       : null;
 
     // return the collection of annotations with the description annotation
@@ -656,10 +664,10 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
     const result = pattern.exec(ctx.image);
     return result
       ? {
-          type: NodeType.ANNOTATION,
-          key: result[3].trim().toLowerCase(),
-          value: result[5].trim()
-        }
+        type: NodeType.ANNOTATION,
+        key: result[3].trim().toLowerCase(),
+        value: result[5].trim()
+      }
       : null;
   }
 }
@@ -692,8 +700,8 @@ export interface IOpen {
   type: NodeType;
   module: string;
   module_start: ITokenStart;
-  imports: string[];
-  imports_start: ITokenStart[];
+  imports?: string[];
+  imports_start?: ITokenStart[];
 }
 
 export interface IType {
