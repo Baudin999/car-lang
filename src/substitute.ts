@@ -124,7 +124,7 @@ The type you're plucking from should be defined.
             return field;
           }
           let targetField = (targetNode.fields || []).find(f => f.id === fieldName);
-
+          // Check if the field is inherited from one of the parents
           if(!targetField && targetNode.extends.length > 0) {
             targetNode.extends.forEach(parent => {
               let node = getNodeById(ast, [], parent) as any;
