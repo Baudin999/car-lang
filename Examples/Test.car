@@ -28,3 +28,7 @@ type Person =
     Gender: Gender
 
 
+@api: test
+type Node = 
+    Id: String
+    Children: List Node

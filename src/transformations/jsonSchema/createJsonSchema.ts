@@ -55,23 +55,32 @@ export const createJsonSchema = (ast: IExpression[]): { name: string; schema: ob
     }
 
     if (node.type === NodeType.TYPE) {
-      let fields = {};
+      // If the type is already defined (forward declaration), do not attempt to do it again and return
+      if (definitions[typeName] === undefined) {
+        // Forward declaration with incomplete type
+        definitions[typeName] = {
+          $id: "#/" + typeName,
+          type: "object",
+        };
+        let fields = {};
 
-      // side effect!!
-      mapFields(node, fields, definitions);
-      let requiredFields = purge(
-        (node as IType).fields.map((f: any) => {
-          return f.ofType !== "Maybe" ? f.id : null;
-        })
-      );
+        // side effect!!
+        mapFields(node, fields, definitions);
+        let requiredFields = purge(
+          (node as IType).fields.map((f: any) => {
+            return f.ofType !== "Maybe" ? f.id : null;
+          })
+        );
 
-      definitions[typeName] = {
-        $id: "#/" + typeName,
-        type: "object",
-        properties: fields,
-        description: description ? description.value : "",
-        required: requiredFields
-      };
+        // Overwrite forward declaration with complete type
+        definitions[typeName] = {
+          $id: "#/" + typeName,
+          type: "object",
+          properties: fields,
+          description: description ? description.value : "",
+          required: requiredFields
+        };
+      }
       return definitions;
     }
 

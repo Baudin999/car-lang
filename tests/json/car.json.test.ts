@@ -39,7 +39,25 @@ alias CustomerNumber = String
 data Identifier =
     | KvK
     | CustomerNumber
+    | Id
 
+`;
+
+  it("Should not contain errors", async () => {
+    let { cst, ast, errors, tokens } = await fakeModule(source);
+    const schema = createJsonSchema(ast);
+    const xsd = createXSD(ast);
+    expect(errors.length).toEqual(0);
+  });
+});
+describe("We can create a recursive API", () => {
+  const source = `
+@ api: person
+type Person =
+    Id: String
+    FirstName: String
+    Friends: List Person
+    BestFriend: Person
 `;
 
   it("Should not contain errors", async () => {
