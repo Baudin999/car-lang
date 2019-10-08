@@ -1,14 +1,4 @@
 # Basic Types
 
-```
-type Person =
-    Name: String
-```
-
-```xml
-<root></root>
-```
-
-
-type Person =
+type Person
     Name: String

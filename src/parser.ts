@@ -95,7 +95,10 @@ class DomainParser extends Parser {
         SEP: tokenLookup.SIGN_dot,
         DEF: () => $.CONSUME(tokenLookup.Identifier)
       });
-      $.SUBRULE($.IMPORTING);
+      // Importing will limit imports, using nothing will import everything in the opened module.
+      $.OPTION(() => {
+        $.SUBRULE($.IMPORTING);
+      });
     });
 
     $.RULE("IMPORTING", () => {
@@ -475,7 +478,7 @@ class DomainParser extends Parser {
             $.AT_LEAST_ONE1(() => {
               $.CONSUME(tokenLookup.Identifier);
             });
-          }
+          } 
         },
         {
           ALT: () => $.CONSUME(tokenLookup.FieldName)

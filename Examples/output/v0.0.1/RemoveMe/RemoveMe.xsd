@@ -10,6 +10,10 @@
     <xsd:annotation></xsd:annotation>
     <xsd:all></xsd:all>
   </xsd:complexType>
+  <xsd:complexType name="Person">
+    <xsd:annotation></xsd:annotation>
+    <xsd:all></xsd:all>
+  </xsd:complexType>
 </xsd:schema>
   
   

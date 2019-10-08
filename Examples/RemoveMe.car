@@ -1,0 +1,5 @@
+open Tutorial.BasicTypes
+
+type RemoveMe
+    Name: String
+    Test: Number
