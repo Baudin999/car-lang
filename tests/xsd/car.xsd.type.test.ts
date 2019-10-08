@@ -61,8 +61,8 @@ describe("Test Restrictions", () => {
     
 type Person =
     Age: Number
-        | min 0
-        | max 130
+        & min 0
+        & max 130
     
     `;
 
@@ -84,9 +84,9 @@ describe("Test Patterns", () => {
       
 type Person =
     Name: String
-        | min 1
-        | max 31
-        | pattern /[A-Z][a-z]{30}/
+        & min 1
+        & max 31
+        & pattern /[A-Z][a-z]{30}/
     
       `;
 
@@ -107,9 +107,9 @@ describe("Test the ALIAS", () => {
   const source = `
 
 alias Name = String
-    | min 1
-    | max 31
-    | pattern /[A-Z][a-z]{30}/
+    & min 1
+    & max 31
+    & pattern /[A-Z][a-z]{30}/
 
     
 type Person =
@@ -134,9 +134,9 @@ describe("Test Plucking", () => {
   const source = `
   
 alias Name = String
-    | min 1
-    | max 31
-    | pattern /[A-Z][a-z]{30}/
+    & min 1
+    & max 31
+    & pattern /[A-Z][a-z]{30}/
 
 type Address =
     Street: String
