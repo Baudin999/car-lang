@@ -43,11 +43,14 @@ type Person =
   it("We should be able to tokenize", async () => {
     let { cst, ast, errors } = await fakeModule(source);
     expect(ast).toBeDefined();
+    expect(errors.length).toEqual(0);
   });
 });
 
 describe("An alias type", () => {
   const source = `
+type Something =
+      Name: String
 
 alias Foo = Something String
 
@@ -56,7 +59,7 @@ alias Foo = Something String
   it("We should be able to tokenize", async () => {
     let { cst, ast, errors } = await fakeModule(source);
     expect(ast).toBeDefined();
-    expect(errors.length).toEqual(1);
+    expect(errors.length).toEqual(0);
   });
 });
 
@@ -71,6 +74,7 @@ choice Food =
   it("We should be able to tokenize", async () => {
     let { cst, ast, errors } = await fakeModule(source);
     expect(ast).toBeDefined();
+    expect(errors.length).toEqual(0);
   });
 });
 
@@ -85,6 +89,7 @@ data Maybe a =
   it("We should be able to tokenize", async () => {
     let { cst, ast, errors } = await fakeModule(source);
     expect(ast).toBeDefined();
+    expect(errors.length).toEqual(0);
   });
 });
 
@@ -114,6 +119,7 @@ type Success a b =
   it("We should be able to tokenize", async () => {
     let { cst, ast, errors } = await fakeModule(source);
     expect(ast).toBeDefined();
+    expect(errors.length).toEqual(0);
   });
 });
 
@@ -133,6 +139,7 @@ type Foo
   it("We should be able to tokenize", async () => {
     let { cst, ast, errors } = await fakeModule(source);
     expect(ast).toBeDefined();
+    expect(errors.length).toEqual(0);
   });
 });
 
@@ -171,6 +178,8 @@ fun sum a b => a + b
   it("We should be able to tokenize", async () => {
     let { cst, ast, errors } = await fakeModule(source);
     expect(ast).toBeDefined();
+    console.error(errors);
+    expect(errors.length).toEqual(0);
   });
 });
 
@@ -178,7 +187,7 @@ describe("Mimic the file system", () => {
   const source = `
 
 alias Author = String
-    | pattern /[A-Z][a-z]* [[A-Z][a-z]*]/
+    & pattern /[A-Z][a-z]* [[A-Z][a-z]*]/
 
 type FileInfo =
     Size: Number
@@ -198,6 +207,7 @@ data FileSystemInfo =
   it("We should be able to tokenize", async () => {
     let { cst, ast, errors } = await fakeModule(source);
     expect(ast).toBeDefined();
+    expect(errors.length).toEqual(0);
   });
 });
 
@@ -244,5 +254,6 @@ type Person extends MyEntity =
   it("We should be able to tokenize", async () => {
     let { cst, ast, errors } = await fakeModule(source);
     expect(ast).toBeDefined();
+    expect(errors.length).toEqual(0);
   });
 });
