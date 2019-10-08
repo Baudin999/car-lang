@@ -128,7 +128,7 @@ The type you're plucking from should be defined.
           if(!targetField && targetNode.extends.length > 0) {
             targetNode.extends.forEach(parent => {
               let node = getNodeById(ast, [], parent) as any;
-              targetField = node.fields.find(f => f.id == fieldName);
+              targetField = node.fields.find(f => f.id == fieldName) || targetField;
             });
           }
           if (!targetField) {

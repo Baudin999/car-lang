@@ -82,10 +82,13 @@ type APIPerson =
 describe("Pluck a type from a parent type", () => {
   const source = `
 
+type Entity =
+    Id: Number
+
 type Person =
     FirstName: String
 
-type APIPerson extends Person
+type APIPerson extends Person, Entity
 
 type BackendPerson =
     pluck APIPerson.FirstName
