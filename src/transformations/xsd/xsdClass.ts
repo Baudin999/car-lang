@@ -36,7 +36,7 @@ else if (xsdType.startsWith("xsd:")) {
               // This is a Maybe of a base type like String or Number...
               return createBaseTypedElement(field, false);
             } else {
-              console.log(JSON.stringify(field, null, 4));
+              // console.log(JSON.stringify(field, null, 4));
               // maybe type of an alias or another reference...
               let name = field.ofType_params[0];
               return `<xsd:element name="${name}" type="self:${name}" minOccurs="0" maxOccurs="1" />`;

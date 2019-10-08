@@ -14,8 +14,8 @@ export const initProject = (projectPath: string, config: any) => {
       }
     })
     .catch(e => {
-      console.log("Failed to initialize the project");
-      console.log(e);
+      console.error("Failed to initialize the project");
+      console.error(e);
       process.exit(1);
     });
 };

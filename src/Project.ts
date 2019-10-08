@@ -196,7 +196,7 @@ export class Project {
     try {
       return new Module(this.projectDirectory, this.config).init(name);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       throw new Error("Could not find module");
     }
   }
@@ -212,7 +212,7 @@ export class Project {
       );
       return modules;
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return [];
     }
   }

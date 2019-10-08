@@ -210,9 +210,9 @@ function generateHashAndFetchUrl(plantSource: string, svgs: any, modulePath: str
       const filePathSVG = join(modulePath, hash + ".svg");
       outputFile(filePathSVG, img);
     });
-    console.log("Hash doesn't exits: " + hash);
+    console.error("Hash doesn't exist: " + hash);
   } else {
-    //
+    //TODO
   }
   return `<div class="image-container"><img src="./${hash}.svg" /></div>`;
 }

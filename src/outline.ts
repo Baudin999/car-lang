@@ -110,7 +110,7 @@ export class OutlineVisitor extends BaseCstVisitorWithDefaults {
       // do nothing, already parsed at the top...
       return null;
     } else {
-      console.log(ctx);
+      // console.log(ctx);
       return null;
     }
 

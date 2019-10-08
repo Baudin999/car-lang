@@ -56,7 +56,7 @@ program
       let result = await new Project(fullPath).verify();
       console.log(`Project at ${fullPath} has successfully been verified.`);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   });
 
@@ -71,7 +71,7 @@ program
       let result = await new Project(fullPath).clean();
       console.log(`Project at ${result.versionPath} has successfully cleaned.`);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   });
 
@@ -104,7 +104,7 @@ program
       let fullPath = resolve(path);
       let project = await new Project(fullPath, path, useRelativePaths).compile();
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   });
 
@@ -120,7 +120,7 @@ program
       let project = await new Project(fullPath).verify();
       project.watch();
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   });
 
@@ -145,7 +145,7 @@ program
         opn(fileName);
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   });
 
