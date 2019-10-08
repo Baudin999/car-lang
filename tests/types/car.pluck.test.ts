@@ -78,3 +78,21 @@ type APIPerson =
     expect(errors[0].type === ErrorType.PluckedFieldUnknown);
   });
 });
+
+describe("Pluck a type from a parent type", () => {
+  const source = `
+
+type Person =
+    FirstName: String
+
+type APIPerson extends Person
+
+type BackendPerson =
+    pluck APIPerson.FirstName
+
+`;
+  it("Should have the type inherited from the parent", async () => {
+    let { cst, ast, errors, tokens } = await fakeModule(source);
+    expect(errors.length).toEqual(0);
+  });
+});
