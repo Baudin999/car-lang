@@ -6,9 +6,7 @@ export const createIndexPage = (modules: IModule[], isRelease: boolean, useRelat
       if(useRelativePaths) {
         return `<li><a href="${m.name + `/` +m.name}.html">${m.name}</a></li>`;
       } else {
-      return isRelease
-        ? `<li><a href="/public/${m.name}.html">${m.name}</a></li>`
-        : `<li><a href="${m.htmlPath.replace(m.projectDirectory, "")}">${m.name}</a></li>`;
+      return `<li><a href="/public/${m.name}.html">${m.name}</a></li>`
       }
     })
     .join("\n");
