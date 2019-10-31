@@ -74,7 +74,7 @@ export class Module implements IModule {
     this.outPath = join(this.path, ("v" + this.config.version).replace(/^vv/, "v"), this.name);
     this.htmlPath = join(this.outPath, this.name + ".html");
 
-    console.log(this.outPath);
+    // console.log(this.outPath);
     try {
       this.svgs = await readFileAsync(join(this.outPath, "svgs.json"), true);
     } catch {
@@ -132,7 +132,7 @@ export class Module implements IModule {
     try {
       result = createAST(this.source);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
 
     this.hash = newHash;
@@ -155,8 +155,8 @@ export class Module implements IModule {
 
     // now output the found errors
     if (this.errors && this.errors.length > 0) {
-      console.log(chalk.red(`\nWe've found some errors in module "${this.name}"`));
-      console.log(cliErrorMessageForModule(this));
+      console.error(chalk.red(`\nWe've found some errors in module "${this.name}"`));
+      console.error(cliErrorMessageForModule(this));
     } else {
       console.log(`Perfectly parsed module ${this.name}`);
     }
