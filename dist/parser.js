@@ -37,7 +37,10 @@ class DomainParser extends chevrotain_1.Parser {
                 SEP: lexer_1.tokenLookup.SIGN_dot,
                 DEF: () => $.CONSUME(lexer_1.tokenLookup.Identifier)
             });
-            $.SUBRULE($.IMPORTING);
+            // Importing will limit imports, using nothing will import everything in the opened module.
+            $.OPTION(() => {
+                $.SUBRULE($.IMPORTING);
+            });
         });
         $.RULE("IMPORTING", () => {
             $.CONSUME(lexer_1.tokenLookup.KW_importing);

@@ -91,13 +91,22 @@ class OutlineVisitor extends BaseCstVisitorWithDefaults {
         return result;
     }
     OPEN(ctx) {
-        return {
-            type: NodeType.OPEN,
-            module: ctx.Identifier.map(i => i.image).join("."),
-            module_start: helpers_1.getStartToken(ctx.Identifier[0]),
-            imports: this.visit(ctx.IMPORTING[0]),
-            imports_start: ctx.IMPORTING[0].children.Identifier.map(helpers_1.getStartToken)
-        };
+        if (ctx.IMPORTING) {
+            return {
+                type: NodeType.OPEN,
+                module: ctx.Identifier.map(i => i.image).join("."),
+                module_start: helpers_1.getStartToken(ctx.Identifier[0]),
+                imports: this.visit(ctx.IMPORTING[0]),
+                imports_start: ctx.IMPORTING[0].children.Identifier.map(helpers_1.getStartToken)
+            };
+        }
+        else {
+            return {
+                type: NodeType.OPEN,
+                module: ctx.Identifier.map(i => i.image).join("."),
+                module_start: helpers_1.getStartToken(ctx.Identifier[0]),
+            };
+        }
     }
     IMPORTING(ctx) {
         return ctx.Identifier.map(i => i.image);

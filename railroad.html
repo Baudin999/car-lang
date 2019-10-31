@@ -233,7 +233,7 @@
   {
     "type": "Rule",
     "name": "OPEN",
-    "orgText": "() => {\n            $.CONSUME(lexer_1.tokenLookup.KW_open);\n            $.AT_LEAST_ONE_SEP({\n                SEP: lexer_1.tokenLookup.SIGN_dot,\n                DEF: () => $.CONSUME(lexer_1.tokenLookup.Identifier)\n            });\n            $.SUBRULE($.IMPORTING);\n        }",
+    "orgText": "() => {\n            $.CONSUME(lexer_1.tokenLookup.KW_open);\n            $.AT_LEAST_ONE_SEP({\n                SEP: lexer_1.tokenLookup.SIGN_dot,\n                DEF: () => $.CONSUME(lexer_1.tokenLookup.Identifier)\n            });\n            // Importing will limit imports, using nothing will import everything in the opened module.\n            $.OPTION(() => {\n                $.SUBRULE($.IMPORTING);\n            });\n        }",
     "definition": [
       {
         "type": "Terminal",
@@ -263,9 +263,15 @@
         ]
       },
       {
-        "type": "NonTerminal",
-        "name": "IMPORTING",
-        "idx": 0
+        "type": "Option",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "IMPORTING",
+            "idx": 0
+          }
+        ]
       }
     ]
   },

@@ -77,8 +77,8 @@ export interface IOpen {
     type: NodeType;
     module: string;
     module_start: ITokenStart;
-    imports: string[];
-    imports_start: ITokenStart[];
+    imports?: string[];
+    imports_start?: ITokenStart[];
 }
 export interface IType {
     type: NodeType;

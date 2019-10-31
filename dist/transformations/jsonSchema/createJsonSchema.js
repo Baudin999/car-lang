@@ -49,19 +49,28 @@ exports.createJsonSchema = (ast) => {
             return definitions;
         }
         if (node.type === outline_1.NodeType.TYPE) {
-            let fields = {};
-            // side effect!!
-            mapFields(node, fields, definitions);
-            let requiredFields = helpers_1.purge(node.fields.map((f) => {
-                return f.ofType !== "Maybe" ? f.id : null;
-            }));
-            definitions[typeName] = {
-                $id: "#/" + typeName,
-                type: "object",
-                properties: fields,
-                description: description ? description.value : "",
-                required: requiredFields
-            };
+            // If the type is already defined (forward declaration), do not attempt to do it again and return
+            if (definitions[typeName] === undefined) {
+                // Forward declaration with incomplete type
+                definitions[typeName] = {
+                    $id: "#/" + typeName,
+                    type: "object",
+                };
+                let fields = {};
+                // side effect!!
+                mapFields(node, fields, definitions);
+                let requiredFields = helpers_1.purge(node.fields.map((f) => {
+                    return f.ofType !== "Maybe" ? f.id : null;
+                }));
+                // Overwrite forward declaration with complete type
+                definitions[typeName] = {
+                    $id: "#/" + typeName,
+                    type: "object",
+                    properties: fields,
+                    description: description ? description.value : "",
+                    required: requiredFields
+                };
+            }
             return definitions;
         }
         return definitions;
