@@ -2,7 +2,7 @@ import { createToken, Lexer } from "chevrotain";
 
 export const EndBlock = createToken({
   name: "EndBlock",
-  pattern: /\r?\n(\s*\n)+(?!\s)/,
+  pattern: /\r?\n(\s*\r?\n)+(?!\s)/,
   push_mode: "root"
 });
 
@@ -261,11 +261,11 @@ const BooleanLiteral = createToken({
 });
 const DirectiveLiteral = createToken({
   name: "DirectiveLiteral",
-  pattern: /[ \n\t]*%.*\n/
+  pattern: /[ \r\n\t]*%.*\n/
 });
 const PragmaLiteral = createToken({
   name: "PragmaLiteral",
-  pattern: /[ \n\t]*#.*\n/
+  pattern: /[ \r\n\t]*#.*\n/
 });
 const AnnotationLiteral = createToken({
   name: "AnnotationLiteral",

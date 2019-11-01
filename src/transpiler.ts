@@ -6,6 +6,7 @@ import { IModule } from "./helpers";
 import { clone } from "./helpers";
 
 export const createAST = (source: string) => {
+  source = source.replace(/\r\n/, "\n");
   if (!source || source.length === 0) {
     return {
       ast: {},
