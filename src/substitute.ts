@@ -113,6 +113,7 @@ export const substitutePluckedFields = (
           if (field.type !== NodeType.PLUCKED_FIELD) return field;
           let [ofType, fieldName] = field.parts;
           let targetNode = getNodeById(ast, [], ofType) as any;
+
           if (!targetNode) {
             errors.push({
               message: `Could not find the type "${ofType}" to pluck from.
@@ -188,9 +189,7 @@ type Temp =
           let targetNode = getNodeById(ast, [], field.ofType) as IType;
           if (!targetNode) {
             errors.push({
-              message: `Type ${field.ofType} cannot be found to grab the field ${
-                field.field
-              } from.`,
+              message: `Type ${field.ofType} cannot be found to grab the field ${field.field} from.`,
               ...field.ofType_start
             });
             return field;
@@ -239,7 +238,8 @@ export const substituteExtensions = (
     if (node.type !== NodeType.TYPE) return node;
     else {
       let newNode = node as IType;
-      newNode.extends.forEach((e, i) => {
+      for (var i = 0; i < newNode.extends.length; ++i) {
+        let e = newNode.extends[i];
         let extension = getNodeById(ast, [], e) as IExpression;
         if (!extension) {
           errors.push({
@@ -265,7 +265,7 @@ export const substituteExtensions = (
               }
             });
         }
-      });
+      }
       return newNode;
     }
   });

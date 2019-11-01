@@ -153,18 +153,6 @@ describe("markdown should be possible", () => {
 And a simple Paragraph!! With
 a couple of lines.
 
-\`\`\`js
-
-function foo() {
-  return 12;
-}
-\`\`\`
-
-\`\`\`
-fun sum a b => a + b
-\`\`\`
-
-
  * Something
  * Or Other
     * Child List Item
@@ -178,7 +166,6 @@ fun sum a b => a + b
   it("We should be able to tokenize", async () => {
     let { cst, ast, errors } = await fakeModule(source);
     expect(ast).toBeDefined();
-    console.error(errors);
     expect(errors.length).toEqual(0);
   });
 });
@@ -223,8 +210,10 @@ data Maybe a =
     | Just a
     | Nothing
 
-type Entity =
+type Identity =
     Id: String
+
+type Entity extends Identity
 
 alias MyEntity = Entity
 

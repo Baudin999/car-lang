@@ -46,3 +46,25 @@ type Foo extends Person Customer
     next();
   });
 });
+
+describe("Pluck a type from a parent type", () => {
+  const source = `
+
+type Entity =
+    Id: Number
+
+type Person =
+    FirstName: String
+
+type APIPerson extends Person, Entity
+
+type BackendPerson =
+    pluck APIPerson.FirstName
+
+`;
+  it("Should have the type inherited from the parent", async () => {
+    let { ast, errors } = await fakeModule(source);
+
+    expect(errors.length).toEqual(0);
+  });
+});

@@ -145,9 +145,10 @@ export class Module implements IModule {
   }
 
   typeCheck(): IModule {
-    let r0 = substitutePluckedFields(this.ast);
-    let r1 = substituteAliases(r0.ast);
-    let r2 = substituteExtensions(r1.ast);
+    let r0 = substituteAliases(this.ast);
+    let r1 = substituteExtensions(r0.ast);
+    let r2 = substitutePluckedFields(r1.ast);
+
     let errors = typeChecker(r2.ast);
 
     this.ast = r2.ast;
