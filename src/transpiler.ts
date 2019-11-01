@@ -25,7 +25,7 @@ export const createAST = (source: string) => {
     parser.errors.forEach(error => {
       //console.log(error);
       // It's either this or casting before each property call.
-      const anyErr = (error as any);
+      const anyErr = error as any;
 
       // If properties are empty, replace them with -1 to indicate an unknown value.
       let shownError = {
@@ -37,7 +37,7 @@ export const createAST = (source: string) => {
         ruleStack: anyErr.context ? anyErr.context.ruleStack : "no context"
       };
 
-      // Message is determined by the type of exception. 
+      // Message is determined by the type of exception.
       let message = "Undetermined";
 
       // In case a field has been declared without a type
@@ -51,9 +51,12 @@ export const createAST = (source: string) => {
         shownError.message = message;
       } else if (error.name === "NoViableAltException") {
         // In case of something like a malformed regex pattern.
-        const searchFor = 'but found:';
+        const searchFor = "but found:";
         // Take the original error message and only show the unrecognised text.
-        const append = error.message.substr(error.message.indexOf(searchFor) + searchFor.length, error.message.length);
+        const append = error.message.substr(
+          error.message.indexOf(searchFor) + searchFor.length,
+          error.message.length
+        );
         message = `Unexpected token(s) encountered: ${append}`;
       } else {
         // Unknown error, so dump everything. Remove the console.error if you want a 'cleaner' console.
