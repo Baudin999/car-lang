@@ -1,6 +1,6 @@
 {
   "name": "car-lang",
-  "version": "v1.0.1",
+  "version": "v1.0.2",
   "description": "The language to rule dragons",
   "main": "dist/ckc.js",
   "repository": "https://github.com/Baudin999/car-lang.git",
@@ -35,6 +35,7 @@
     "file-watch-iterator": "^0.6.3",
     "fs-extra": "^7.0.1",
     "jest": "^24.3.1",
+    "lodash": "^4.17.11",
     "no-case": "^2.3.2",
     "node-fetch": "^2.3.0",
     "open": "^6.0.0",

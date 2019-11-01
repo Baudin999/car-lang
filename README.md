@@ -4,9 +4,9 @@
 
 # Downloads
 
-- [osx](https://github.com/Baudin999/car-lang/releases/download/v1.0.1/ckc)
-- [Windows](https://github.com/Baudin999/car-lang/releases/download/v1.0.1/ckc.exe)
-- [Linux](https://github.com/Baudin999/car-lang/releases/download/v1.0.1/ckcl)
+- [osx](https://github.com/Baudin999/car-lang/releases/download/v1.0.2/ckc)
+- [Windows](https://github.com/Baudin999/car-lang/releases/download/v1.0.2/ckc.exe)
+- [Linux](https://github.com/Baudin999/car-lang/releases/download/v1.0.2/ckcl)
 
 # ZDragon
 
