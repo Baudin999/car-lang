@@ -21,9 +21,9 @@ export const fakeConfig: IConfiguration = {
 export const fakeModule = async (source: string): Promise<IModule> => {
   let module = await new Module("", fakeConfig).update(source);
   module = await module.parse();
-  let r0 = substitutePluckedFields(module.ast);
-  let r1 = substituteAliases(r0.ast);
-  let r2 = substituteExtensions(r1.ast);
+  let r0 = substituteAliases(module.ast);
+  let r1 = substituteExtensions(r0.ast);
+  let r2 = substitutePluckedFields(r1.ast);
   let errors = typeChecker(r2.ast);
 
   module.ast = r2.ast;
