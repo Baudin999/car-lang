@@ -1,3 +1,5 @@
+# Current version: 1.0.1
+
 [read the docs](zdragon.nl)
 
 # Downloads
