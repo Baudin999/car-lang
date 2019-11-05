@@ -1,11 +1,12 @@
 #!/bin/bash
-yarn nvm use
-yarn ci:build
-
-# OLDVERSION=$(cat package.json \
-#   | grep version \
-#   | head -1 \
-#   | awk -F: '{ print $2 }' \
-#   | sed 's/[",]//g')
-# NEWVERSION=$(npm version $0)
-# sed -i -e 's/'+$OLDVERSION+'/'+$NEWVERSION+'/g' README.md
+# Find a way to run nvm in bash
+# nvm use
+# yarn ci:build
+NEWTAG=$1
+PREVIOUSTAG=$(git describe --abbrev=0 --tags)
+FILES=("README.md" "package.json")
+for FILE in "${FILES[@]}"
+do
+    sed -i '' -e "s/$PREVIOUSTAG/$NEWTAG/g" $FILE
+    echo "Updated version in $FILE from $PREVIOUSTAG to $NEWTAG" 
+done

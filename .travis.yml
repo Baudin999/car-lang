@@ -4,8 +4,8 @@ before_script:
 script:
   - jest --all
 before_deploy:
-  - bash ./release.sh
   - NAME=$(git describe --tag --abbrev=0)
+  - bash ./release.sh $NAME
 deploy:
     provider: releases
     api_key: $TOKEN #TODO
@@ -14,6 +14,6 @@ deploy:
     name: $NAME
     on:
         tags: true
-        #branch: master
+        #branch: master # add before merging
     file_glob: true
     file: lib/*
