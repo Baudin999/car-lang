@@ -1,0 +1,19 @@
+language: nodejs
+before_script:
+  - npm run build
+script:
+  - jest --all
+before_deploy:
+  - bash ./release.sh
+  - NAME=$(git describe --tag --abbrev=0)
+deploy:
+    provider: releases
+    api_key: $TOKEN #TODO
+    draft: true
+    skip_cleanup: true
+    name: $NAME
+    on:
+        tags: true
+        #branch: master
+    file_glob: true
+    file: lib/*
