@@ -2,17 +2,11 @@
 
 This document will describe how to get started with ZDragon
 
-## Download the Compiler
+## Download the Compiler - Current version: v.1.0.2
 
-- [osx](https://github.com/Baudin999/car-lang/releases/download/v0.1.1-beta/ckc)
-- [Windows](https://github.com/Baudin999/car-lang/releases/download/v0.1.1-beta/ckc.exe)
-- [Linux](https://github.com/Baudin999/car-lang/releases/download/v0.1.1-beta/ckc-linux)
-
-Pre-Release (v0.2.1-beta):
-
-- [osx](https://github.com/Baudin999/car-lang/releases/download/v0.2.3-beta/ckc)
-- [Windows](https://github.com/Baudin999/car-lang/releases/download/v0.2.3-beta/ckc.exe)
-- [Linux](https://github.com/Baudin999/car-lang/releases/download/v0.2.3-beta/ckcl)
+- [osx](https://github.com/Baudin999/car-lang/releases/download/v1.0.2/ckc)
+- [Windows](https://github.com/Baudin999/car-lang/releases/download/v1.0.2/ckc.exe)
+- [Linux](https://github.com/Baudin999/car-lang/releases/download/v1.0.2/ckcl)
 
 After downloading the compiler you can use it directly or you set the executable in your PATH
 variable. I personally use a mac and I put the `ckc` tool in my `/usr/local/bin` because this is the
